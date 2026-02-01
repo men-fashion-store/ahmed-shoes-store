@@ -228,25 +228,52 @@
     }
 
     let lastOrderCount = 0;
+    function notifyNewOrder() {
+        playNewOrderSound();
+        toast('🛒 طلب جديد وصل!', 'success');
+        if(document.hidden) showBrowserNotification();
+        document.title = '🔔 طلب جديد! - أحمد الشيخ';
+        setTimeout(() => { document.title = 'لوحة التحكم - أحمد الشيخ'; }, 3000);
+        const tabOrders = document.getElementById('tab-orders');
+        if(tabOrders && !tabOrders.classList.contains('active')) {
+            tabOrders.innerHTML = '🛒 الطلبات الواردة <span class="animate-pulse text-red-500">●</span>';
+            setTimeout(() => { tabOrders.innerHTML = '🛒 الطلبات الواردة'; }, 5000);
+        }
+    }
     function playNewOrderSound() {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.frequency.value = 800;
-            gain.gain.setValueAtTime(0.3, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.3);
+            const playBeep = (freq, start, dur) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0, ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
+                osc.start(ctx.currentTime + start);
+                osc.stop(ctx.currentTime + start + dur);
+            };
+            playBeep(880, 0, 0.15);
+            playBeep(880, 0.2, 0.15);
+            playBeep(1100, 0.4, 0.25);
         } catch(e){}
+    }
+    function showBrowserNotification() {
+        if(!('Notification' in window)) return;
+        if(Notification.permission === 'granted') {
+            new Notification('🛒 طلب جديد - أحمد الشيخ', { body: 'وصلك طلب جديد! افتح لوحة التحكم', icon: 'احمد الشيخ (3).png' });
+        } else if(Notification.permission !== 'denied') {
+            Notification.requestPermission();
+        }
     }
 
     window.login = function() {
         if(document.getElementById('admin-pass').value === 'AM') {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
+            if('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
             loadProducts();
             loadOrders();
         } else toast('كلمة مرور خاطئة', 'error');
@@ -427,8 +454,9 @@
     document.getElementById('product-search')?.addEventListener('input', filterAndRenderProducts);
     document.getElementById('product-cat-filter')?.addEventListener('change', filterAndRenderProducts);
 
-    window.confirmDelProd = function(id, name) {
-        window.pendingDel = {type:'prod', id};
+    window.confirmDelProd = function(id) {
+        const p = window.allProducts?.find(x=>x.doc.id===id)?.p;
+        const name = p?.name || 'هذا المنتج';
         document.getElementById('confirm-msg').textContent = `حذف المنتج "${name}" نهائياً من السيرفر؟`;
         document.getElementById('confirm-ok-btn').onclick = async () => {
             await deleteDoc(doc(db, "products", id));
@@ -577,7 +605,7 @@
             const todayStart = new Date(); todayStart.setHours(0,0,0,0);
             const todayCount = snapshot.docs.filter(d=> d.data().timestamp >= todayStart.getTime()).length;
             document.getElementById('stat-today').textContent = todayCount;
-            if(snapshot.size > lastOrderCount && lastOrderCount > 0) playNewOrderSound();
+            if(snapshot.size > lastOrderCount && lastOrderCount > 0) notifyNewOrder();
             lastOrderCount = snapshot.size;
             filterAndRenderOrders();
         });

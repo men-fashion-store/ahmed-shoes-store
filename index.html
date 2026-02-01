@@ -175,14 +175,12 @@
          </div>
        </div>
        <div class="p-4 border-t border-gray-100 space-y-3">
+         <p class="text-xs text-gray-500 text-center mb-2">عدّل كمياتك أو احذف منتجات كما تشاء قبل التأكيد</p>
          <div class="p-4 bg-brand/10 border-2 border-brand/30 rounded-xl">
            <p class="text-sm font-bold text-gray-600 mb-1">المبلغ الإجمالي للدفع</p>
            <p id="cart-total" class="text-2xl font-black text-brand">0 ج.م</p>
          </div>
-         <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl">
-           <input id="coupon-input" placeholder="🎟 كود الخصم" oninput="applyCoupon()" class="w-full p-2 rounded-lg border border-amber-200 text-sm">
-           <p id="coupon-msg" class="text-xs mt-1 text-green-600 font-bold hidden"></p>
-         </div>
+         <button onclick="closeCart()" class="w-full py-2 rounded-xl border-2 border-brand/50 text-brand font-bold text-sm hover:bg-brand/10 transition">🛍 استمر بالتسوق لإضافة المزيد</button>
          <div class="p-4 bg-gray-50 rounded-xl space-y-3">
            <p class="text-sm font-bold text-gray-600">بيانات التوصيل</p>
            <input id="c-name" placeholder="الاسم ثلاثي" class="w-full bg-white border border-gray-200 p-3 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-brand transition">
@@ -237,8 +235,6 @@
     window.currentSize = null;
     window.currentColor = null;
     try { window.cart = JSON.parse(localStorage.getItem('cart')||'[]'); } catch(e) { window.cart = []; }
-    window.appliedCoupon = null;
-    const DISCOUNT_CODES = { 'SALE10': 10, 'AHMED20': 20 };
 
     function toast(msg, type='success') {
         const c = document.getElementById('toast-container');
@@ -310,22 +306,11 @@
 
     window.updateCartQty = function(idx, delta) {
         const item = window.cart[idx];
-        item.qty = Math.max(1, (item.qty||1) + delta);
-        if(item.qty < 1) { window.cart.splice(idx,1); }
+        item.qty = (item.qty||1) + delta;
+        if(item.qty < 1) { window.cart.splice(idx, 1); }
         renderCart();
         updateCartBadge();
         saveCart();
-    }
-
-    window.applyCoupon = function() {
-        if(!document.getElementById('coupon-input')) return;
-        const code = document.getElementById('coupon-input').value?.trim().toUpperCase();
-        const msg = document.getElementById('coupon-msg');
-        if(!code) { window.appliedCoupon = null; msg.classList.add('hidden'); renderCart(); return; }
-        const discount = DISCOUNT_CODES[code];
-        if(discount) { window.appliedCoupon = discount; msg.textContent = `خصم ${discount}% مطبق!`; msg.classList.remove('hidden'); }
-        else { window.appliedCoupon = null; msg.textContent = 'كود غير صالح'; msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2000); }
-        renderCart();
     }
 
     window.removeFromCart = function(idx) {
@@ -347,8 +332,7 @@
             return;
         }
         empty.classList.add('hidden');
-        let total = window.cart.reduce((s, i) => s + (i.price * (i.qty||1)), 0);
-        if(window.appliedCoupon) total = Math.round(total * (100 - window.appliedCoupon) / 100);
+        const total = window.cart.reduce((s, i) => s + (i.price * (i.qty||1)), 0);
         const totalStr = total + ' ج.م';
         document.getElementById('cart-total').innerText = totalStr;
         document.getElementById('cart-total-confirm').innerText = totalStr;
@@ -417,8 +401,6 @@
             document.getElementById('order-success-modal').classList.remove('hidden');
             toast('تم استلام طلبك! تم فتح واتساب');
             window.cart = [];
-            window.appliedCoupon = null;
-            document.getElementById('coupon-input').value = '';
             updateCartBadge();
             saveCart();
         } catch (e) {
