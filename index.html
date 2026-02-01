@@ -14,15 +14,15 @@
         extend: { 
           colors: { 
             brand: { 
-              light: '#C5D8A4', // زيتي فاتح جداً للنصوص
-              DEFAULT: '#8C9E5E', // زيتي متوسط للأيقونات
-              glow: '#708238', // زيتي متوهج
-              dark: '#1a1f16'   // خلفية داكنة جداً مائلة للزيتي
+              light: '#f1f8e9', // خلفيات فاتحة جداً
+              DEFAULT: '#556b2f', // زيتي (Olive Green)
+              dark: '#33401c',   // زيتي غامق للنصوص
+              accent: '#8C9E5E'  // زيتي متوسط
             } 
           },
           boxShadow: {
-            'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-            'glow': '0 0 15px rgba(140, 158, 94, 0.3)'
+            'glass-light': '0 8px 32px 0 rgba(31, 38, 135, 0.1)',
+            'glass-hover': '0 8px 32px 0 rgba(85, 107, 47, 0.25)'
           }
         } 
       } 
@@ -30,171 +30,175 @@
   </script>
   
   <style>
-    body { font-family: 'Cairo', sans-serif; background-color: #0f0f0f; color: #e2e8f0; }
+    body { font-family: 'Cairo', sans-serif; background-color: #f9fafb; color: #1a1a1a; }
     
-    /* الخلفية الأساسية مع اللوجو */
+    /* الخلفية البيضاء مع اللوجو الشفاف (Watermark) */
     .brand-bg {
-      background-color: #050505;
+      background-color: #ffffff;
       background-image: 
-        linear-gradient(to bottom, rgba(5, 5, 5, 0.85), rgba(5, 5, 5, 0.95)),
+        linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.96)),
         url('احمد الشيخ (3).png');
-      background-size: cover; 
+      background-size: 500px; /* حجم اللوجو في الخلفية */
       background-position: center; 
       background-attachment: fixed; 
-      background-repeat: no-repeat;
+      background-repeat: repeat; /* تكرار اللوجو كخلفية */
     }
 
-    /* تأثير الزجاج الشفاف (Glassmorphism) */
+    /* الزجاج الشفاف (Light Glass) */
     .glass-panel {
-      background: rgba(30, 35, 30, 0.4); /* شفافية مائلة للزيتي */
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(140, 158, 94, 0.15); /* حدود زيتية خفيفة */
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
     }
 
-    /* كروت المنتجات الزجاجية */
-    .product-glass {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      transition: all 0.3s ease;
+    /* كروت الأقسام الزجاجية */
+    .cat-glass {
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .product-glass:hover {
-      background: rgba(140, 158, 94, 0.1); /* توهج زيتي عند اللمس */
-      border-color: #8C9E5E;
-      transform: translateY(-5px);
-      box-shadow: 0 0 20px rgba(140, 158, 94, 0.2);
+    .cat-glass:hover {
+      background: rgba(255, 255, 255, 0.8);
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(85, 107, 47, 0.15);
+      border-color: #556b2f;
     }
 
-    /* الأزرار الزجاجية */
-    .btn-glass {
-      background: rgba(140, 158, 94, 0.2);
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(140, 158, 94, 0.3);
-      color: #C5D8A4;
+    /* الأزرار */
+    .btn-brand {
+      background: linear-gradient(135deg, #556b2f 0%, #33401c 100%);
+      color: white;
       transition: all 0.3s;
     }
-    .btn-glass:hover {
-      background: rgba(140, 158, 94, 0.4);
-      box-shadow: 0 0 15px rgba(140, 158, 94, 0.4);
-      color: white;
+    .btn-brand:hover {
+      background: linear-gradient(135deg, #6b8c3a 0%, #556b2f 100%);
+      box-shadow: 0 5px 15px rgba(85, 107, 47, 0.4);
     }
 
     /* حقول الإدخال */
     .input-glass {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(140, 158, 94, 0.2);
-      color: #C5D8A4;
-      backdrop-filter: blur(5px);
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid #e5e7eb;
+      color: #333;
     }
     .input-glass:focus {
-      border-color: #8C9E5E;
-      box-shadow: 0 0 10px rgba(140, 158, 94, 0.2);
+      border-color: #556b2f;
+      background: #fff;
       outline: none;
+      box-shadow: 0 0 0 3px rgba(85, 107, 47, 0.1);
     }
     
-    /* أيقونات SVG */
-    .icon-sport { fill: #8C9E5E; transition: 0.3s; }
-    .product-glass:hover .icon-sport { fill: #C5D8A4; filter: drop-shadow(0 0 5px #8C9E5E); }
-
-    .modal-overlay { background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+    .modal-overlay { background: rgba(255,255,255,0.8); backdrop-filter: blur(8px); }
   </style>
  </head>
- <body class="h-full brand-bg min-h-screen overflow-auto selection:bg-brand text-brand-light">
+ <body class="h-full brand-bg min-h-screen overflow-auto selection:bg-brand-accent selection:text-white">
 
-   <header class="glass-panel p-4 sticky top-0 z-50 border-b-0 rounded-b-2xl mx-2 mt-2">
+   <header class="glass-panel p-3 sticky top-0 z-50 border-b border-gray-100 shadow-sm">
      <div class="max-w-6xl mx-auto flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 overflow-hidden shadow-glow">
-            <img src="احمد الشيخ (3).png" alt="Logo" class="w-full h-full object-contain hover:scale-110 transition" onerror="this.style.display='none'; this.parentElement.innerHTML='✨'">
+        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center border border-gray-100 shadow-sm overflow-hidden">
+            <img src="احمد الشيخ (3).png" alt="Logo" class="w-full h-full object-contain p-1" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2589/2589903.png'">
         </div>
         <div>
-            <h1 class="text-xl font-bold leading-none text-white drop-shadow-md">أحمد الشيخ</h1>
-            <span class="text-xs text-brand font-bold tracking-widest uppercase">Luxury Kicks</span>
+            <h1 class="text-xl font-bold leading-none text-brand-dark">أحمد الشيخ</h1>
+            <span class="text-xs text-brand font-bold tracking-widest uppercase">Shoes Store</span>
         </div>
       </div>
-      <button onclick="toggleAdmin()" class="px-4 py-2 rounded-xl btn-glass text-xs font-bold">🔐 الإدارة</button>
+      <button onclick="toggleAdmin()" class="px-4 py-2 rounded-xl bg-white text-brand-dark border border-gray-200 text-xs font-bold hover:bg-brand hover:text-white transition shadow-sm">🔐 الإدارة</button>
      </div>
    </header>
 
    <div id="home-view">
-     <section class="h-[70vh] flex flex-col items-center justify-center text-center px-4">
-       <div class="relative mb-6 group">
-         <div class="absolute inset-0 bg-brand/20 blur-3xl rounded-full group-hover:bg-brand/30 transition duration-700"></div>
-         <img src="احمد الشيخ (3).png" class="h-32 relative z-10 drop-shadow-2xl hover:scale-105 transition duration-500" onerror="this.style.display='none'">
+     <section class="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 pt-10">
+       
+       <div class="relative w-40 h-40 mb-6 group cursor-pointer">
+           <div class="absolute inset-0 bg-brand/10 rounded-full blur-2xl group-hover:bg-brand/20 transition duration-500"></div>
+           <img src="احمد الشيخ (3).png" class="relative z-10 w-full h-full object-contain drop-shadow-xl transform group-hover:scale-110 transition duration-500" onerror="this.style.display='none'">
        </div>
+
+       <h2 class="text-4xl md:text-6xl font-black mb-3 text-brand-dark tracking-tight">اكتشف <span class="text-brand">أناقتك</span></h2>
+       <p class="text-gray-500 mb-8 font-medium">أرقى الموديلات الرياضية والكلاسيكية بين يديك</p>
        
-       <h2 class="text-4xl md:text-5xl font-black mb-2 text-white tracking-tight">خطواتك.. <span class="text-brand">فخامة</span></h2>
-       <p class="text-brand-light/70 mb-8 text-sm md:text-base">أحدث الموديلات الرياضية والكلاسيكية</p>
-       
-       <button onclick="document.getElementById('cats').scrollIntoView({behavior: 'smooth'})" class="btn-glass px-10 py-4 rounded-full font-bold text-lg shadow-glow border-brand/50">
-         تصفح الكوليكشن ↓
+       <button onclick="document.getElementById('cats').scrollIntoView({behavior: 'smooth'})" class="btn-brand px-10 py-4 rounded-full font-bold text-lg shadow-lg animate-bounce">
+         تسوق الآن ↓
        </button>
      </section>
 
-     <section id="cats" class="max-w-6xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-4">
+     <section id="cats" class="max-w-6xl mx-auto px-4 py-16">
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
        
-       <div onclick="showCategory('رجالي')" class="product-glass p-8 rounded-2xl text-center cursor-pointer group relative overflow-hidden">
-           <div class="absolute top-0 right-0 w-20 h-20 bg-brand/10 rounded-bl-full -mr-4 -mt-4 transition group-hover:bg-brand/20"></div>
-           <svg class="w-20 h-20 mx-auto mb-4 icon-sport" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21.5,14c0.8-0.8,0.5-2.2-0.6-2.5l-3-0.9c-0.7-0.2-1.5,0.1-1.9,0.7L13.8,14H9V9l2.2-2.2C11.6,6.4,12,5.9,12,5.3 V3c0-0.6-0.4-1-1-1H5C3.3,2,2,3.3,2,5v6c0,2.8,2.2,5,5,5h11C19.9,16,21.5,14,21.5,14z M5,14c-1.7,0-3-1.3-3-3H1v3 c0,2.2,1.8,4,4,4h13l-1.6-1.6C16.1,16.2,16.2,16,16.4,15.8L5,14z"/></svg>
-           <h3 class="text-2xl font-bold text-white group-hover:text-brand transition">رجالي</h3>
-           <p class="text-xs text-brand-light/50 mt-1">SPORT & CLASSIC</p>
-       </div>
+         <div onclick="showCategory('رجالي')" class="cat-glass p-6 rounded-3xl text-center cursor-pointer group relative overflow-hidden">
+             <div class="w-32 h-32 mx-auto mb-4 relative z-10">
+                 <img src="men.png" class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition duration-500" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3043/3043888.png'">
+             </div>
+             <h3 class="text-2xl font-black text-brand-dark mb-1">RAGOL SPORT</h3>
+             <p class="text-gray-500 text-sm font-bold">أحدث الكوتشيات الرجالي</p>
+         </div>
 
-       <div onclick="showCategory('حريمي')" class="product-glass p-8 rounded-2xl text-center cursor-pointer group relative overflow-hidden">
-           <div class="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-bl-full -mr-4 -mt-4 transition group-hover:bg-purple-500/20"></div>
-           <svg class="w-20 h-20 mx-auto mb-4 icon-sport" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.6,12.5l-4-6.5C16.2,5.4,15.4,5,14.6,5H6C3.8,5,2,6.8,2,9v4c0,2.8,2.2,5,5,5h11c1.8,0,3.4-1.3,3.9-3.1 C22.1,13.9,21.6,13,20.6,12.5z M6,16c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S7.1,16,6,16z"/></svg>
-           <h3 class="text-2xl font-bold text-white group-hover:text-brand transition">حريمي</h3>
-           <p class="text-xs text-brand-light/50 mt-1">TRENDY & CHIC</p>
-       </div>
+         <div onclick="showCategory('حريمي')" class="cat-glass p-6 rounded-3xl text-center cursor-pointer group relative overflow-hidden">
+             <div class="w-32 h-32 mx-auto mb-4 relative z-10">
+                 <img src="women.png" class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition duration-500" onerror="this.src='https://cdn-icons-png.flaticon.com/512/9463/9463177.png'">
+             </div>
+             <h3 class="text-2xl font-black text-brand-dark mb-1">SITTAT CHIC</h3>
+             <p class="text-gray-500 text-sm font-bold">أناقة وراحة لخطواتك</p>
+         </div>
 
-       <div onclick="showCategory('أطفالي')" class="product-glass p-8 rounded-2xl text-center cursor-pointer group relative overflow-hidden">
-           <div class="absolute top-0 right-0 w-20 h-20 bg-yellow-500/10 rounded-bl-full -mr-4 -mt-4 transition group-hover:bg-yellow-500/20"></div>
-           <svg class="w-20 h-20 mx-auto mb-4 icon-sport" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19,13c0.6-0.6,0.6-1.5,0-2.1l-2.3-2.3c-0.4-0.4-1-0.4-1.4,0l-1.3,1.3V6c0-1.1-0.9-2-2-2H6C3.8,4,2,5.8,2,8v4 c0,2.8,2.2,5,5,5h9c1.5,0,2.9-0.8,3.6-2.1L19,13z M6,15c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S7.1,15,6,15z"/></svg>
-           <h3 class="text-2xl font-bold text-white group-hover:text-brand transition">أطفالي</h3>
-           <p class="text-xs text-brand-light/50 mt-1">LITTLE HEROES</p>
+         <div onclick="showCategory('أطفالي')" class="cat-glass p-6 rounded-3xl text-center cursor-pointer group relative overflow-hidden">
+             <div class="w-32 h-32 mx-auto mb-4 relative z-10">
+                 <img src="kids.png" class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition duration-500" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3082/3082060.png'">
+             </div>
+             <h3 class="text-2xl font-black text-brand-dark mb-1">ATFAL FUN</h3>
+             <p class="text-gray-500 text-sm font-bold">لأبطالنا الصغار</p>
+         </div>
+
        </div>
      </section>
    </div>
 
-   <div id="products-view" class="hidden max-w-6xl mx-auto px-4 py-4 min-h-screen">
-     <div class="glass-panel p-3 rounded-xl sticky top-24 z-40 flex justify-between items-center mb-6">
-       <h3 id="cat-title" class="text-xl font-bold text-brand pl-4 border-l-2 border-brand"></h3>
-       <button onclick="goHome()" class="px-3 py-1 text-sm text-brand-light hover:text-white transition">✕ رجوع</button>
+   <div id="products-view" class="hidden max-w-6xl mx-auto px-4 py-6 min-h-screen">
+     <div class="glass-panel px-4 py-3 rounded-2xl sticky top-24 z-40 flex justify-between items-center mb-8 shadow-glass-light">
+       <div class="flex items-center gap-2">
+           <div class="w-2 h-8 bg-brand rounded-full"></div>
+           <h3 id="cat-title" class="text-2xl font-bold text-brand-dark"></h3>
+       </div>
+       <button onclick="goHome()" class="px-4 py-2 bg-white rounded-xl text-sm font-bold text-gray-600 hover:text-brand hover:shadow-md transition">الرئيسية 🏠</button>
      </div>
      
-     <div id="loading-msg" class="text-center py-20 text-brand animate-pulse hidden">جاري استدعاء الموديلات...</div>
+     <div id="loading-msg" class="text-center py-20 text-brand hidden">جاري التحميل...</div>
      <div id="grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-     <div id="empty-msg" class="hidden text-center py-20 text-gray-500">
-         <div class="text-6xl mb-4 opacity-20 grayscale">👟</div>
-         <p class="text-brand-light/50">لا توجد موديلات حالياً</p>
+     <div id="empty-msg" class="hidden text-center py-20">
+         <div class="text-6xl mb-4 opacity-30 grayscale">👟</div>
+         <p class="text-gray-400 font-bold">لا توجد موديلات حالياً</p>
      </div>
    </div>
 
    <div id="modal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
-     <div class="glass-panel w-full max-w-md rounded-2xl overflow-hidden shadow-glass max-h-[95vh] overflow-y-auto relative flex flex-col border border-white/10">
-       <button onclick="closeModal()" class="absolute top-3 left-3 bg-black/40 hover:bg-brand/80 w-8 h-8 rounded-full z-20 text-white transition backdrop-blur-md">✕</button>
+     <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl max-h-[95vh] overflow-y-auto relative flex flex-col">
+       <button onclick="closeModal()" class="absolute top-4 left-4 bg-white/80 hover:bg-white w-10 h-10 rounded-full z-20 text-gray-800 shadow-md transition font-bold text-xl">✕</button>
        
-       <div class="h-80 flex items-center justify-center relative shrink-0 bg-gradient-to-b from-transparent to-black/50">
-         <img id="main-img" class="max-h-full max-w-full object-contain drop-shadow-2xl">
+       <div class="bg-gray-50 h-80 flex items-center justify-center relative shrink-0">
+         <img id="main-img" class="max-h-full max-w-full object-contain drop-shadow-xl">
          <div id="thumbs" class="absolute bottom-4 flex gap-2 justify-center w-full px-2"></div>
        </div>
 
-       <div class="p-6 bg-black/40 backdrop-blur-xl">
-         <h2 id="m-name" class="text-xl font-bold text-center mb-1 text-white"></h2>
-         <p id="m-price" class="text-3xl font-black text-brand text-center mb-6 tracking-wide"></p>
+       <div class="p-6">
+         <h2 id="m-name" class="text-2xl font-bold text-center mb-1 text-gray-800"></h2>
+         <p id="m-price" class="text-3xl font-black text-brand text-center mb-6"></p>
          
          <div class="mb-6 text-center">
-             <p class="text-[10px] text-brand-light/60 mb-2 uppercase tracking-[0.2em]">اختر المقاس</p>
+             <p class="text-xs text-gray-400 mb-2 font-bold uppercase">المقاسات المتاحة</p>
              <div id="m-sizes" class="flex flex-wrap justify-center gap-2"></div>
          </div>
 
-         <div class="space-y-3 pt-6 border-t border-white/5">
-           <input id="c-name" placeholder="الاسم" class="input-glass w-full p-3 rounded-xl text-sm">
-           <input id="c-phone" type="tel" placeholder="رقم الهاتف" class="input-glass w-full p-3 rounded-xl text-sm">
-           <input id="c-address" placeholder="العنوان" class="input-glass w-full p-3 rounded-xl text-sm">
-           <button onclick="sendOrder()" class="btn-glass w-full py-4 rounded-xl font-bold mt-2 text-lg border-brand/50 bg-brand/10 hover:bg-brand/30 text-white shadow-glow">
+         <div class="space-y-3 pt-6 border-t border-gray-100">
+           <input id="c-name" placeholder="الاسم ثلاثي" class="input-glass w-full p-4 rounded-xl text-sm font-medium">
+           <input id="c-phone" type="tel" placeholder="رقم الهاتف" class="input-glass w-full p-4 rounded-xl text-sm font-medium">
+           <input id="c-address" placeholder="العنوان بالتفصيل" class="input-glass w-full p-4 rounded-xl text-sm font-medium">
+           <button onclick="sendOrder()" class="btn-brand w-full py-4 rounded-xl font-bold mt-2 text-lg shadow-lg">
              تأكيد الطلب 🛒
            </button>
          </div>
@@ -202,60 +206,60 @@
      </div>
    </div>
 
-   <div id="admin-panel" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-xl overflow-y-auto">
+   <div id="admin-panel" class="hidden fixed inset-0 z-50 bg-[#1a1a1a] overflow-y-auto text-white">
      <div class="p-4 max-w-2xl mx-auto">
-       <header class="flex justify-between items-center mb-8 border-b border-white/10 pb-4 sticky top-0 bg-black/50 backdrop-blur-md z-10 pt-4 rounded-b-xl">
+       <header class="flex justify-between items-center mb-8 border-b border-gray-800 pb-4 sticky top-0 bg-[#1a1a1a] z-10 pt-4">
          <h2 class="text-2xl font-bold text-brand flex items-center gap-2">لوحة التحكم</h2>
          <button onclick="toggleAdmin()" class="text-gray-400 hover:text-white transition">إغلاق</button>
        </header>
 
-       <div class="glass-panel p-4 rounded-xl mb-8">
+       <div class="bg-gray-900 p-4 rounded-xl mb-8 border border-gray-800">
            <div class="flex gap-3">
-               <button onclick="exportData()" class="flex-1 btn-glass py-2 rounded-lg text-xs font-bold">📥 تحميل نسخة</button>
-               <button onclick="document.getElementById('import-file').click()" class="flex-1 btn-glass py-2 rounded-lg text-xs font-bold">📤 استرجاع نسخة</button>
+               <button onclick="exportData()" class="flex-1 bg-blue-600/20 text-blue-400 border border-blue-600/30 py-2 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white transition">📥 تحميل نسخة</button>
+               <button onclick="document.getElementById('import-file').click()" class="flex-1 bg-green-600/20 text-green-400 border border-green-600/30 py-2 rounded-lg text-xs font-bold hover:bg-green-600 hover:text-white transition">📤 استرجاع نسخة</button>
                <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(this)">
            </div>
        </div>
 
-       <div class="glass-panel p-6 rounded-xl mb-8">
-         <h3 class="font-bold mb-4 text-brand-light text-lg">➕ إضافة موديل</h3>
+       <div class="bg-gray-900 p-6 rounded-xl mb-8 border border-gray-800">
+         <h3 class="font-bold mb-4 text-brand-light">➕ إضافة موديل</h3>
          <div class="space-y-4">
            
-           <div class="border-2 border-dashed border-brand/20 bg-black/20 p-6 text-center rounded-xl cursor-pointer hover:border-brand/50 transition group" onclick="document.getElementById('file-in').click()">
+           <div class="border-2 border-dashed border-gray-700 bg-gray-800/50 p-6 text-center rounded-xl cursor-pointer hover:border-brand transition group" onclick="document.getElementById('file-in').click()">
              <input type="file" id="file-in" multiple accept="image/*" class="hidden" onchange="handleFiles(this)">
              <div id="upload-placeholder" class="group-hover:scale-105 transition-transform">
                  <span class="text-3xl block mb-2 opacity-50">📸</span>
-                 <span class="text-sm text-brand-light font-bold">اضغط لإضافة صور</span>
+                 <span class="text-sm text-gray-400 font-bold">اضغط لإضافة صور</span>
              </div>
              <div id="preview" class="grid grid-cols-4 gap-2 mt-2 hidden"></div>
            </div>
            <p id="file-msg" class="text-xs text-brand mt-1 text-center hidden"></p>
 
-           <input id="new-name" placeholder="اسم الموديل" class="input-glass w-full p-3 rounded-xl">
+           <input id="new-name" placeholder="اسم الموديل" class="w-full bg-gray-800 border border-gray-700 p-3 rounded-xl text-white focus:border-brand outline-none">
            
            <div class="flex gap-3">
-             <input id="new-price" type="number" placeholder="السعر" class="input-glass flex-1 p-3 rounded-xl">
-             <select id="new-cat" class="input-glass flex-1 p-3 rounded-xl bg-black">
+             <input id="new-price" type="number" placeholder="السعر" class="flex-1 bg-gray-800 border border-gray-700 p-3 rounded-xl text-white focus:border-brand outline-none">
+             <select id="new-cat" class="flex-1 bg-gray-800 border border-gray-700 p-3 rounded-xl text-white focus:border-brand outline-none">
                <option value="رجالي">رجالي</option>
                <option value="حريمي">حريمي</option>
                <option value="أطفالي">أطفالي</option>
              </select>
            </div>
            
-           <div id="size-options" class="flex flex-wrap gap-2 p-3 bg-black/20 rounded-xl border border-white/5"></div>
+           <div id="size-options" class="flex flex-wrap gap-2 p-3 bg-gray-800 rounded-xl"></div>
            
-           <button onclick="addProduct()" id="add-btn" class="btn-glass w-full py-3 rounded-xl font-bold bg-brand/20 text-white hover:bg-brand/40">حفظ الموديل</button>
+           <button onclick="addProduct()" id="add-btn" class="w-full py-3 rounded-xl font-bold bg-brand text-white hover:bg-brand-accent transition">حفظ الموديل</button>
          </div>
        </div>
 
-       <h3 class="font-bold mb-4 text-white flex items-center gap-2">المنتجات <span id="count-badge" class="text-xs bg-brand text-white px-2 rounded-full">0</span></h3>
+       <h3 class="font-bold mb-4 flex items-center gap-2">المنتجات <span id="count-badge" class="text-xs bg-gray-700 text-white px-2 rounded-full">0</span></h3>
        <div id="admin-list" class="space-y-3 pb-10"></div>
      </div>
    </div>
 
    <script>
-    // === IndexedDB (تخزين ضخم) ===
-    const dbName = "AhmedShoesDB_Pro";
+    // === IndexedDB ===
+    const dbName = "AhmedShoesDB_White";
     const storeName = "products";
     let db;
 
@@ -295,12 +299,11 @@
         });
     }
 
-    // === المتغيرات ===
+    // === Logic ===
     let products = [];
     let currentProd = null, currentSize = null, newImages = [], newSizes = [];
     const whatsapp = "01000000000"; 
 
-    // === التشغيل ===
     async function init() {
         await openDB();
         products = await getAllProducts();
@@ -308,7 +311,7 @@
     }
     init();
 
-    // === معالجة الصور ===
+    // === Images ===
     function handleFiles(input) {
       const files = [...input.files].slice(0, 4);
       const preview = document.getElementById('preview');
@@ -338,10 +341,9 @@
             ctx.drawImage(img, 0, 0, w, h);
             newImages.push(canvas.toDataURL('image/jpeg', 0.7));
             processedCount++;
-            
             if(processedCount === files.length) {
                 renderPreview();
-                msg.innerText = "✅ جاهز للحفظ";
+                msg.innerText = "✅ جاهز";
             }
           }
         };
@@ -353,17 +355,17 @@
         const preview = document.getElementById('preview');
         preview.innerHTML = '';
         newImages.forEach(img => {
-            preview.innerHTML += `<div class="aspect-square rounded-lg bg-cover bg-center border border-brand/50 shadow-glow" style="background-image: url('${img}')"></div>`;
+            preview.innerHTML += `<div class="aspect-square rounded-lg bg-cover bg-center border border-brand/50" style="background-image: url('${img}')"></div>`;
         });
     }
 
-    // === الإدارة ===
+    // === Admin ===
     async function addProduct() {
       const btn = document.getElementById('add-btn');
       const name = document.getElementById('new-name').value;
       const price = document.getElementById('new-price').value;
       
-      if(!name || !price || !newImages.length || !newSizes.length) return alert('⚠️ البيانات ناقصة');
+      if(!name || !price || !newImages.length || !newSizes.length) return alert('بيانات ناقصة');
       
       btn.innerText = "جاري الحفظ...";
       btn.disabled = true;
@@ -380,7 +382,6 @@
       products = await getAllProducts();
       
       alert('تم الحفظ');
-      // Reset
       document.getElementById('new-name').value = '';
       document.getElementById('new-price').value = '';
       document.getElementById('upload-placeholder').classList.remove('hidden');
@@ -405,9 +406,9 @@
       const list = document.getElementById('admin-list');
       document.getElementById('count-badge').innerText = products.length;
       list.innerHTML = products.map(p => `
-        <div class="glass-panel p-3 rounded-xl flex justify-between items-center mb-2">
+        <div class="bg-gray-800 p-3 rounded-xl flex justify-between items-center mb-2 border border-gray-700">
           <div class="flex gap-4 items-center">
-            <img src="${p.images[0]}" class="w-12 h-12 rounded-lg object-cover border border-white/10">
+            <img src="${p.images[0]}" class="w-12 h-12 rounded-lg object-cover border border-gray-600">
             <div>
                 <div class="font-bold text-white">${p.name}</div>
                 <div class="text-xs text-brand font-bold">${p.price} ج.م</div>
@@ -418,7 +419,7 @@
       `).join('');
     }
 
-    // === النسخ الاحتياطي ===
+    // === Backup ===
     async function exportData() {
         if(!products.length) return alert('لا توجد بيانات');
         const blob = new Blob([JSON.stringify(products)], {type: "application/json"});
@@ -446,23 +447,23 @@
         reader.readAsText(file);
     }
 
-    // === واجهة المستخدم ===
+    // === UI ===
     function updateSizeOpts() {
       const cat = document.getElementById('new-cat').value;
       let sizes = cat === 'رجالي' ? [40,41,42,43,44,45] : (cat === 'حريمي' ? [37,38,39,40,41] : [25,26,27,28,29,30,31,32,33,34,35]);
       newSizes = [];
       document.getElementById('size-options').innerHTML = sizes.map(s => 
-        `<button onclick="toggleNewSize(${s}, this)" class="w-8 h-8 rounded-lg bg-white/5 text-xs text-brand-light font-bold hover:bg-white/10 transition border border-transparent">${s}</button>`
+        `<button onclick="toggleNewSize(${s}, this)" class="w-8 h-8 rounded-lg bg-gray-700 text-xs font-bold text-gray-300 hover:bg-gray-600 transition border border-transparent">${s}</button>`
       ).join('');
     }
 
     function toggleNewSize(s, btn) {
       if(newSizes.includes(s)) {
         newSizes = newSizes.filter(x => x !== s);
-        btn.classList.remove('border-brand', 'text-brand', 'bg-brand/10');
+        btn.classList.remove('border-brand', 'text-white', 'bg-brand/20');
       } else {
         newSizes.push(s);
-        btn.classList.add('border-brand', 'text-brand', 'bg-brand/10');
+        btn.classList.add('border-brand', 'text-white', 'bg-brand/20');
       }
     }
 
@@ -484,14 +485,17 @@
       document.getElementById('empty-msg').classList.add('hidden');
       
       document.getElementById('grid').innerHTML = items.map(p => `
-        <div onclick="openModal(${p.id})" class="product-glass rounded-xl overflow-hidden cursor-pointer group relative">
-          <div class="h-48 relative overflow-hidden">
-            <img src="${p.images[0]}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-            <div class="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent"></div>
-            <div class="absolute bottom-2 right-2 text-white font-bold text-lg drop-shadow-md">${p.price}<span class="text-xs text-brand ml-1">ج.م</span></div>
+        <div onclick="openModal(${p.id})" class="bg-white rounded-2xl overflow-hidden cursor-pointer group relative shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+          <div class="h-48 relative overflow-hidden bg-gray-50">
+            <img src="${p.images[0]}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+            <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-brand-dark px-2 py-1 text-xs font-bold rounded-lg shadow-sm">جديد</div>
           </div>
-          <div class="p-3 text-center">
-             <h4 class="font-bold text-sm text-brand-light truncate">${p.name}</h4>
+          <div class="p-4">
+             <div class="flex justify-between items-start mb-1">
+                 <h4 class="font-bold text-gray-800 text-sm truncate flex-1">${p.name}</h4>
+                 <span class="text-brand font-black text-sm">${p.price}</span>
+             </div>
+             <p class="text-xs text-gray-400">${p.sizes.length} مقاسات</p>
           </div>
         </div>
       `).join('');
@@ -514,7 +518,7 @@
       } else p.classList.add('hidden');
     }
 
-    // === المودال ===
+    // === Modal ===
     function openModal(id) {
       currentProd = products.find(p => p.id === id);
       const modal = document.getElementById('modal');
@@ -528,20 +532,20 @@
       
       document.getElementById('thumbs').innerHTML = currentProd.images.map(src => `
         <div onclick="document.getElementById('main-img').src='${src}'" 
-             class="w-12 h-12 rounded-lg border border-white/20 cursor-pointer overflow-hidden hover:border-brand transition">
+             class="w-12 h-12 rounded-lg border border-gray-200 cursor-pointer overflow-hidden hover:border-brand transition">
              <img src="${src}" class="w-full h-full object-cover">
         </div>
       `).join('');
 
       document.getElementById('m-sizes').innerHTML = currentProd.sizes.map(s => `
-        <button onclick="selectSize(${s}, this)" class="w-8 h-8 rounded bg-white/5 text-xs font-bold text-brand-light hover:bg-brand/20 border border-transparent transition">${s}</button>
+        <button onclick="selectSize(${s}, this)" class="w-8 h-8 rounded-lg bg-gray-100 text-xs font-bold text-gray-600 hover:bg-gray-200 border border-transparent transition">${s}</button>
       `).join('');
     }
 
     function selectSize(s, btn) {
       currentSize = s;
-      document.querySelectorAll('#m-sizes button').forEach(b => b.classList.remove('border-brand', 'text-white', 'bg-brand/20'));
-      btn.classList.add('border-brand', 'text-white', 'bg-brand/20');
+      document.querySelectorAll('#m-sizes button').forEach(b => b.classList.remove('border-brand', 'bg-brand/10', 'text-brand'));
+      btn.classList.add('border-brand', 'bg-brand/10', 'text-brand');
     }
 
     function closeModal() { document.getElementById('modal').classList.add('hidden'); }
