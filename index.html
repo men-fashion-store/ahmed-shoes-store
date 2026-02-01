@@ -14,15 +14,14 @@
         extend: { 
           colors: { 
             brand: { 
-              light: '#f1f8e9', // خلفيات فاتحة جداً
-              DEFAULT: '#556b2f', // زيتي (Olive Green)
-              dark: '#33401c',   // زيتي غامق للنصوص
-              accent: '#8C9E5E'  // زيتي متوسط
+              light: '#dce6c8', 
+              DEFAULT: '#708238', // الزيتي (Olive)
+              dark: '#3f4a20',
+              glass: 'rgba(112, 130, 56, 0.15)' 
             } 
           },
           boxShadow: {
-            'glass-light': '0 8px 32px 0 rgba(31, 38, 135, 0.1)',
-            'glass-hover': '0 8px 32px 0 rgba(85, 107, 47, 0.25)'
+            '3d': '0 20px 50px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.1)',
           }
         } 
       } 
@@ -30,129 +29,134 @@
   </script>
   
   <style>
-    body { font-family: 'Cairo', sans-serif; background-color: #f9fafb; color: #1a1a1a; }
+    body { font-family: 'Cairo', sans-serif; background-color: #f5f5f5; color: #1a1a1a; }
     
-    /* الخلفية البيضاء مع اللوجو الشفاف (Watermark) */
+    /* الخلفية البيضاء مع اللوجو الشفاف */
     .brand-bg {
       background-color: #ffffff;
       background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.96)),
+        linear-gradient(rgba(255, 255, 255, 0.93), rgba(255, 255, 255, 0.97)),
         url('احمد الشيخ (3).png');
-      background-size: 500px; /* حجم اللوجو في الخلفية */
+      background-size: 400px;
       background-position: center; 
       background-attachment: fixed; 
-      background-repeat: repeat; /* تكرار اللوجو كخلفية */
+      background-repeat: repeat;
     }
 
-    /* الزجاج الشفاف (Light Glass) */
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    /* === سحر الزجاج الـ 3D === */
+    .glass-3d-card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-top: 1px solid rgba(255, 255, 255, 0.9);
+      border-left: 1px solid rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid rgba(112, 130, 56, 0.2);
+      border-right: 1px solid rgba(112, 130, 56, 0.2);
+      border-radius: 30px;
+      box-shadow: 
+        10px 10px 20px rgba(0, 0, 0, 0.05),
+        -5px -5px 15px rgba(255, 255, 255, 0.8),
+        inset 0 0 20px rgba(255, 255, 255, 0.5);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .glass-3d-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 
+        20px 20px 40px rgba(112, 130, 56, 0.15),
+        -10px -10px 20px rgba(255, 255, 255, 0.9);
+      border-color: #708238;
     }
 
-    /* كروت الأقسام الزجاجية */
-    .cat-glass {
-      background: rgba(255, 255, 255, 0.4);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .cat-glass:hover {
-      background: rgba(255, 255, 255, 0.8);
-      transform: translateY(-8px);
-      box-shadow: 0 20px 40px rgba(85, 107, 47, 0.15);
-      border-color: #556b2f;
-    }
-
-    /* الأزرار */
-    .btn-brand {
-      background: linear-gradient(135deg, #556b2f 0%, #33401c 100%);
+    /* الأزرار الزجاجية */
+    .btn-glass {
+      background: linear-gradient(135deg, #708238 0%, #3f4a20 100%);
       color: white;
-      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(112, 130, 56, 0.4);
+      transition: 0.3s;
     }
-    .btn-brand:hover {
-      background: linear-gradient(135deg, #6b8c3a 0%, #556b2f 100%);
-      box-shadow: 0 5px 15px rgba(85, 107, 47, 0.4);
+    .btn-glass:hover {
+      box-shadow: 0 8px 25px rgba(112, 130, 56, 0.6);
+      transform: translateY(-2px);
     }
 
     /* حقول الإدخال */
     .input-glass {
-      background: rgba(255, 255, 255, 0.8);
-      border: 1px solid #e5e7eb;
-      color: #333;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #d1d5db;
+      box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
     }
     .input-glass:focus {
-      border-color: #556b2f;
+      border-color: #708238;
       background: #fff;
       outline: none;
-      box-shadow: 0 0 0 3px rgba(85, 107, 47, 0.1);
     }
     
-    .modal-overlay { background: rgba(255,255,255,0.8); backdrop-filter: blur(8px); }
+    .modal-overlay { background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); }
   </style>
  </head>
- <body class="h-full brand-bg min-h-screen overflow-auto selection:bg-brand-accent selection:text-white">
+ <body class="h-full brand-bg min-h-screen overflow-auto selection:bg-brand selection:text-white">
 
-   <header class="glass-panel p-3 sticky top-0 z-50 border-b border-gray-100 shadow-sm">
+   <header class="bg-white/70 backdrop-blur-md p-3 sticky top-0 z-50 border-b border-white shadow-sm">
      <div class="max-w-6xl mx-auto flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center border border-gray-100 shadow-sm overflow-hidden">
-            <img src="احمد الشيخ (3).png" alt="Logo" class="w-full h-full object-contain p-1" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2589/2589903.png'">
+        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center border border-gray-100 shadow-inner overflow-hidden">
+            <img src="احمد الشيخ (3).png" alt="Logo" class="w-full h-full object-contain p-1">
         </div>
         <div>
-            <h1 class="text-xl font-bold leading-none text-brand-dark">أحمد الشيخ</h1>
-            <span class="text-xs text-brand font-bold tracking-widest uppercase">Shoes Store</span>
+            <h1 class="text-xl font-black leading-none text-brand-dark">أحمد الشيخ</h1>
+            <span class="text-xs text-brand font-bold tracking-[0.2em] uppercase">Shoes Store</span>
         </div>
       </div>
-      <button onclick="toggleAdmin()" class="px-4 py-2 rounded-xl bg-white text-brand-dark border border-gray-200 text-xs font-bold hover:bg-brand hover:text-white transition shadow-sm">🔐 الإدارة</button>
+      <button onclick="toggleAdmin()" class="px-4 py-2 rounded-xl bg-white text-brand border border-brand/20 text-xs font-bold hover:bg-brand hover:text-white transition shadow-sm">🔐 الإدارة</button>
      </div>
    </header>
 
    <div id="home-view">
-     <section class="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 pt-10">
+     <section class="min-h-[50vh] flex flex-col items-center justify-center text-center px-4 pt-4">
        
-       <div class="relative w-40 h-40 mb-6 group cursor-pointer">
-           <div class="absolute inset-0 bg-brand/10 rounded-full blur-2xl group-hover:bg-brand/20 transition duration-500"></div>
-           <img src="احمد الشيخ (3).png" class="relative z-10 w-full h-full object-contain drop-shadow-xl transform group-hover:scale-110 transition duration-500" onerror="this.style.display='none'">
+       <div class="relative w-36 h-36 mb-4 group cursor-pointer">
+           <div class="absolute inset-0 bg-brand/30 rounded-full blur-2xl group-hover:bg-brand/50 transition duration-500"></div>
+           <img src="احمد الشيخ (3).png" class="relative z-10 w-full h-full object-contain drop-shadow-2xl transform group-hover:rotate-6 transition duration-500">
        </div>
 
-       <h2 class="text-4xl md:text-6xl font-black mb-3 text-brand-dark tracking-tight">اكتشف <span class="text-brand">أناقتك</span></h2>
-       <p class="text-gray-500 mb-8 font-medium">أرقى الموديلات الرياضية والكلاسيكية بين يديك</p>
+       <h2 class="text-4xl md:text-5xl font-black mb-2 text-brand-dark">خطواتك.. <span class="text-brand">فخامة</span></h2>
+       <p class="text-gray-500 mb-6 font-bold text-sm">أرقى الموديلات الرياضية والكلاسيكية</p>
        
-       <button onclick="document.getElementById('cats').scrollIntoView({behavior: 'smooth'})" class="btn-brand px-10 py-4 rounded-full font-bold text-lg shadow-lg animate-bounce">
-         تسوق الآن ↓
+       <button onclick="document.getElementById('cats').scrollIntoView({behavior: 'smooth'})" class="btn-glass px-8 py-3 rounded-full font-bold text-lg animate-bounce">
+         تصفح الأقسام ↓
        </button>
      </section>
 
-     <section id="cats" class="max-w-6xl mx-auto px-4 py-16">
-       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+     <section id="cats" class="max-w-6xl mx-auto px-4 py-10 pb-20">
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
        
-         <div onclick="showCategory('رجالي')" class="cat-glass p-6 rounded-3xl text-center cursor-pointer group relative overflow-hidden">
-             <div class="w-32 h-32 mx-auto mb-4 relative z-10">
-                 <img src="men.png" class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition duration-500" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3043/3043888.png'">
+         <div onclick="showCategory('رجالي')" class="glass-3d-card p-8 flex flex-col items-center cursor-pointer group">
+             <div class="w-32 h-32 relative z-10 mb-4 transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-2">
+                 <img src="men.png" class="w-full h-full object-contain drop-shadow-2xl" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3043/3043888.png'">
              </div>
-             <h3 class="text-2xl font-black text-brand-dark mb-1">RAGOL SPORT</h3>
-             <p class="text-gray-500 text-sm font-bold">أحدث الكوتشيات الرجالي</p>
+             <h3 class="text-3xl font-black text-brand-dark mb-1 relative z-10">رجالي</h3>
+             <div class="h-1 w-12 bg-brand rounded-full mb-2 relative z-10"></div>
+             <p class="text-gray-500 text-sm font-bold relative z-10">RAGOL SPORT</p>
          </div>
 
-         <div onclick="showCategory('حريمي')" class="cat-glass p-6 rounded-3xl text-center cursor-pointer group relative overflow-hidden">
-             <div class="w-32 h-32 mx-auto mb-4 relative z-10">
-                 <img src="women.png" class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition duration-500" onerror="this.src='https://cdn-icons-png.flaticon.com/512/9463/9463177.png'">
+         <div onclick="showCategory('حريمي')" class="glass-3d-card p-8 flex flex-col items-center cursor-pointer group">
+             <div class="w-32 h-32 relative z-10 mb-4 transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-2">
+                 <img src="women.png" class="w-full h-full object-contain drop-shadow-2xl" onerror="this.src='https://cdn-icons-png.flaticon.com/512/9463/9463177.png'">
              </div>
-             <h3 class="text-2xl font-black text-brand-dark mb-1">SITTAT CHIC</h3>
-             <p class="text-gray-500 text-sm font-bold">أناقة وراحة لخطواتك</p>
+             <h3 class="text-3xl font-black text-brand-dark mb-1 relative z-10">حريمي</h3>
+             <div class="h-1 w-12 bg-purple-500 rounded-full mb-2 relative z-10"></div>
+             <p class="text-gray-500 text-sm font-bold relative z-10">SITTAT CHIC</p>
          </div>
 
-         <div onclick="showCategory('أطفالي')" class="cat-glass p-6 rounded-3xl text-center cursor-pointer group relative overflow-hidden">
-             <div class="w-32 h-32 mx-auto mb-4 relative z-10">
-                 <img src="kids.png" class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition duration-500" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3082/3082060.png'">
+         <div onclick="showCategory('أطفالي')" class="glass-3d-card p-8 flex flex-col items-center cursor-pointer group">
+             <div class="w-32 h-32 relative z-10 mb-4 transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-2">
+                 <img src="kids.png" class="w-full h-full object-contain drop-shadow-2xl" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3082/3082060.png'">
              </div>
-             <h3 class="text-2xl font-black text-brand-dark mb-1">ATFAL FUN</h3>
-             <p class="text-gray-500 text-sm font-bold">لأبطالنا الصغار</p>
+             <h3 class="text-3xl font-black text-brand-dark mb-1 relative z-10">أطفالي</h3>
+             <div class="h-1 w-12 bg-yellow-500 rounded-full mb-2 relative z-10"></div>
+             <p class="text-gray-500 text-sm font-bold relative z-10">ATFAL FUN</p>
          </div>
 
        </div>
@@ -160,15 +164,15 @@
    </div>
 
    <div id="products-view" class="hidden max-w-6xl mx-auto px-4 py-6 min-h-screen">
-     <div class="glass-panel px-4 py-3 rounded-2xl sticky top-24 z-40 flex justify-between items-center mb-8 shadow-glass-light">
+     <div class="bg-white/80 backdrop-blur-md px-4 py-3 rounded-2xl sticky top-24 z-40 flex justify-between items-center mb-8 shadow-sm border border-white">
        <div class="flex items-center gap-2">
            <div class="w-2 h-8 bg-brand rounded-full"></div>
            <h3 id="cat-title" class="text-2xl font-bold text-brand-dark"></h3>
        </div>
-       <button onclick="goHome()" class="px-4 py-2 bg-white rounded-xl text-sm font-bold text-gray-600 hover:text-brand hover:shadow-md transition">الرئيسية 🏠</button>
+       <button onclick="goHome()" class="px-4 py-2 bg-gray-100 rounded-xl text-sm font-bold text-gray-600 hover:text-brand hover:bg-white shadow-sm transition">الرئيسية 🏠</button>
      </div>
      
-     <div id="loading-msg" class="text-center py-20 text-brand hidden">جاري التحميل...</div>
+     <div id="loading-msg" class="text-center py-20 text-brand hidden font-bold">جاري التحميل...</div>
      <div id="grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
      <div id="empty-msg" class="hidden text-center py-20">
          <div class="text-6xl mb-4 opacity-30 grayscale">👟</div>
@@ -177,11 +181,11 @@
    </div>
 
    <div id="modal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
-     <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl max-h-[95vh] overflow-y-auto relative flex flex-col">
-       <button onclick="closeModal()" class="absolute top-4 left-4 bg-white/80 hover:bg-white w-10 h-10 rounded-full z-20 text-gray-800 shadow-md transition font-bold text-xl">✕</button>
+     <div class="bg-white w-full max-w-md rounded-[2rem] overflow-hidden shadow-2xl max-h-[95vh] overflow-y-auto relative flex flex-col border-4 border-white">
+       <button onclick="closeModal()" class="absolute top-4 left-4 bg-white/90 hover:bg-red-500 hover:text-white w-10 h-10 rounded-full z-20 text-gray-800 shadow-lg transition font-bold text-xl flex items-center justify-center">✕</button>
        
-       <div class="bg-gray-50 h-80 flex items-center justify-center relative shrink-0">
-         <img id="main-img" class="max-h-full max-w-full object-contain drop-shadow-xl">
+       <div class="bg-gray-50 h-72 flex items-center justify-center relative shrink-0">
+         <img id="main-img" class="max-h-full max-w-full object-contain drop-shadow-xl mix-blend-multiply">
          <div id="thumbs" class="absolute bottom-4 flex gap-2 justify-center w-full px-2"></div>
        </div>
 
@@ -190,15 +194,23 @@
          <p id="m-price" class="text-3xl font-black text-brand text-center mb-6"></p>
          
          <div class="mb-6 text-center">
-             <p class="text-xs text-gray-400 mb-2 font-bold uppercase">المقاسات المتاحة</p>
+             <p class="text-xs text-gray-400 mb-2 font-bold uppercase tracking-widest">اختر المقاس</p>
              <div id="m-sizes" class="flex flex-wrap justify-center gap-2"></div>
          </div>
 
-         <div class="space-y-3 pt-6 border-t border-gray-100">
-           <input id="c-name" placeholder="الاسم ثلاثي" class="input-glass w-full p-4 rounded-xl text-sm font-medium">
-           <input id="c-phone" type="tel" placeholder="رقم الهاتف" class="input-glass w-full p-4 rounded-xl text-sm font-medium">
-           <input id="c-address" placeholder="العنوان بالتفصيل" class="input-glass w-full p-4 rounded-xl text-sm font-medium">
-           <button onclick="sendOrder()" class="btn-brand w-full py-4 rounded-xl font-bold mt-2 text-lg shadow-lg">
+         <div class="mb-6 p-4 bg-green-50 rounded-2xl border border-green-100 flex items-center gap-3">
+             <div class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center text-xl shadow-lg shadow-green-200">💸</div>
+             <div>
+                 <p class="text-xs text-gray-500 font-bold mb-1">الدفع عبر فودافون كاش</p>
+                 <p class="text-lg font-black text-gray-800 tracking-widest font-mono">01020468021</p>
+             </div>
+         </div>
+
+         <div class="space-y-3 pt-4 border-t border-gray-100">
+           <input id="c-name" placeholder="الاسم ثلاثي" class="input-glass w-full p-4 rounded-xl text-sm font-bold text-gray-700">
+           <input id="c-phone" type="tel" placeholder="رقم الهاتف" class="input-glass w-full p-4 rounded-xl text-sm font-bold text-gray-700">
+           <input id="c-address" placeholder="العنوان بالتفصيل" class="input-glass w-full p-4 rounded-xl text-sm font-bold text-gray-700">
+           <button onclick="sendOrder()" class="btn-glass w-full py-4 rounded-xl font-bold mt-2 text-lg shadow-lg">
              تأكيد الطلب 🛒
            </button>
          </div>
@@ -224,7 +236,6 @@
        <div class="bg-gray-900 p-6 rounded-xl mb-8 border border-gray-800">
          <h3 class="font-bold mb-4 text-brand-light">➕ إضافة موديل</h3>
          <div class="space-y-4">
-           
            <div class="border-2 border-dashed border-gray-700 bg-gray-800/50 p-6 text-center rounded-xl cursor-pointer hover:border-brand transition group" onclick="document.getElementById('file-in').click()">
              <input type="file" id="file-in" multiple accept="image/*" class="hidden" onchange="handleFiles(this)">
              <div id="upload-placeholder" class="group-hover:scale-105 transition-transform">
@@ -234,34 +245,29 @@
              <div id="preview" class="grid grid-cols-4 gap-2 mt-2 hidden"></div>
            </div>
            <p id="file-msg" class="text-xs text-brand mt-1 text-center hidden"></p>
-
            <input id="new-name" placeholder="اسم الموديل" class="w-full bg-gray-800 border border-gray-700 p-3 rounded-xl text-white focus:border-brand outline-none">
-           
            <div class="flex gap-3">
              <input id="new-price" type="number" placeholder="السعر" class="flex-1 bg-gray-800 border border-gray-700 p-3 rounded-xl text-white focus:border-brand outline-none">
              <select id="new-cat" class="flex-1 bg-gray-800 border border-gray-700 p-3 rounded-xl text-white focus:border-brand outline-none">
-               <option value="رجالي">رجالي</option>
-               <option value="حريمي">حريمي</option>
-               <option value="أطفالي">أطفالي</option>
+               <option value="رجالي">رجالي</option><option value="حريمي">حريمي</option><option value="أطفالي">أطفالي</option>
              </select>
            </div>
-           
            <div id="size-options" class="flex flex-wrap gap-2 p-3 bg-gray-800 rounded-xl"></div>
-           
-           <button onclick="addProduct()" id="add-btn" class="w-full py-3 rounded-xl font-bold bg-brand text-white hover:bg-brand-accent transition">حفظ الموديل</button>
+           <button onclick="addProduct()" id="add-btn" class="w-full py-3 rounded-xl font-bold bg-brand text-white hover:bg-brand-light hover:text-brand-dark transition">حفظ الموديل</button>
          </div>
        </div>
-
        <h3 class="font-bold mb-4 flex items-center gap-2">المنتجات <span id="count-badge" class="text-xs bg-gray-700 text-white px-2 rounded-full">0</span></h3>
        <div id="admin-list" class="space-y-3 pb-10"></div>
      </div>
    </div>
 
    <script>
-    // === IndexedDB ===
-    const dbName = "AhmedShoesDB_White";
+    // === قاعدة البيانات والتخزين ===
+    const dbName = "AhmedShoesDB_White_Final";
     const storeName = "products";
     let db;
+    // رقم الواتساب المحدث
+    const whatsapp = "201020468021"; 
 
     function openDB() {
         return new Promise((resolve, reject) => {
@@ -299,10 +305,8 @@
         });
     }
 
-    // === Logic ===
     let products = [];
     let currentProd = null, currentSize = null, newImages = [], newSizes = [];
-    const whatsapp = "01000000000"; 
 
     async function init() {
         await openDB();
@@ -311,21 +315,18 @@
     }
     init();
 
-    // === Images ===
+    // === معالجة الصور ===
     function handleFiles(input) {
       const files = [...input.files].slice(0, 4);
       const preview = document.getElementById('preview');
       const placeholder = document.getElementById('upload-placeholder');
       const msg = document.getElementById('file-msg');
-      
       placeholder.classList.add('hidden');
       preview.classList.remove('hidden');
       msg.classList.remove('hidden');
       msg.innerText = "جاري المعالجة...";
-      
       newImages = []; 
       let processedCount = 0;
-
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = e => {
@@ -359,17 +360,14 @@
         });
     }
 
-    // === Admin ===
+    // === الإدارة ===
     async function addProduct() {
       const btn = document.getElementById('add-btn');
       const name = document.getElementById('new-name').value;
       const price = document.getElementById('new-price').value;
-      
       if(!name || !price || !newImages.length || !newSizes.length) return alert('بيانات ناقصة');
-      
       btn.innerText = "جاري الحفظ...";
       btn.disabled = true;
-
       const newItem = {
         id: Date.now(),
         name, price,
@@ -377,10 +375,8 @@
         images: newImages,
         sizes: newSizes
       };
-
       await saveProductToDB(newItem);
       products = await getAllProducts();
-      
       alert('تم الحفظ');
       document.getElementById('new-name').value = '';
       document.getElementById('new-price').value = '';
@@ -389,7 +385,6 @@
       document.getElementById('file-msg').classList.add('hidden');
       newImages = []; newSizes = []; updateSizeOpts();
       renderAdminList();
-      
       btn.innerText = "حفظ الموديل";
       btn.disabled = false;
     }
@@ -419,7 +414,6 @@
       `).join('');
     }
 
-    // === Backup ===
     async function exportData() {
         if(!products.length) return alert('لا توجد بيانات');
         const blob = new Blob([JSON.stringify(products)], {type: "application/json"});
@@ -474,20 +468,17 @@
       document.getElementById('products-view').classList.remove('hidden');
       document.getElementById('cat-title').innerText = cat;
       document.getElementById('grid').innerHTML = '';
-      
       products = await getAllProducts();
       const items = products.filter(p => p.category === cat);
-      
       if(!items.length) {
         document.getElementById('empty-msg').classList.remove('hidden');
         return;
       }
       document.getElementById('empty-msg').classList.add('hidden');
-      
       document.getElementById('grid').innerHTML = items.map(p => `
         <div onclick="openModal(${p.id})" class="bg-white rounded-2xl overflow-hidden cursor-pointer group relative shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
           <div class="h-48 relative overflow-hidden bg-gray-50">
-            <img src="${p.images[0]}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+            <img src="${p.images[0]}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 mix-blend-multiply">
             <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-brand-dark px-2 py-1 text-xs font-bold rounded-lg shadow-sm">جديد</div>
           </div>
           <div class="p-4">
@@ -518,25 +509,21 @@
       } else p.classList.add('hidden');
     }
 
-    // === Modal ===
+    // === المودال ===
     function openModal(id) {
       currentProd = products.find(p => p.id === id);
       const modal = document.getElementById('modal');
       modal.classList.remove('hidden');
-      
       document.getElementById('m-name').innerText = currentProd.name;
       document.getElementById('m-price').innerText = currentProd.price + ' ج.م';
-      
       const main = document.getElementById('main-img');
       main.src = currentProd.images[0];
-      
       document.getElementById('thumbs').innerHTML = currentProd.images.map(src => `
         <div onclick="document.getElementById('main-img').src='${src}'" 
              class="w-12 h-12 rounded-lg border border-gray-200 cursor-pointer overflow-hidden hover:border-brand transition">
              <img src="${src}" class="w-full h-full object-cover">
         </div>
       `).join('');
-
       document.getElementById('m-sizes').innerHTML = currentProd.sizes.map(s => `
         <button onclick="selectSize(${s}, this)" class="w-8 h-8 rounded-lg bg-gray-100 text-xs font-bold text-gray-600 hover:bg-gray-200 border border-transparent transition">${s}</button>
       `).join('');
@@ -554,9 +541,7 @@
       const name = document.getElementById('c-name').value;
       const addr = document.getElementById('c-address').value;
       const phone = document.getElementById('c-phone').value;
-      
       if(!currentSize || !name || !addr) return alert('أكمل البيانات');
-      
       const msg = `طلب جديد: \n👟 ${currentProd.name}\n📏 ${currentSize}\n💰 ${currentProd.price}\n👤 ${name}\n📞 ${phone}\n📍 ${addr}`;
       window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
       closeModal();
