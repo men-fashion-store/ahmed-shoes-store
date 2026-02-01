@@ -45,15 +45,15 @@
 
      <div class="w-full space-y-4">
        <button onclick="showCategory('رجالي')" class="link-btn group">
-         <div class="btn-icon-box shadow-sm group-hover:scale-110 transition"><img src="man.png" class="btn-icon-img" onerror="this.parentElement.innerHTML='👞'"></div>
+         <div class="btn-icon-box shadow-sm group-hover:scale-110 transition"><img src="men.jpg" class="btn-icon-img" onerror="this.parentElement.innerHTML='👞'"></div>
          <h3>MEN COLLECTION</h3><span class="text-gray-400">→</span>
        </button>
        <button onclick="showCategory('حريمي')" class="link-btn group">
-         <div class="btn-icon-box shadow-sm group-hover:scale-110 transition"><img src="women.png" class="btn-icon-img" onerror="this.parentElement.innerHTML='👠'"></div>
+         <div class="btn-icon-box shadow-sm group-hover:scale-110 transition"><img src="women.jpg" class="btn-icon-img" onerror="this.parentElement.innerHTML='👠'"></div>
          <h3>WOMEN COLLECTION</h3><span class="text-gray-400">→</span>
        </button>
        <button onclick="showCategory('أطفالي')" class="link-btn group">
-         <div class="btn-icon-box shadow-sm group-hover:scale-110 transition"><img src="kids.png" class="btn-icon-img" onerror="this.parentElement.innerHTML='👟'"></div>
+         <div class="btn-icon-box shadow-sm group-hover:scale-110 transition"><img src="kids.jpg" class="btn-icon-img" onerror="this.parentElement.innerHTML='👟'"></div>
          <h3>KIDS COLLECTION</h3><span class="text-gray-400">→</span>
        </button>
 
@@ -100,6 +100,10 @@
          <h2 id="m-name" class="text-2xl font-bold text-center mb-1 text-gray-800"></h2>
          <p id="m-price" class="text-3xl font-black text-brand text-center mb-6"></p>
          
+         <div id="m-colors-wrap" class="mb-4 text-center hidden">
+             <p class="text-xs text-gray-400 mb-2 font-bold uppercase tracking-widest">اختر اللون</p>
+             <div id="m-colors" class="flex flex-wrap justify-center gap-2"></div>
+         </div>
          <div class="mb-6 text-center">
              <p class="text-xs text-gray-400 mb-2 font-bold uppercase tracking-widest">اختر المقاس</p>
              <div id="m-sizes" class="flex flex-wrap justify-center gap-2"></div>
@@ -145,6 +149,7 @@
     let products = [];
     window.currentProd = null;
     window.currentSize = null;
+    window.currentColor = null;
 
     window.showCategory = async function(cat) {
         document.getElementById('home-view').classList.add('hidden');
@@ -181,14 +186,38 @@
 
     window.openModal = function(id) {
         window.currentProd = products.find(p => p.id === id);
+        window.currentSize = null;
+        window.currentColor = null;
         document.getElementById('modal').classList.remove('hidden');
         document.getElementById('m-name').innerText = window.currentProd.name;
         document.getElementById('m-price').innerText = window.currentProd.price + ' ج.م';
-        document.getElementById('main-img').src = window.currentProd.images[0];
-        document.getElementById('thumbs').innerHTML = window.currentProd.images.map(src => `<div onclick="document.getElementById('main-img').src='${src}'" class="w-12 h-12 rounded-lg border cursor-pointer overflow-hidden"><img src="${src}" class="w-full h-full object-cover"></div>`).join('');
-        document.getElementById('m-sizes').innerHTML = window.currentProd.sizes.map(s => `<button onclick="selectSize(${s}, this)" class="w-8 h-8 rounded-lg bg-gray-100 text-xs font-bold text-gray-600 hover:bg-brand hover:text-white transition">${s}</button>`).join('');
+        document.getElementById('main-img').src = (window.currentProd.images||[])[0];
+        document.getElementById('thumbs').innerHTML = (window.currentProd.images||[]).map(src => `<div onclick="document.getElementById('main-img').src='${src}'" class="w-12 h-12 rounded-lg border cursor-pointer overflow-hidden"><img src="${src}" class="w-full h-full object-cover"></div>`).join('');
+        const colors = window.currentProd.colors;
+        if(colors && colors.length > 1) {
+            document.getElementById('m-colors-wrap').classList.remove('hidden');
+            document.getElementById('m-colors').innerHTML = colors.map(c => `<button onclick="selectColor('${c.name}', this)" class="px-4 py-2 rounded-lg text-sm font-bold border-2 border-gray-200 hover:border-brand transition">${c.name}</button>`).join('');
+            document.getElementById('m-sizes').innerHTML = '<p class="text-gray-400 text-sm">اختر اللون أولاً</p>';
+        } else if(colors && colors.length === 1) {
+            document.getElementById('m-colors-wrap').classList.add('hidden');
+            window.currentColor = colors[0].name;
+            renderSizesForColor(colors[0].sizes);
+        } else {
+            document.getElementById('m-colors-wrap').classList.add('hidden');
+            renderSizesForColor(window.currentProd.sizes || []);
+        }
     }
-
+    function renderSizesForColor(sizes) {
+        document.getElementById('m-sizes').innerHTML = sizes.map(s => `<button onclick="selectSize(${s}, this)" class="w-8 h-8 rounded-lg bg-gray-100 text-xs font-bold text-gray-600 hover:bg-brand hover:text-white transition">${s}</button>`).join('');
+    }
+    window.selectColor = function(colorName, btn) {
+        window.currentColor = colorName;
+        window.currentSize = null;
+        document.querySelectorAll('#m-colors button').forEach(b => b.classList.remove('bg-brand', 'text-white', 'border-brand'));
+        btn.classList.add('bg-brand', 'text-white', 'border-brand');
+        const color = window.currentProd.colors.find(c => c.name === colorName);
+        renderSizesForColor(color ? color.sizes : []);
+    }
     window.selectSize = function(s, btn) {
         window.currentSize = s;
         document.querySelectorAll('#m-sizes button').forEach(b => b.classList.remove('bg-brand', 'text-white'));
@@ -207,7 +236,7 @@
         document.getElementById('order-btn').innerText = "جاري الإرسال...";
         
         try {
-            await addDoc(collection(db, "orders"), {
+            const orderData = {
                 productName: window.currentProd.name,
                 productPrice: window.currentProd.price,
                 size: window.currentSize,
@@ -215,7 +244,9 @@
                 customerPhone: phone,
                 customerAddress: addr,
                 timestamp: Date.now()
-            });
+            };
+            if(window.currentColor) orderData.color = window.currentColor;
+            await addDoc(collection(db, "orders"), orderData);
             alert('✅ تم استلام طلبك بنجاح! سيتم التواصل معك قريباً.');
             closeModal();
         } catch (e) {
