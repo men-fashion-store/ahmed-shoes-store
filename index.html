@@ -59,7 +59,6 @@
       background-color: #fff;
     }
 
-    /* تنسيق الأزرار مع الصور */
     .link-btn {
       display: flex;
       align-items: center; 
@@ -84,7 +83,6 @@
       border-color: #4b5f28;
     }
 
-    /* حاوية أيقونة الزر */
     .btn-icon-box {
       width: 50px;
       height: 50px;
@@ -127,6 +125,27 @@
       border-radius: 50%;
       font-size: 12px;
       margin-right: 5px;
+    }
+
+    /* تبويبات الإدارة */
+    .admin-tab {
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: bold;
+        transition: 0.3s;
+        cursor: pointer;
+        flex: 1;
+        text-align: center;
+        border: 1px solid #333;
+    }
+    .admin-tab.active {
+        background-color: #4b5f28;
+        color: white;
+        border-color: #4b5f28;
+    }
+    .admin-tab.inactive {
+        background-color: transparent;
+        color: #888;
     }
   </style>
  </head>
@@ -237,7 +256,7 @@
            <input id="c-address" placeholder="العنوان بالتفصيل" class="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-brand focus:bg-white transition">
            
            <button onclick="sendOrder()" class="w-full py-4 rounded-xl font-bold mt-2 text-lg shadow-xl text-white bg-gradient-to-r from-brand to-brand-accent hover:shadow-2xl transition transform hover:-translate-y-1">
-             تأكيد الطلب واتساب 🟢
+             تأكيد الطلب ✅
            </button>
          </div>
        </div>
@@ -251,85 +270,121 @@
          <button onclick="toggleAdmin()" class="text-gray-400 hover:text-white transition">إغلاق</button>
        </header>
 
-       <div class="bg-gray-900 p-4 rounded-xl mb-8 border border-gray-800">
-           <div class="flex gap-3">
-               <button onclick="exportData()" class="flex-1 bg-blue-600/20 text-blue-400 border border-blue-600/30 py-2 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white transition">📥 تحميل نسخة</button>
-               <button onclick="document.getElementById('import-file').click()" class="flex-1 bg-green-600/20 text-green-400 border border-green-600/30 py-2 rounded-lg text-xs font-bold hover:bg-green-600 hover:text-white transition">📤 استرجاع نسخة</button>
-               <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(this)">
-           </div>
+       <div class="flex gap-2 mb-6">
+           <div onclick="switchAdminTab('products')" id="tab-products" class="admin-tab active">المنتجات</div>
+           <div onclick="switchAdminTab('orders')" id="tab-orders" class="admin-tab inactive">الطلبات الواردة</div>
        </div>
 
-       <div class="bg-gray-900 p-6 rounded-xl mb-8 border border-gray-800">
-         <h3 class="font-bold mb-4 text-brand-light">➕ إضافة موديل</h3>
-         <div class="space-y-4">
-           <div class="border-2 border-dashed border-gray-700 bg-gray-800/50 p-6 text-center rounded-xl cursor-pointer hover:border-brand transition group" onclick="document.getElementById('file-in').click()">
-             <input type="file" id="file-in" multiple accept="image/*" class="hidden" onchange="handleFiles(this)">
-             <div id="upload-placeholder" class="group-hover:scale-105 transition-transform">
-                 <span class="text-3xl block mb-2 opacity-50">📸</span>
-                 <span class="text-sm text-gray-400 font-bold">اضغط لإضافة صور</span>
+       <div id="admin-products-section">
+           <div class="bg-gray-900 p-4 rounded-xl mb-8 border border-gray-800">
+               <div class="flex gap-3">
+                   <button onclick="exportData()" class="flex-1 bg-blue-600/20 text-blue-400 border border-blue-600/30 py-2 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white transition">📥 تحميل نسخة</button>
+                   <button onclick="document.getElementById('import-file').click()" class="flex-1 bg-green-600/20 text-green-400 border border-green-600/30 py-2 rounded-lg text-xs font-bold hover:bg-green-600 hover:text-white transition">📤 استرجاع نسخة</button>
+                   <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(this)">
+               </div>
+           </div>
+
+           <div class="bg-gray-900 p-6 rounded-xl mb-8 border border-gray-800">
+             <h3 class="font-bold mb-4 text-brand-light">➕ إضافة موديل</h3>
+             <div class="space-y-4">
+               <div class="border-2 border-dashed border-gray-700 bg-gray-800/50 p-6 text-center rounded-xl cursor-pointer hover:border-brand transition group" onclick="document.getElementById('file-in').click()">
+                 <input type="file" id="file-in" multiple accept="image/*" class="hidden" onchange="handleFiles(this)">
+                 <div id="upload-placeholder" class="group-hover:scale-105 transition-transform">
+                     <span class="text-3xl block mb-2 opacity-50">📸</span>
+                     <span class="text-sm text-gray-400 font-bold">اضغط لإضافة صور</span>
+                 </div>
+                 <div id="preview" class="grid grid-cols-4 gap-2 mt-2 hidden"></div>
+               </div>
+               <p id="file-msg" class="text-xs text-brand mt-1 text-center hidden"></p>
+               <input id="new-name" placeholder="اسم الموديل" class="w-full bg-gray-800 border border-gray-700 p-3 rounded-xl text-white focus:border-brand outline-none">
+               <div class="flex gap-3">
+                 <input id="new-price" type="number" placeholder="السعر" class="flex-1 bg-gray-800 border border-gray-700 p-3 rounded-xl text-white focus:border-brand outline-none">
+                 <select id="new-cat" class="flex-1 bg-gray-800 border border-gray-700 p-3 rounded-xl text-white focus:border-brand outline-none">
+                   <option value="رجالي">رجالي</option><option value="حريمي">حريمي</option><option value="أطفالي">أطفالي</option>
+                 </select>
+               </div>
+               <div id="size-options" class="flex flex-wrap gap-2 p-3 bg-gray-800 rounded-xl"></div>
+               <button onclick="addProduct()" id="add-btn" class="w-full py-3 rounded-xl font-bold bg-brand text-white hover:bg-brand-light hover:text-brand-dark transition">حفظ الموديل</button>
              </div>
-             <div id="preview" class="grid grid-cols-4 gap-2 mt-2 hidden"></div>
            </div>
-           <p id="file-msg" class="text-xs text-brand mt-1 text-center hidden"></p>
-           <input id="new-name" placeholder="اسم الموديل" class="w-full bg-gray-800 border border-gray-700 p-3 rounded-xl text-white focus:border-brand outline-none">
-           <div class="flex gap-3">
-             <input id="new-price" type="number" placeholder="السعر" class="flex-1 bg-gray-800 border border-gray-700 p-3 rounded-xl text-white focus:border-brand outline-none">
-             <select id="new-cat" class="flex-1 bg-gray-800 border border-gray-700 p-3 rounded-xl text-white focus:border-brand outline-none">
-               <option value="رجالي">رجالي</option><option value="حريمي">حريمي</option><option value="أطفالي">أطفالي</option>
-             </select>
-           </div>
-           <div id="size-options" class="flex flex-wrap gap-2 p-3 bg-gray-800 rounded-xl"></div>
-           <button onclick="addProduct()" id="add-btn" class="w-full py-3 rounded-xl font-bold bg-brand text-white hover:bg-brand-light hover:text-brand-dark transition">حفظ الموديل</button>
-         </div>
+           <h3 class="font-bold mb-4 flex items-center gap-2">المنتجات <span id="count-badge" class="text-xs bg-gray-700 text-white px-2 rounded-full">0</span></h3>
+           <div id="admin-list" class="space-y-3 pb-10"></div>
        </div>
-       <h3 class="font-bold mb-4 flex items-center gap-2">المنتجات <span id="count-badge" class="text-xs bg-gray-700 text-white px-2 rounded-full">0</span></h3>
-       <div id="admin-list" class="space-y-3 pb-10"></div>
+
+       <div id="admin-orders-section" class="hidden">
+           <h3 class="font-bold mb-4 flex items-center gap-2">الطلبات الجديدة</h3>
+           <div id="admin-orders-list" class="space-y-3 pb-10"></div>
+       </div>
+
      </div>
    </div>
 
    <script>
-    const dbName = "AhmedShoesDB_Modern_V6";
-    const storeName = "products";
+    // === قاعدة البيانات (تخزين المنتجات والطلبات) ===
+    const dbName = "AhmedShoesDB_Orders_V7";
     let db;
-    const whatsapp = "201020468021"; 
 
     function openDB() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open(dbName, 1);
             request.onupgradeneeded = (e) => {
                 db = e.target.result;
-                if (!db.objectStoreNames.contains(storeName)) db.createObjectStore(storeName, { keyPath: "id" });
+                if (!db.objectStoreNames.contains("products")) db.createObjectStore("products", { keyPath: "id" });
+                if (!db.objectStoreNames.contains("orders")) db.createObjectStore("orders", { keyPath: "id" });
             };
             request.onsuccess = (e) => { db = e.target.result; resolve(db); };
             request.onerror = () => reject("DB Error");
         });
     }
 
+    // دوال المنتجات
     function saveProductToDB(product) {
         return new Promise((resolve) => {
-            const tx = db.transaction([storeName], "readwrite");
-            tx.objectStore(storeName).put(product);
+            const tx = db.transaction(["products"], "readwrite");
+            tx.objectStore("products").put(product);
+            tx.oncomplete = () => resolve(true);
+        });
+    }
+    function getAllProducts() {
+        return new Promise((resolve) => {
+            if(!db) return resolve([]);
+            const tx = db.transaction(["products"], "readonly");
+            tx.objectStore("products").getAll().onsuccess = (e) => resolve(e.target.result || []);
+        });
+    }
+    function deleteProductFromDB(id) {
+        return new Promise((resolve) => {
+            const tx = db.transaction(["products"], "readwrite");
+            tx.objectStore("products").delete(id);
             tx.oncomplete = () => resolve(true);
         });
     }
 
-    function getAllProducts() {
+    // دوال الطلبات
+    function saveOrderToDB(order) {
         return new Promise((resolve) => {
-            if(!db) return resolve([]);
-            const tx = db.transaction([storeName], "readonly");
-            tx.objectStore(storeName).getAll().onsuccess = (e) => resolve(e.target.result || []);
+            const tx = db.transaction(["orders"], "readwrite");
+            tx.objectStore("orders").put(order);
+            tx.oncomplete = () => resolve(true);
         });
     }
-
-    function deleteProductFromDB(id) {
+    function getAllOrders() {
         return new Promise((resolve) => {
-            const tx = db.transaction([storeName], "readwrite");
-            tx.objectStore(storeName).delete(id);
+            if(!db) return resolve([]);
+            const tx = db.transaction(["orders"], "readonly");
+            tx.objectStore("orders").getAll().onsuccess = (e) => resolve(e.target.result || []);
+        });
+    }
+    function deleteOrderFromDB(id) {
+        return new Promise((resolve) => {
+            const tx = db.transaction(["orders"], "readwrite");
+            tx.objectStore("orders").delete(id);
             tx.oncomplete = () => resolve(true);
         });
     }
 
     let products = [];
+    let orders = [];
     let currentProd = null, currentSize = null, newImages = [], newSizes = [];
 
     async function init() {
@@ -339,6 +394,7 @@
     }
     init();
 
+    // === الصور ===
     function handleFiles(input) {
       const files = [...input.files].slice(0, 4);
       const preview = document.getElementById('preview');
@@ -381,6 +437,76 @@
         newImages.forEach(img => {
             preview.innerHTML += `<div class="aspect-square rounded-lg bg-cover bg-center border border-brand/50" style="background-image: url('${img}')"></div>`;
         });
+    }
+
+    // === الإدارة ===
+    async function toggleAdmin() {
+      const p = document.getElementById('admin-panel');
+      if(p.classList.contains('hidden')) {
+        const pass = prompt('كلمة المرور:');
+        if(pass === 'admin123') {
+           p.classList.remove('hidden');
+           products = await getAllProducts();
+           renderAdminList();
+           switchAdminTab('products'); // Default tab
+        } else alert('خطأ');
+      } else p.classList.add('hidden');
+    }
+
+    function switchAdminTab(tabName) {
+        const prodSec = document.getElementById('admin-products-section');
+        const ordSec = document.getElementById('admin-orders-section');
+        const tabProd = document.getElementById('tab-products');
+        const tabOrd = document.getElementById('tab-orders');
+
+        if(tabName === 'products') {
+            prodSec.classList.remove('hidden');
+            ordSec.classList.add('hidden');
+            tabProd.classList.add('active'); tabProd.classList.remove('inactive');
+            tabOrd.classList.remove('active'); tabOrd.classList.add('inactive');
+            renderAdminList();
+        } else {
+            prodSec.classList.add('hidden');
+            ordSec.classList.remove('hidden');
+            tabOrd.classList.add('active'); tabOrd.classList.remove('inactive');
+            tabProd.classList.remove('active'); tabProd.classList.add('inactive');
+            renderAdminOrders();
+        }
+    }
+
+    async function renderAdminOrders() {
+        orders = await getAllOrders();
+        const list = document.getElementById('admin-orders-list');
+        
+        if(orders.length === 0) {
+            list.innerHTML = '<p class="text-center text-gray-500">لا توجد طلبات جديدة</p>';
+            return;
+        }
+
+        list.innerHTML = orders.reverse().map(o => `
+            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 relative">
+                <button onclick="deleteOrder(${o.id})" class="absolute top-2 left-2 text-red-400 text-xs border border-red-900 p-1 rounded hover:bg-red-900">حذف</button>
+                <div class="text-brand-light font-bold text-sm mb-2">${o.date}</div>
+                <div class="flex gap-3 mb-3">
+                    <div class="text-white">
+                        <p class="text-lg font-bold">${o.productName}</p>
+                        <p class="text-brand text-sm">${o.productPrice} ج.م | مقاس ${o.size}</p>
+                    </div>
+                </div>
+                <div class="bg-black/30 p-2 rounded text-sm text-gray-300">
+                    <p>👤 ${o.customerName}</p>
+                    <p>📞 <a href="tel:${o.customerPhone}" class="text-blue-400">${o.customerPhone}</a></p>
+                    <p>📍 ${o.customerAddress}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function deleteOrder(id) {
+        if(confirm('حذف هذا الطلب؟')) {
+            await deleteOrderFromDB(id);
+            renderAdminOrders();
+        }
     }
 
     async function addProduct() {
@@ -436,33 +562,7 @@
       `).join('');
     }
 
-    async function exportData() {
-        if(!products.length) return alert('لا توجد بيانات');
-        const blob = new Blob([JSON.stringify(products)], {type: "application/json"});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = `backup_${new Date().toISOString().slice(0,10)}.json`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    }
-
-    function importData(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            try {
-                const imported = JSON.parse(e.target.result);
-                if (confirm(`استرجاع ${imported.length} منتج؟`)) {
-                    for (const p of imported) await saveProductToDB(p);
-                    products = await getAllProducts();
-                    renderAdminList();
-                    alert('تم الاسترجاع');
-                }
-            } catch (err) { alert('خطأ في الملف'); }
-        };
-        reader.readAsText(file);
-    }
-
+    // === UI ===
     function updateSizeOpts() {
       const cat = document.getElementById('new-cat').value;
       let sizes = cat === 'رجالي' ? [40,41,42,43,44,45] : (cat === 'حريمي' ? [37,38,39,40,41] : [25,26,27,28,29,30,31,32,33,34,35]);
@@ -518,18 +618,7 @@
       document.getElementById('home-view').classList.remove('hidden');
     }
 
-    async function toggleAdmin() {
-      const p = document.getElementById('admin-panel');
-      if(p.classList.contains('hidden')) {
-        const pass = prompt('كلمة المرور:');
-        if(pass === 'admin123') {
-           p.classList.remove('hidden');
-           products = await getAllProducts();
-           renderAdminList();
-        } else alert('خطأ');
-      } else p.classList.add('hidden');
-    }
-
+    // === Modal & Internal Order ===
     function openModal(id) {
       currentProd = products.find(p => p.id === id);
       const modal = document.getElementById('modal');
@@ -557,14 +646,56 @@
 
     function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
-    function sendOrder() {
+    async function sendOrder() {
       const name = document.getElementById('c-name').value;
       const addr = document.getElementById('c-address').value;
       const phone = document.getElementById('c-phone').value;
+      
       if(!currentSize || !name || !addr) return alert('أكمل البيانات');
-      const msg = `طلب جديد: \n👟 ${currentProd.name}\n📏 ${currentSize}\n💰 ${currentProd.price}\n👤 ${name}\n📞 ${phone}\n📍 ${addr}`;
-      window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
+      
+      const newOrder = {
+          id: Date.now(),
+          productName: currentProd.name,
+          productPrice: currentProd.price,
+          size: currentSize,
+          customerName: name,
+          customerPhone: phone,
+          customerAddress: addr,
+          date: new Date().toLocaleString('ar-EG')
+      };
+
+      await saveOrderToDB(newOrder);
+      
+      alert('✅ تم استلام طلبك بنجاح! سنتواصل معك قريباً لتأكيد الشحن.');
       closeModal();
+    }
+
+    // === Backup Helpers ===
+    async function exportData() {
+        if(!products.length) return alert('لا توجد بيانات');
+        const blob = new Blob([JSON.stringify(products)], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `backup_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+
+    function importData(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (confirm(`استرجاع ${imported.length} منتج؟`)) {
+                    for (const p of imported) await saveProductToDB(p);
+                    products = await getAllProducts();
+                    renderAdminList();
+                    alert('تم الاسترجاع');
+                }
+            } catch (err) { alert('خطأ في الملف'); }
+        };
+        reader.readAsText(file);
     }
    </script>
  </body>
