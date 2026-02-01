@@ -27,7 +27,7 @@
 
    <div id="dashboard" class="hidden">
        <header class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-           <h1 class="text-2xl font-bold text-[#708238]">لوحة القيادة</h1>
+           <h1 class="text-2xl font-bold text-[#708238]">لوحة القيادة (أونلاين)</h1>
            <button onclick="location.reload()" class="text-red-400 text-sm">خروج</button>
        </header>
 
@@ -40,9 +40,13 @@
            <div class="bg-[#2d2d2d] p-4 rounded-xl mb-6">
                <h3 class="font-bold mb-4">إضافة موديل جديد</h3>
                <div class="space-y-3">
-                   <input type="file" id="file-in" multiple accept="image/*" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#708238] file:text-white hover:file:bg-[#556b2f]" onchange="handleFiles(this)">
-                   <div id="preview" class="flex gap-2"></div>
-                   <p id="img-status" class="text-xs text-yellow-500 hidden">جاري رفع الصور...</p>
+                   <div class="border-2 border-dashed border-gray-600 p-4 text-center rounded-xl cursor-pointer" onclick="document.getElementById('file-in').click()">
+                        <input type="file" id="file-in" multiple accept="image/*" class="hidden" onchange="handleFiles(this)">
+                        <span class="text-gray-400 text-sm">اضغط لإضافة صور</span>
+                   </div>
+                   <div id="preview" class="flex gap-2 justify-center"></div>
+                   <p id="img-status" class="text-xs text-center text-yellow-500 hidden">جاري معالجة الصور...</p>
+                   
                    <input id="new-name" placeholder="اسم الموديل" class="input-dark">
                    <div class="flex gap-2">
                        <input id="new-price" type="number" placeholder="السعر" class="input-dark">
@@ -53,14 +57,19 @@
                        </select>
                    </div>
                    <div id="size-options" class="flex flex-wrap gap-2"></div>
-                   <button onclick="addProduct()" id="save-btn" class="btn-primary">حفظ ورفع</button>
+                   <button onclick="addProduct()" id="save-btn" class="btn-primary">حفظ ورفع للسيرفر ☁️</button>
                </div>
            </div>
-           <div id="products-list" class="space-y-2"></div>
+           <h3 class="mb-2 font-bold text-gray-400">المنتجات المرفوعة:</h3>
+           <div id="products-list" class="space-y-2">
+               <p class="text-center text-gray-600 py-4">جاري تحميل البيانات...</p>
+           </div>
        </div>
 
        <div id="sec-orders" class="hidden">
-           <div id="orders-list" class="space-y-4"></div>
+           <div id="orders-list" class="space-y-4">
+               <p class="text-center text-gray-600 py-4">جاري تحميل الطلبات...</p>
+           </div>
        </div>
    </div>
 
@@ -68,7 +77,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // ✅ كود الربط بقاعدة البيانات
+    // ✅ كود الفايربيس (تم دمجه)
     const firebaseConfig = {
       apiKey: "AIzaSyASO-AN5XaSGn4SaCZ8VlHr6zsFCIxPCzs",
       authDomain: "ahmed-shoes.firebaseapp.com",
@@ -82,11 +91,9 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // متغيرات
     window.newImages = []; 
     window.newSizes = [];
 
-    // Login
     window.login = function() {
         if(document.getElementById('admin-pass').value === 'admin123') {
             document.getElementById('login-screen').classList.add('hidden');
@@ -97,7 +104,6 @@
         } else alert('خطأ');
     }
 
-    // Tabs
     window.switchTab = function(t) {
         document.getElementById('sec-products').classList.toggle('hidden', t !== 'products');
         document.getElementById('sec-orders').classList.toggle('hidden', t !== 'orders');
@@ -105,7 +111,6 @@
         document.getElementById('tab-orders').className = t === 'orders' ? 'tab active' : 'tab';
     }
 
-    // Products Logic
     window.updateSizeOpts = function() {
         const cat = document.getElementById('new-cat').value;
         const sizes = cat === 'رجالي' ? [40,41,42,43,44,45] : (cat === 'حريمي' ? [37,38,39,40,41] : [26,27,28,29,30,31,32,33,34,35]);
@@ -122,20 +127,22 @@
         window.newImages = [];
         document.getElementById('preview').innerHTML = '';
         document.getElementById('img-status').classList.remove('hidden');
+        
         let processed = 0;
         const files = [...input.files].slice(0,4);
+        
         files.forEach(f => {
             const r = new FileReader();
             r.onload = e => {
                 const img = new Image(); img.src=e.target.result;
                 img.onload = () => {
                     const c = document.createElement('canvas'); const ctx=c.getContext('2d');
-                    const maxWidth = 700;
+                    const maxWidth = 600;
                     c.width=maxWidth; c.height=img.height*(maxWidth/img.width);
                     ctx.drawImage(img,0,0,c.width,c.height);
                     const d = c.toDataURL('image/jpeg', 0.6);
                     window.newImages.push(d);
-                    document.getElementById('preview').innerHTML+=`<img src="${d}" class="w-10 h-10 rounded">`;
+                    document.getElementById('preview').innerHTML+=`<img src="${d}" class="w-10 h-10 rounded border border-gray-500">`;
                     processed++;
                     if(processed === files.length) {
                         document.getElementById('img-status').innerText = "✅ الصور جاهزة";
@@ -150,14 +157,30 @@
         const btn = document.getElementById('save-btn');
         const name = document.getElementById('new-name').value;
         const price = document.getElementById('new-price').value;
+        
         if(!name || !price || !window.newImages.length) return alert('أكمل البيانات');
-        btn.innerText = "جاري الرفع..."; btn.disabled = true;
+        
+        btn.innerText = "جاري الرفع للسيرفر...";
+        btn.disabled = true;
+
         try {
-            await addDoc(collection(db, "products"), { name, price, category: document.getElementById('new-cat').value, images: window.newImages, sizes: window.newSizes, timestamp: Date.now() });
-            alert('تم الرفع!');
-            document.getElementById('new-name').value = ''; document.getElementById('preview').innerHTML = ''; window.newImages = [];
-        } catch (e) { alert('خطأ: ' + e.message); }
-        btn.innerText = "حفظ ورفع"; btn.disabled = false;
+            await addDoc(collection(db, "products"), {
+                name: name,
+                price: price,
+                category: document.getElementById('new-cat').value,
+                images: window.newImages,
+                sizes: window.newSizes,
+                timestamp: Date.now()
+            });
+            alert('تم الرفع بنجاح!');
+            document.getElementById('new-name').value = '';
+            document.getElementById('preview').innerHTML = '';
+            window.newImages = [];
+        } catch (e) {
+            alert('حدث خطأ: ' + e.message);
+        }
+        btn.innerText = "حفظ ورفع للسيرفر ☁️";
+        btn.disabled = false;
     }
 
     function loadProducts() {
@@ -165,19 +188,28 @@
         onSnapshot(q, (snapshot) => {
             const list = document.getElementById('products-list');
             list.innerHTML = "";
+            if(snapshot.empty) list.innerHTML = '<p class="text-center text-gray-500">لا توجد منتجات</p>';
             snapshot.forEach((doc) => {
                 const p = doc.data();
                 list.innerHTML += `
                     <div class="bg-[#2d2d2d] p-3 rounded flex justify-between items-center border border-gray-600">
-                        <div class="flex gap-2 items-center"><img src="${p.images[0]}" class="w-10 h-10 rounded object-cover"><div><div class="font-bold">${p.name}</div><div class="text-xs text-gray-400">${p.price} ج.م</div></div></div>
+                        <div class="flex gap-2 items-center">
+                            <img src="${p.images[0]}" class="w-12 h-12 rounded object-cover">
+                            <div><div class="font-bold">${p.name}</div><div class="text-xs text-gray-400">${p.price} ج.م</div></div>
+                        </div>
                         <button onclick="delProd('${doc.id}')" class="text-red-400 text-sm border border-red-900 p-1 rounded">حذف</button>
-                    </div>`;
+                    </div>
+                `;
             });
         });
     }
-    window.delProd = async function(id) { if(confirm('حذف؟')) await deleteDoc(doc(db, "products", id)); }
 
-    // Orders Logic
+    window.delProd = async function(id) {
+        if(confirm('حذف نهائي؟')) {
+            await deleteDoc(doc(db, "products", id));
+        }
+    }
+
     function loadOrders() {
         const q = query(collection(db, "orders"), orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
@@ -188,15 +220,28 @@
                 const o = doc.data();
                 list.innerHTML += `
                     <div class="bg-[#2d2d2d] p-4 rounded-xl border-r-4 border-[#708238]">
-                        <div class="flex justify-between mb-2"><span class="text-xs text-gray-400">${new Date(o.timestamp).toLocaleString()}</span><button onclick="delOrder('${doc.id}')" class="text-red-400 text-xs">تم التسليم</button></div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-xs text-gray-400">${new Date(o.timestamp).toLocaleString('ar-EG')}</span>
+                            <button onclick="delOrder('${doc.id}')" class="text-red-400 text-xs">تم التسليم</button>
+                        </div>
                         <div class="font-bold text-lg text-white mb-1">${o.productName}</div>
                         <div class="text-[#708238] text-sm mb-3">السعر: ${o.productPrice} | مقاس: ${o.size}</div>
-                        <div class="bg-black/30 p-2 rounded text-sm text-gray-300"><p>👤 ${o.customerName}</p><p>📞 <a href="tel:${o.customerPhone}" class="text-blue-400">${o.customerPhone}</a></p><p>📍 ${o.customerAddress}</p></div>
-                    </div>`;
+                        <div class="bg-black/30 p-2 rounded text-sm text-gray-300">
+                            <p>👤 ${o.customerName}</p>
+                            <p>📞 ${o.customerPhone}</p>
+                            <p>📍 ${o.customerAddress}</p>
+                        </div>
+                    </div>
+                `;
             });
         });
     }
-    window.delOrder = async function(id) { if(confirm('حذف؟')) await deleteDoc(doc(db, "orders", id)); }
+
+    window.delOrder = async function(id) {
+        if(confirm('هل تم التسليم؟ سيتم الحذف.')) {
+            await deleteDoc(doc(db, "orders", id));
+        }
+    }
    </script>
  </body>
 </html>
