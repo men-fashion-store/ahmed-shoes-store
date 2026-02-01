@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ar" dir="rtl" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <title>لوحة التحكم - أحمد الشيخ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #1a1a1a; color: white; }
+    .input-dark { background: #2d2d2d; border: 1px solid #444; color: white; padding: 10px; width: 100%; border-radius: 8px; outline: none; }
+    .input-dark:focus { border-color: #708238; }
+    .btn-primary { background: #708238; color: white; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; transition: 0.3s; }
+    .btn-primary:hover { background: #556b2f; }
+    .tab { padding: 10px; cursor: pointer; border-bottom: 2px solid transparent; flex: 1; text-align: center; color: #888; }
+    .tab.active { border-color: #708238; color: #708238; font-weight: bold; }
+  </style>
+ </head>
+ <body class="p-4 max-w-3xl mx-auto">
+
+   <div id="login-screen" class="fixed inset-0 bg-[#1a1a1a] flex items-center justify-center z-50">
+       <div class="bg-[#2d2d2d] p-8 rounded-xl text-center w-full max-w-sm">
+           <h2 class="text-2xl font-bold mb-4">🔐 دخول الإدارة</h2>
+           <input type="password" id="admin-pass" class="input-dark text-center mb-4" placeholder="كلمة المرور">
+           <button onclick="login()" class="btn-primary">دخول</button>
+       </div>
+   </div>
+
+   <div id="dashboard" class="hidden">
+       <header class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+           <h1 class="text-2xl font-bold text-[#708238]">لوحة القيادة</h1>
+           <button onclick="location.reload()" class="text-red-400 text-sm">خروج</button>
+       </header>
+
+       <div class="flex mb-6 border-b border-gray-700">
+           <div onclick="switchTab('products')" id="tab-products" class="tab active">📦 المنتجات</div>
+           <div onclick="switchTab('orders')" id="tab-orders" class="tab">🛒 الطلبات الواردة</div>
+       </div>
+
+       <div id="sec-products">
+           <div class="bg-[#2d2d2d] p-4 rounded-xl mb-6">
+               <h3 class="font-bold mb-4">إضافة موديل جديد</h3>
+               <div class="space-y-3">
+                   <input type="file" id="file-in" multiple accept="image/*" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#708238] file:text-white hover:file:bg-[#556b2f]" onchange="handleFiles(this)">
+                   <div id="preview" class="flex gap-2"></div>
+                   <p id="img-status" class="text-xs text-yellow-500 hidden">جاري رفع الصور...</p>
+                   <input id="new-name" placeholder="اسم الموديل" class="input-dark">
+                   <div class="flex gap-2">
+                       <input id="new-price" type="number" placeholder="السعر" class="input-dark">
+                       <select id="new-cat" class="input-dark">
+                           <option value="رجالي">رجالي</option>
+                           <option value="حريمي">حريمي</option>
+                           <option value="أطفالي">أطفالي</option>
+                       </select>
+                   </div>
+                   <div id="size-options" class="flex flex-wrap gap-2"></div>
+                   <button onclick="addProduct()" id="save-btn" class="btn-primary">حفظ ورفع</button>
+               </div>
+           </div>
+           <div id="products-list" class="space-y-2"></div>
+       </div>
+
+       <div id="sec-orders" class="hidden">
+           <div id="orders-list" class="space-y-4"></div>
+       </div>
+   </div>
+
+   <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // ✅ كود الربط بقاعدة البيانات
+    const firebaseConfig = {
+      apiKey: "AIzaSyASO-AN5XaSGn4SaCZ8VlHr6zsFCIxPCzs",
+      authDomain: "ahmed-shoes.firebaseapp.com",
+      projectId: "ahmed-shoes",
+      storageBucket: "ahmed-shoes.firebasestorage.app",
+      messagingSenderId: "172928088473",
+      appId: "1:172928088473:web:100f543fd097a8d5c33b08",
+      measurementId: "G-S50TX0VMKE"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // متغيرات
+    window.newImages = []; 
+    window.newSizes = [];
+
+    // Login
+    window.login = function() {
+        if(document.getElementById('admin-pass').value === 'admin123') {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            loadProducts();
+            loadOrders();
+            updateSizeOpts();
+        } else alert('خطأ');
+    }
+
+    // Tabs
+    window.switchTab = function(t) {
+        document.getElementById('sec-products').classList.toggle('hidden', t !== 'products');
+        document.getElementById('sec-orders').classList.toggle('hidden', t !== 'orders');
+        document.getElementById('tab-products').className = t === 'products' ? 'tab active' : 'tab';
+        document.getElementById('tab-orders').className = t === 'orders' ? 'tab active' : 'tab';
+    }
+
+    // Products Logic
+    window.updateSizeOpts = function() {
+        const cat = document.getElementById('new-cat').value;
+        const sizes = cat === 'رجالي' ? [40,41,42,43,44,45] : (cat === 'حريمي' ? [37,38,39,40,41] : [26,27,28,29,30,31,32,33,34,35]);
+        window.newSizes = [];
+        document.getElementById('size-options').innerHTML = sizes.map(s => `<button onclick="toggleSize(${s}, this)" class="px-3 py-1 rounded bg-gray-700 text-sm border border-gray-600 hover:border-green-500">${s}</button>`).join('');
+    }
+    window.toggleSize = function(s, btn) {
+        if(window.newSizes.includes(s)) { window.newSizes = window.newSizes.filter(x=>x!==s); btn.style.borderColor='#4b5563'; }
+        else { window.newSizes.push(s); btn.style.borderColor='#708238'; }
+    }
+    document.getElementById('new-cat').addEventListener('change', window.updateSizeOpts);
+
+    window.handleFiles = function(input) {
+        window.newImages = [];
+        document.getElementById('preview').innerHTML = '';
+        document.getElementById('img-status').classList.remove('hidden');
+        let processed = 0;
+        const files = [...input.files].slice(0,4);
+        files.forEach(f => {
+            const r = new FileReader();
+            r.onload = e => {
+                const img = new Image(); img.src=e.target.result;
+                img.onload = () => {
+                    const c = document.createElement('canvas'); const ctx=c.getContext('2d');
+                    const maxWidth = 700;
+                    c.width=maxWidth; c.height=img.height*(maxWidth/img.width);
+                    ctx.drawImage(img,0,0,c.width,c.height);
+                    const d = c.toDataURL('image/jpeg', 0.6);
+                    window.newImages.push(d);
+                    document.getElementById('preview').innerHTML+=`<img src="${d}" class="w-10 h-10 rounded">`;
+                    processed++;
+                    if(processed === files.length) {
+                        document.getElementById('img-status').innerText = "✅ الصور جاهزة";
+                        document.getElementById('img-status').classList.replace('text-yellow-500', 'text-green-500');
+                    }
+                }
+            }; r.readAsDataURL(f);
+        });
+    }
+
+    window.addProduct = async function() {
+        const btn = document.getElementById('save-btn');
+        const name = document.getElementById('new-name').value;
+        const price = document.getElementById('new-price').value;
+        if(!name || !price || !window.newImages.length) return alert('أكمل البيانات');
+        btn.innerText = "جاري الرفع..."; btn.disabled = true;
+        try {
+            await addDoc(collection(db, "products"), { name, price, category: document.getElementById('new-cat').value, images: window.newImages, sizes: window.newSizes, timestamp: Date.now() });
+            alert('تم الرفع!');
+            document.getElementById('new-name').value = ''; document.getElementById('preview').innerHTML = ''; window.newImages = [];
+        } catch (e) { alert('خطأ: ' + e.message); }
+        btn.innerText = "حفظ ورفع"; btn.disabled = false;
+    }
+
+    function loadProducts() {
+        const q = query(collection(db, "products"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const list = document.getElementById('products-list');
+            list.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const p = doc.data();
+                list.innerHTML += `
+                    <div class="bg-[#2d2d2d] p-3 rounded flex justify-between items-center border border-gray-600">
+                        <div class="flex gap-2 items-center"><img src="${p.images[0]}" class="w-10 h-10 rounded object-cover"><div><div class="font-bold">${p.name}</div><div class="text-xs text-gray-400">${p.price} ج.م</div></div></div>
+                        <button onclick="delProd('${doc.id}')" class="text-red-400 text-sm border border-red-900 p-1 rounded">حذف</button>
+                    </div>`;
+            });
+        });
+    }
+    window.delProd = async function(id) { if(confirm('حذف؟')) await deleteDoc(doc(db, "products", id)); }
+
+    // Orders Logic
+    function loadOrders() {
+        const q = query(collection(db, "orders"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const list = document.getElementById('orders-list');
+            list.innerHTML = "";
+            if(snapshot.empty) list.innerHTML = '<p class="text-center text-gray-500">لا توجد طلبات</p>';
+            snapshot.forEach((doc) => {
+                const o = doc.data();
+                list.innerHTML += `
+                    <div class="bg-[#2d2d2d] p-4 rounded-xl border-r-4 border-[#708238]">
+                        <div class="flex justify-between mb-2"><span class="text-xs text-gray-400">${new Date(o.timestamp).toLocaleString()}</span><button onclick="delOrder('${doc.id}')" class="text-red-400 text-xs">تم التسليم</button></div>
+                        <div class="font-bold text-lg text-white mb-1">${o.productName}</div>
+                        <div class="text-[#708238] text-sm mb-3">السعر: ${o.productPrice} | مقاس: ${o.size}</div>
+                        <div class="bg-black/30 p-2 rounded text-sm text-gray-300"><p>👤 ${o.customerName}</p><p>📞 <a href="tel:${o.customerPhone}" class="text-blue-400">${o.customerPhone}</a></p><p>📍 ${o.customerAddress}</p></div>
+                    </div>`;
+            });
+        });
+    }
+    window.delOrder = async function(id) { if(confirm('حذف؟')) await deleteDoc(doc(db, "orders", id)); }
+   </script>
+ </body>
+</html>
