@@ -27,7 +27,7 @@
 
    <div id="dashboard" class="hidden">
        <header class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-           <h1 class="text-2xl font-bold text-[#708238]">لوحة القيادة (أونلاين)</h1>
+           <h1 class="text-2xl font-bold text-[#708238]">لوحة القيادة</h1>
            <button onclick="location.reload()" class="text-red-400 text-sm">خروج</button>
        </header>
 
@@ -205,7 +205,7 @@
     }
 
     window.delProd = async function(id) {
-        if(confirm('حذف نهائي؟')) {
+        if(confirm('حذف نهائي من السيرفر؟')) {
             await deleteDoc(doc(db, "products", id));
         }
     }
@@ -222,13 +222,13 @@
                     <div class="bg-[#2d2d2d] p-4 rounded-xl border-r-4 border-[#708238]">
                         <div class="flex justify-between mb-2">
                             <span class="text-xs text-gray-400">${new Date(o.timestamp).toLocaleString('ar-EG')}</span>
-                            <button onclick="delOrder('${doc.id}')" class="text-red-400 text-xs">تم التسليم</button>
+                            <button onclick="delOrder('${doc.id}')" class="text-red-400 text-xs">تم التسليم (حذف)</button>
                         </div>
                         <div class="font-bold text-lg text-white mb-1">${o.productName}</div>
                         <div class="text-[#708238] text-sm mb-3">السعر: ${o.productPrice} | مقاس: ${o.size}</div>
                         <div class="bg-black/30 p-2 rounded text-sm text-gray-300">
                             <p>👤 ${o.customerName}</p>
-                            <p>📞 ${o.customerPhone}</p>
+                            <p>📞 <a href="tel:${o.customerPhone}" class="text-blue-400">${o.customerPhone}</a></p>
                             <p>📍 ${o.customerAddress}</p>
                         </div>
                     </div>
@@ -238,7 +238,7 @@
     }
 
     window.delOrder = async function(id) {
-        if(confirm('هل تم التسليم؟ سيتم الحذف.')) {
+        if(confirm('هل تم تسليم الطلب؟ سيتم حذفه.')) {
             await deleteDoc(doc(db, "orders", id));
         }
     }
