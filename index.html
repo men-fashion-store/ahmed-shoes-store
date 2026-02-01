@@ -14,14 +14,15 @@
         extend: { 
           colors: { 
             brand: { 
-              light: '#dce6c8', 
-              DEFAULT: '#708238', // الزيتي (Olive)
-              dark: '#3f4a20',
-              glass: 'rgba(112, 130, 56, 0.15)' 
+              light: '#F3F4F6', 
+              DEFAULT: '#4b5f28', // الزيتي الغامق
+              text: '#2d3748',
+              accent: '#708238' 
             } 
           },
           boxShadow: {
-            '3d': '0 20px 50px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.1)',
+            'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+            'button': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
           }
         } 
       } 
@@ -29,147 +30,173 @@
   </script>
   
   <style>
-    body { font-family: 'Cairo', sans-serif; background-color: #f5f5f5; color: #1a1a1a; }
-    
-    /* الخلفية البيضاء مع اللوجو الشفاف */
-    .brand-bg {
-      background-color: #ffffff;
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.93), rgba(255, 255, 255, 0.97)),
-        url('احمد الشيخ (3).png');
-      background-size: 400px;
-      background-position: center; 
-      background-attachment: fixed; 
-      background-repeat: repeat;
+    body { 
+      font-family: 'Cairo', sans-serif; 
+      background-color: #f0f2f5; 
+      color: #1a1a1a; 
+      background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+      background-size: 20px 20px;
     }
-
-    /* === سحر الزجاج الـ 3D === */
-    .glass-3d-card {
+    
+    .profile-container {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: white;
+      padding: 5px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      border: 4px solid white;
       position: relative;
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      border-top: 1px solid rgba(255, 255, 255, 0.9);
-      border-left: 1px solid rgba(255, 255, 255, 0.9);
-      border-bottom: 1px solid rgba(112, 130, 56, 0.2);
-      border-right: 1px solid rgba(112, 130, 56, 0.2);
-      border-radius: 30px;
-      box-shadow: 
-        10px 10px 20px rgba(0, 0, 0, 0.05),
-        -5px -5px 15px rgba(255, 255, 255, 0.8),
-        inset 0 0 20px rgba(255, 255, 255, 0.5);
+      overflow: hidden;
+    }
+    
+    .profile-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: contain;
+      background-color: #fff;
+    }
+
+    /* تنسيق الأزرار مع الصور */
+    .link-btn {
+      display: flex;
+      align-items: center; /* محاذاة عمودية */
+      gap: 1.5rem; /* مسافة بين الصورة والنص */
+      width: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 1rem 1.5rem;
+      border-radius: 1.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ffffff;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02), 0 10px 15px rgba(0,0,0,0.03);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .glass-3d-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 
-        20px 20px 40px rgba(112, 130, 56, 0.15),
-        -10px -10px 20px rgba(255, 255, 255, 0.9);
-      border-color: #708238;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
 
-    /* الأزرار الزجاجية */
-    .btn-glass {
-      background: linear-gradient(135deg, #708238 0%, #3f4a20 100%);
+    .link-btn:hover {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+      border-color: #4b5f28;
+    }
+
+    /* حاوية أيقونة الزر */
+    .btn-icon-box {
+      width: 50px;
+      height: 50px;
+      background: #f8fafc;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      flex-shrink: 0; /* منع الانكماش */
+    }
+
+    .btn-icon-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .link-btn h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #3f4a20;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-grow: 1; /* يأخذ المساحة المتبقية */
+      text-align: right;
+    }
+
+    .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
+    
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      background: #4b5f28;
       color: white;
-      box-shadow: 0 4px 15px rgba(112, 130, 56, 0.4);
-      transition: 0.3s;
+      border-radius: 50%;
+      font-size: 12px;
+      margin-right: 5px;
     }
-    .btn-glass:hover {
-      box-shadow: 0 8px 25px rgba(112, 130, 56, 0.6);
-      transform: translateY(-2px);
-    }
-
-    /* حقول الإدخال */
-    .input-glass {
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid #d1d5db;
-      box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
-    }
-    .input-glass:focus {
-      border-color: #708238;
-      background: #fff;
-      outline: none;
-    }
-    
-    .modal-overlay { background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); }
   </style>
  </head>
- <body class="h-full brand-bg min-h-screen overflow-auto selection:bg-brand selection:text-white">
+ <body class="h-full min-h-screen overflow-auto">
 
-   <header class="bg-white/70 backdrop-blur-md p-3 sticky top-0 z-50 border-b border-white shadow-sm">
-     <div class="max-w-6xl mx-auto flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center border border-gray-100 shadow-inner overflow-hidden">
-            <img src="احمد الشيخ (3).png" alt="Logo" class="w-full h-full object-contain p-1">
-        </div>
-        <div>
-            <h1 class="text-xl font-black leading-none text-brand-dark">أحمد الشيخ</h1>
-            <span class="text-xs text-brand font-bold tracking-[0.2em] uppercase">Shoes Store</span>
-        </div>
-      </div>
-      <button onclick="toggleAdmin()" class="px-4 py-2 rounded-xl bg-white text-brand border border-brand/20 text-xs font-bold hover:bg-brand hover:text-white transition shadow-sm">🔐 الإدارة</button>
+   <div id="home-view" class="max-w-md mx-auto px-6 py-10 min-h-screen flex flex-col items-center">
+     
+     <div class="w-full flex justify-end mb-4">
+        <button onclick="toggleAdmin()" class="text-xs text-gray-400 hover:text-brand transition">🔐 Admin</button>
      </div>
-   </header>
 
-   <div id="home-view">
-     <section class="min-h-[50vh] flex flex-col items-center justify-center text-center px-4 pt-4">
-       
-       <div class="relative w-36 h-36 mb-4 group cursor-pointer">
-           <div class="absolute inset-0 bg-brand/30 rounded-full blur-2xl group-hover:bg-brand/50 transition duration-500"></div>
-           <img src="احمد الشيخ (3).png" class="relative z-10 w-full h-full object-contain drop-shadow-2xl transform group-hover:rotate-6 transition duration-500">
-       </div>
+     <div class="text-center mb-10 w-full relative">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-brand-accent/10 rounded-full blur-3xl -z-10"></div>
+        <div class="profile-container mb-4">
+            <img src="احمد الشيخ (3).png" class="profile-img" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2589/2589903.png'">
+        </div>
+        <h1 class="text-3xl font-black text-brand mb-1 flex items-center justify-center gap-2">
+            <span class="verified-badge">✓</span>
+            أحمد الشيخ
+        </h1>
+        <p class="text-gray-500 font-bold text-sm tracking-widest uppercase">CHIC & ELEGANT SHOES</p>
+     </div>
 
-       <h2 class="text-4xl md:text-5xl font-black mb-2 text-brand-dark">خطواتك.. <span class="text-brand">فخامة</span></h2>
-       <p class="text-gray-500 mb-6 font-bold text-sm">أرقى الموديلات الرياضية والكلاسيكية</p>
+     <div class="w-full space-y-4">
        
-       <button onclick="document.getElementById('cats').scrollIntoView({behavior: 'smooth'})" class="btn-glass px-8 py-3 rounded-full font-bold text-lg animate-bounce">
-         تصفح الأقسام ↓
+       <button onclick="showCategory('رجالي')" class="link-btn group">
+         <div class="btn-icon-box shadow-sm group-hover:scale-110 transition">
+             <img src="man.png" class="btn-icon-img" onerror="this.parentElement.innerHTML='👞'">
+         </div>
+         <h3>MEN COLLECTION</h3>
+         <span class="text-gray-400 text-sm">→</span>
        </button>
-     </section>
 
-     <section id="cats" class="max-w-6xl mx-auto px-4 py-10 pb-20">
-       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-       
-         <div onclick="showCategory('رجالي')" class="glass-3d-card p-8 flex flex-col items-center cursor-pointer group">
-             <div class="w-32 h-32 relative z-10 mb-4 transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-2">
-                 <img src="men.png" class="w-full h-full object-contain drop-shadow-2xl" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3043/3043888.png'">
-             </div>
-             <h3 class="text-3xl font-black text-brand-dark mb-1 relative z-10">رجالي</h3>
-             <div class="h-1 w-12 bg-brand rounded-full mb-2 relative z-10"></div>
-             <p class="text-gray-500 text-sm font-bold relative z-10">RAGOL SPORT</p>
+       <button onclick="showCategory('حريمي')" class="link-btn group">
+         <div class="btn-icon-box shadow-sm group-hover:scale-110 transition">
+             <img src="women.png" class="btn-icon-img" onerror="this.parentElement.innerHTML='👠'">
          </div>
+         <h3>WOMEN COLLECTION</h3>
+         <span class="text-gray-400 text-sm">→</span>
+       </button>
 
-         <div onclick="showCategory('حريمي')" class="glass-3d-card p-8 flex flex-col items-center cursor-pointer group">
-             <div class="w-32 h-32 relative z-10 mb-4 transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-2">
-                 <img src="women.png" class="w-full h-full object-contain drop-shadow-2xl" onerror="this.src='https://cdn-icons-png.flaticon.com/512/9463/9463177.png'">
-             </div>
-             <h3 class="text-3xl font-black text-brand-dark mb-1 relative z-10">حريمي</h3>
-             <div class="h-1 w-12 bg-purple-500 rounded-full mb-2 relative z-10"></div>
-             <p class="text-gray-500 text-sm font-bold relative z-10">SITTAT CHIC</p>
+       <button onclick="showCategory('أطفالي')" class="link-btn group">
+         <div class="btn-icon-box shadow-sm group-hover:scale-110 transition">
+             <img src="kids.png" class="btn-icon-img" onerror="this.parentElement.innerHTML='👟'">
          </div>
+         <h3>KIDS COLLECTION</h3>
+         <span class="text-gray-400 text-sm">→</span>
+       </button>
 
-         <div onclick="showCategory('أطفالي')" class="glass-3d-card p-8 flex flex-col items-center cursor-pointer group">
-             <div class="w-32 h-32 relative z-10 mb-4 transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-2">
-                 <img src="kids.png" class="w-full h-full object-contain drop-shadow-2xl" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3082/3082060.png'">
-             </div>
-             <h3 class="text-3xl font-black text-brand-dark mb-1 relative z-10">أطفالي</h3>
-             <div class="h-1 w-12 bg-yellow-500 rounded-full mb-2 relative z-10"></div>
-             <p class="text-gray-500 text-sm font-bold relative z-10">ATFAL FUN</p>
-         </div>
-
+       <div class="flex gap-3 mt-6 w-full">
+           <a href="https://wa.me/201020468021" target="_blank" class="flex-1 bg-white p-4 rounded-xl flex justify-center items-center shadow-sm text-green-600 hover:shadow-md transition">
+               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+           </a>
+           <a href="#" class="flex-1 bg-white p-4 rounded-xl flex justify-center items-center shadow-sm text-blue-600 hover:shadow-md transition">
+               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+           </a>
+           <a href="#" class="flex-1 bg-white p-4 rounded-xl flex justify-center items-center shadow-sm text-pink-600 hover:shadow-md transition">
+               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+           </a>
        </div>
-     </section>
+
+     </div>
    </div>
 
    <div id="products-view" class="hidden max-w-6xl mx-auto px-4 py-6 min-h-screen">
-     <div class="bg-white/80 backdrop-blur-md px-4 py-3 rounded-2xl sticky top-24 z-40 flex justify-between items-center mb-8 shadow-sm border border-white">
+     <div class="bg-white/90 backdrop-blur-md px-4 py-3 rounded-2xl sticky top-4 z-40 flex justify-between items-center mb-8 shadow-sm border border-gray-100">
        <div class="flex items-center gap-2">
-           <div class="w-2 h-8 bg-brand rounded-full"></div>
-           <h3 id="cat-title" class="text-2xl font-bold text-brand-dark"></h3>
+           <button onclick="goHome()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-brand hover:text-white transition">←</button>
+           <h3 id="cat-title" class="text-xl font-bold text-brand-dark"></h3>
        </div>
-       <button onclick="goHome()" class="px-4 py-2 bg-gray-100 rounded-xl text-sm font-bold text-gray-600 hover:text-brand hover:bg-white shadow-sm transition">الرئيسية 🏠</button>
      </div>
      
      <div id="loading-msg" class="text-center py-20 text-brand hidden font-bold">جاري التحميل...</div>
@@ -181,8 +208,8 @@
    </div>
 
    <div id="modal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
-     <div class="bg-white w-full max-w-md rounded-[2rem] overflow-hidden shadow-2xl max-h-[95vh] overflow-y-auto relative flex flex-col border-4 border-white">
-       <button onclick="closeModal()" class="absolute top-4 left-4 bg-white/90 hover:bg-red-500 hover:text-white w-10 h-10 rounded-full z-20 text-gray-800 shadow-lg transition font-bold text-xl flex items-center justify-center">✕</button>
+     <div class="bg-white w-full max-w-md rounded-[2rem] overflow-hidden shadow-2xl max-h-[95vh] overflow-y-auto relative flex flex-col">
+       <button onclick="closeModal()" class="absolute top-4 left-4 bg-white/90 w-10 h-10 rounded-full z-20 text-gray-800 shadow-lg transition font-bold text-xl flex items-center justify-center hover:bg-red-50 hover:text-red-500">✕</button>
        
        <div class="bg-gray-50 h-72 flex items-center justify-center relative shrink-0">
          <img id="main-img" class="max-h-full max-w-full object-contain drop-shadow-xl mix-blend-multiply">
@@ -198,20 +225,19 @@
              <div id="m-sizes" class="flex flex-wrap justify-center gap-2"></div>
          </div>
 
-         <div class="mb-6 p-4 bg-green-50 rounded-2xl border border-green-100 flex items-center gap-3">
-             <div class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center text-xl shadow-lg shadow-green-200">💸</div>
-             <div>
-                 <p class="text-xs text-gray-500 font-bold mb-1">الدفع عبر فودافون كاش</p>
-                 <p class="text-lg font-black text-gray-800 tracking-widest font-mono">01020468021</p>
-             </div>
+         <div class="mb-6 p-4 bg-white border-2 border-dashed border-green-300 rounded-2xl text-center shadow-sm">
+             <p class="text-xs text-gray-500 font-bold mb-1">💳 الدفع عبر فودافون كاش</p>
+             <p class="text-xl font-black text-green-600 tracking-widest font-mono select-all">01020468021</p>
+             <p class="text-[10px] text-gray-400 mt-1">* نفس رقم التواصل</p>
          </div>
 
-         <div class="space-y-3 pt-4 border-t border-gray-100">
-           <input id="c-name" placeholder="الاسم ثلاثي" class="input-glass w-full p-4 rounded-xl text-sm font-bold text-gray-700">
-           <input id="c-phone" type="tel" placeholder="رقم الهاتف" class="input-glass w-full p-4 rounded-xl text-sm font-bold text-gray-700">
-           <input id="c-address" placeholder="العنوان بالتفصيل" class="input-glass w-full p-4 rounded-xl text-sm font-bold text-gray-700">
-           <button onclick="sendOrder()" class="btn-glass w-full py-4 rounded-xl font-bold mt-2 text-lg shadow-lg">
-             تأكيد الطلب 🛒
+         <div class="space-y-3 pt-2">
+           <input id="c-name" placeholder="الاسم ثلاثي" class="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-brand focus:bg-white transition">
+           <input id="c-phone" type="tel" placeholder="رقم الهاتف" class="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-brand focus:bg-white transition">
+           <input id="c-address" placeholder="العنوان بالتفصيل" class="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-brand focus:bg-white transition">
+           
+           <button onclick="sendOrder()" class="w-full py-4 rounded-xl font-bold mt-2 text-lg shadow-xl text-white bg-gradient-to-r from-brand to-brand-accent hover:shadow-2xl transition transform hover:-translate-y-1">
+             تأكيد الطلب واتساب 🟢
            </button>
          </div>
        </div>
@@ -262,11 +288,12 @@
    </div>
 
    <script>
-    // === قاعدة البيانات والتخزين ===
-    const dbName = "AhmedShoesDB_White_Final";
+    // === قاعدة البيانات (IndexedDB) ===
+    const dbName = "AhmedShoesDB_Modern_V5";
     const storeName = "products";
     let db;
-    // رقم الواتساب المحدث
+    
+    // === رقم الواتساب المحدث (والكاش) ===
     const whatsapp = "201020468021"; 
 
     function openDB() {
@@ -441,7 +468,7 @@
         reader.readAsText(file);
     }
 
-    // === UI ===
+    // === UI Logic ===
     function updateSizeOpts() {
       const cat = document.getElementById('new-cat').value;
       let sizes = cat === 'رجالي' ? [40,41,42,43,44,45] : (cat === 'حريمي' ? [37,38,39,40,41] : [25,26,27,28,29,30,31,32,33,34,35]);
@@ -476,10 +503,10 @@
       }
       document.getElementById('empty-msg').classList.add('hidden');
       document.getElementById('grid').innerHTML = items.map(p => `
-        <div onclick="openModal(${p.id})" class="bg-white rounded-2xl overflow-hidden cursor-pointer group relative shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
-          <div class="h-48 relative overflow-hidden bg-gray-50">
+        <div onclick="openModal(${p.id})" class="bg-white rounded-2xl overflow-hidden cursor-pointer group relative shadow-soft hover:shadow-button transition-all duration-300 border border-gray-100">
+          <div class="h-44 relative overflow-hidden bg-gray-50">
             <img src="${p.images[0]}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 mix-blend-multiply">
-            <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-brand-dark px-2 py-1 text-xs font-bold rounded-lg shadow-sm">جديد</div>
+            <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm text-brand-dark px-2 py-1 text-xs font-bold rounded-lg shadow-sm">جديد</div>
           </div>
           <div class="p-4">
              <div class="flex justify-between items-start mb-1">
@@ -509,7 +536,7 @@
       } else p.classList.add('hidden');
     }
 
-    // === المودال ===
+    // === Modal & Order ===
     function openModal(id) {
       currentProd = products.find(p => p.id === id);
       const modal = document.getElementById('modal');
@@ -525,14 +552,14 @@
         </div>
       `).join('');
       document.getElementById('m-sizes').innerHTML = currentProd.sizes.map(s => `
-        <button onclick="selectSize(${s}, this)" class="w-8 h-8 rounded-lg bg-gray-100 text-xs font-bold text-gray-600 hover:bg-gray-200 border border-transparent transition">${s}</button>
+        <button onclick="selectSize(${s}, this)" class="w-8 h-8 rounded-lg bg-gray-100 text-xs font-bold text-gray-600 hover:bg-brand hover:text-white transition">${s}</button>
       `).join('');
     }
 
     function selectSize(s, btn) {
       currentSize = s;
-      document.querySelectorAll('#m-sizes button').forEach(b => b.classList.remove('border-brand', 'bg-brand/10', 'text-brand'));
-      btn.classList.add('border-brand', 'bg-brand/10', 'text-brand');
+      document.querySelectorAll('#m-sizes button').forEach(b => b.classList.remove('bg-brand', 'text-white'));
+      btn.classList.add('bg-brand', 'text-white');
     }
 
     function closeModal() { document.getElementById('modal').classList.add('hidden'); }
