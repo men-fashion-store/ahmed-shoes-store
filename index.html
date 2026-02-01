@@ -6,696 +6,542 @@
   <title>أحمد الشيخ - للأحذية</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/_sdk/data_sdk.js"></script>
-  <script src="/_sdk/element_sdk.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
   
   <script>
-    // إعدادات الألوان (زيتي وأبيض فخم)
     tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              light: '#A4B494', // زيتي فاتح
-              DEFAULT: '#708238', // زيتي غني (الأساسي)
-              dark: '#4B5726',   // زيتي غامق
-              accent: '#EBEFE8'  // أبيض دخاني
-            }
-          }
-        }
-      }
+      theme: { extend: { colors: { brand: { light: '#A4B494', DEFAULT: '#708238', dark: '#4B5726', accent: '#EBEFE8' } } } }
     }
   </script>
   
   <style>
-    /* تنسيقات عامة */
-    body { 
-      font-family: 'Cairo', sans-serif; 
-      background-color: #121212; 
-      color: #ffffff; 
-    }
+    body { font-family: 'Cairo', sans-serif; background-color: #121212; color: #ffffff; }
     
-    /* الخلفية مع اللوجو كعلامة مائية */
+    /* الخلفية */
     .brand-bg {
+      background-color: #121212;
       background-image: 
         linear-gradient(rgba(18, 18, 18, 0.94), rgba(18, 18, 18, 0.97)),
         url('احمد الشيخ (3).png');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      background-repeat: no-repeat;
+      background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat;
     }
 
-    /* تأثير الزجاج */
-    .glass-effect { 
-      background: rgba(30, 30, 30, 0.8); 
-      backdrop-filter: blur(15px); 
-      border-bottom: 1px solid rgba(112, 130, 56, 0.2); 
-    }
-
-    /* كروت المنتجات */
-    .product-card { 
-      background: linear-gradient(145deg, #1e1e1e 0%, #151515 100%); 
-      border: 1px solid #333; 
-      transition: all 0.3s ease; 
-    }
-    .product-card:hover { 
-      border-color: #708238; 
-      transform: translateY(-5px); 
-      box-shadow: 0 10px 30px rgba(112, 130, 56, 0.15); 
-    }
-
-    /* الأزرار الرئيسية */
-    .btn-primary { 
-      background: linear-gradient(135deg, #708238 0%, #4B5726 100%); 
-      border: 1px solid #708238; 
-      transition: all 0.3s; 
-    }
-    .btn-primary:hover { 
-      background: linear-gradient(135deg, #8C9E5E 0%, #708238 100%); 
-      box-shadow: 0 0 20px rgba(112, 130, 56, 0.6); 
-    }
-
-    /* أزرار المقاسات */
-    .size-btn { border: 1px solid #333; transition: all 0.2s; }
-    .size-btn.selected { background: #708238; color: #fff; border-color: #8C9E5E; transform: scale(1.1); box-shadow: 0 0 10px rgba(112, 130, 56, 0.4); }
-    .size-btn.unavailable { background: #151515; color: #444; text-decoration: line-through; cursor: not-allowed; }
+    /* تأثيرات الزجاج والبطاقات */
+    .glass-effect { background: rgba(30, 30, 30, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(112, 130, 56, 0.3); }
+    .product-card { background: linear-gradient(145deg, #222 0%, #151515 100%); border: 1px solid #333; transition: 0.3s; }
+    .product-card:hover { border-color: #708238; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(112, 130, 56, 0.2); }
     
-    /* الصور المصغرة في المعرض */
-    .thumbnail.active { border: 2px solid #708238; opacity: 1; transform: scale(1.05); }
-    .thumbnail { opacity: 0.6; transition: all 0.2s; border: 2px solid transparent; }
+    /* الأزرار */
+    .btn-primary { background: linear-gradient(135deg, #708238 0%, #4B5726 100%); border: 1px solid #708238; transition: 0.3s; }
+    .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 0 15px rgba(112, 130, 56, 0.5); }
+    .btn-disabled { background: #444; cursor: not-allowed; opacity: 0.7; }
     
     /* حقول الإدخال */
-    .input-field { background: #2d2d2d; border: 1px solid #444; color: white; transition: 0.3s; }
-    .input-field:focus { border-color: #708238; box-shadow: 0 0 0 2px rgba(112, 130, 56, 0.2); }
+    .input-field { background: #2d2d2d; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; width: 100%; outline: none; }
+    .input-field:focus { border-color: #708238; }
     
-    /* حركات وتأثيرات */
-    .modal-overlay { background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(5px); }
-    .animate-fade-in { animation: fadeIn 0.4s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-overlay { background: rgba(0,0,0,0.95); backdrop-filter: blur(5px); }
   </style>
  </head>
  <body class="h-full brand-bg min-h-screen overflow-auto">
-  <div id="app" class="min-h-full w-full">
-   
-   <div id="home-page" class="min-h-full w-full">
-    
-    <header class="glass-effect p-3 sticky top-0 z-50">
+
+   <header class="glass-effect p-3 sticky top-0 z-50">
      <div class="max-w-6xl mx-auto flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 bg-white/5 rounded-lg p-1 flex items-center justify-center border border-white/10">
-            <img src="احمد الشيخ (3).png" alt="Logo" class="w-full h-full object-contain">
+        <div class="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center border border-white/10 overflow-hidden">
+            <img src="احمد الشيخ (3).png" alt="Logo" class="w-full h-full object-contain" onerror="this.style.display='none'; this.parentElement.innerHTML='👞'">
         </div>
         <div>
-            <h1 class="text-xl md:text-2xl font-bold text-white leading-none">أحمد الشيخ</h1>
-            <span class="text-xs text-brand-light font-bold tracking-widest">SHOES STORE</span>
+            <h1 class="text-xl font-bold leading-none">أحمد الشيخ</h1>
+            <span class="text-xs text-brand-light font-bold">SHOES STORE</span>
         </div>
       </div>
-      <button onclick="showAdminLogin()" class="px-4 py-2 rounded-lg text-sm bg-white/5 hover:bg-white/10 border border-white/10 transition-colors">🔐 الإدارة</button>
+      <button onclick="toggleAdmin()" class="px-3 py-1 rounded bg-white/5 border border-white/10 text-xs hover:bg-white/10 transition">🔐 الإدارة</button>
      </div>
-    </header>
+   </header>
 
-    <section class="relative h-64 md:h-80 flex items-center justify-center overflow-hidden">
-     <div class="text-center px-4 relative z-10">
-      <img src="احمد الشيخ (3).png" class="h-28 mx-auto mb-4 opacity-90 drop-shadow-2xl animate-fade-in" alt="Big Logo">
-      <h2 class="text-3xl font-black mb-4 animate-fade-in">خطواتك.. عنوان أناقتك</h2>
-      <button onclick="document.getElementById('categories-section').scrollIntoView({behavior: 'smooth'})" class="btn-primary text-white px-8 py-3 rounded-full font-bold shadow-lg">
-        تصفح الموديلات ↓
-      </button>
-     </div>
-    </section>
+   <div id="home-view">
+     <section class="h-64 flex flex-col items-center justify-center text-center px-4">
+       <img src="احمد الشيخ (3).png" class="h-28 mb-4 opacity-90 drop-shadow-2xl" onerror="this.style.display='none'">
+       <h2 class="text-3xl font-bold mb-4">خطواتك.. عنوان أناقتك</h2>
+       <button onclick="document.getElementById('cats').scrollIntoView({behavior: 'smooth'})" class="btn-primary text-white px-8 py-3 rounded-full font-bold shadow-lg">تسوق الآن</button>
+     </section>
 
-    <section id="categories-section" class="max-w-6xl mx-auto px-4 py-8">
-     <div class="grid grid-cols-3 gap-4">
-       <button onclick="selectCategory('رجالي')" class="product-card p-6 rounded-2xl text-center group">
-         <div class="text-5xl mb-3 group-hover:scale-110 transition-transform text-brand">👞</div>
-         <h4 class="font-bold text-white group-hover:text-brand transition-colors">رجالي</h4>
-       </button>
-       <button onclick="selectCategory('حريمي')" class="product-card p-6 rounded-2xl text-center group">
-         <div class="text-5xl mb-3 group-hover:scale-110 transition-transform text-brand">👠</div>
-         <h4 class="font-bold text-white group-hover:text-brand transition-colors">حريمي</h4>
-       </button>
-       <button onclick="selectCategory('أطفالي')" class="product-card p-6 rounded-2xl text-center group">
-         <div class="text-5xl mb-3 group-hover:scale-110 transition-transform text-brand">👟</div>
-         <h4 class="font-bold text-white group-hover:text-brand transition-colors">أطفالي</h4>
-       </button>
-     </div>
-    </section>
-
-    <section id="products-section" class="max-w-6xl mx-auto px-4 py-4 hidden min-h-screen">
-     <div class="flex justify-between items-center mb-6 sticky top-20 z-40 py-3 bg-[#121212]/95 backdrop-blur-md border-b border-gray-800">
-      <h3 id="category-title" class="text-xl font-bold text-brand-light border-r-4 border-brand pr-3">المنتجات</h3>
-      <button onclick="goHome()" class="text-gray-400 hover:text-white text-sm flex items-center gap-1 transition-colors">✕ إغلاق القسم</button>
-     </div>
-     
-     <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6"></div>
-     
-     <div id="no-products" class="text-center py-20 text-gray-500 hidden">
-      <div class="text-6xl mb-4 opacity-30">📦</div>
-      <p>لا توجد موديلات مضافة في هذا القسم حالياً</p>
-     </div>
-    </section>
+     <section id="cats" class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-3 gap-3">
+       <div onclick="showCategory('رجالي')" class="product-card p-4 rounded-xl text-center cursor-pointer group">
+           <div class="text-4xl mb-2 group-hover:scale-110 transition-transform">👞</div><h3 class="font-bold">رجالي</h3>
+       </div>
+       <div onclick="showCategory('حريمي')" class="product-card p-4 rounded-xl text-center cursor-pointer group">
+           <div class="text-4xl mb-2 group-hover:scale-110 transition-transform">👠</div><h3 class="font-bold">حريمي</h3>
+       </div>
+       <div onclick="showCategory('أطفالي')" class="product-card p-4 rounded-xl text-center cursor-pointer group">
+           <div class="text-4xl mb-2 group-hover:scale-110 transition-transform">👟</div><h3 class="font-bold">أطفالي</h3>
+       </div>
+     </section>
    </div>
 
-   <div id="product-modal" class="fixed inset-0 z-[60] hidden modal-overlay flex items-center justify-center p-4">
-    <div class="bg-[#1e1e1e] text-white rounded-2xl max-w-md w-full max-h-[95%] overflow-y-auto border border-gray-700 shadow-2xl animate-fade-in relative flex flex-col">
+   <div id="products-view" class="hidden max-w-6xl mx-auto px-4 py-4 min-h-screen">
+     <div class="flex justify-between items-center mb-6 bg-[#121212] p-3 rounded-xl sticky top-20 z-40 border border-gray-800 shadow-xl">
+       <h3 id="cat-title" class="text-xl font-bold text-brand"></h3>
+       <button onclick="goHome()" class="text-sm text-gray-400 hover:text-white transition">✕ رجوع</button>
+     </div>
      
-     <button onclick="closeProductModal()" class="absolute top-4 left-4 z-20 bg-black/60 hover:bg-black/80 w-9 h-9 rounded-full text-white flex items-center justify-center transition-colors">✕</button>
+     <div id="loading-msg" class="text-center py-20 text-brand hidden">جاري تحميل المنتجات...</div>
+     <div id="grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+     <div id="empty-msg" class="hidden text-center py-20 text-gray-500">
+         <div class="text-6xl mb-4 opacity-30">📦</div>
+         <p>لا توجد منتجات مضافة في هذا القسم</p>
+     </div>
+   </div>
 
-     <div class="relative bg-black w-full shrink-0">
-       <div id="main-image-container" class="h-80 w-full flex items-center justify-center overflow-hidden bg-[#151515]">
+   <div id="modal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+     <div class="bg-[#1e1e1e] w-full max-w-md rounded-2xl overflow-hidden shadow-2xl max-h-[95vh] overflow-y-auto relative flex flex-col">
+       <button onclick="closeModal()" class="absolute top-3 left-3 bg-black/60 hover:bg-black/80 w-9 h-9 rounded-full z-20 text-white transition">✕</button>
+       
+       <div class="bg-black h-80 flex items-center justify-center relative shrink-0">
+         <img id="main-img" class="max-h-full max-w-full object-contain">
+         <div id="thumbs" class="absolute bottom-2 flex gap-2 justify-center w-full px-2"></div>
+       </div>
+
+       <div class="p-6">
+         <h2 id="m-name" class="text-xl font-bold text-center mb-1"></h2>
+         <p id="m-price" class="text-3xl font-bold text-brand text-center mb-6"></p>
+         
+         <div class="mb-6 text-center">
+             <p class="text-xs text-gray-400 mb-2 uppercase tracking-widest">المقاسات المتاحة</p>
+             <div id="m-sizes" class="flex flex-wrap justify-center gap-2"></div>
          </div>
-       <div id="thumbnails-container" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 px-4 z-10">
+
+         <div class="space-y-3 pt-6 border-t border-gray-700">
+           <input id="c-name" placeholder="الاسم ثلاثي" class="input-field">
+           <input id="c-phone" type="tel" placeholder="رقم الهاتف" class="input-field">
+           <input id="c-address" placeholder="العنوان بالتفصيل" class="input-field">
+           <button onclick="sendOrder()" class="btn-primary w-full py-4 rounded-xl font-bold mt-2 text-lg shadow-lg">🛒 إرسال الطلب (واتساب)</button>
          </div>
-       <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/80 to-transparent pointer-events-none"></div>
+       </div>
      </div>
-     
-     <div class="p-6 flex-1">
-      <h3 id="modal-product-name" class="text-xl font-bold mb-2 text-center text-gray-100"></h3>
-      
-      <div class="text-center mb-6">
-        <span id="modal-product-price" class="text-3xl font-black text-brand inline-block border-b-2 border-brand pb-1"></span>
-      </div>
-      
-      <div class="mb-8 text-center">
-       <p class="text-xs text-gray-400 mb-3 font-bold uppercase tracking-wider">اختر المقاس المناسب</p>
-       <div id="modal-sizes" class="flex flex-wrap gap-2 justify-center"></div>
-      </div>
-      
-      <div class="space-y-3 pt-6 border-t border-gray-700">
-        <p class="text-sm font-bold text-brand-light mb-2 flex items-center gap-2">📝 بيانات الشحن:</p>
-        <input type="text" id="customer-name" placeholder="الاسم ثلاثي" class="w-full px-4 py-3 rounded-xl input-field outline-none text-sm">
-        <input type="tel" id="customer-phone" placeholder="رقم الهاتف (واتساب)" class="w-full px-4 py-3 rounded-xl input-field outline-none text-sm">
-        <input type="text" id="customer-address" placeholder="العنوان بالتفصيل (المنطقة - الشارع)" class="w-full px-4 py-3 rounded-xl input-field outline-none text-sm">
-        
-        <button onclick="submitOrder()" class="w-full btn-primary text-white py-4 rounded-xl font-bold mt-4 shadow-lg flex items-center justify-center gap-2 text-lg">
-          <span>🛒</span> إرسال الطلب الآن
-        </button>
-      </div>
-     </div>
-    </div>
    </div>
 
-   <div id="admin-login-modal" class="fixed inset-0 z-[60] hidden modal-overlay flex items-center justify-center p-4">
-    <div class="bg-[#1e1e1e] border border-gray-700 text-white rounded-2xl max-w-sm w-full p-8 text-center shadow-2xl">
-     <div class="w-16 h-16 bg-brand/20 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🔐</div>
-     <h3 class="text-xl font-bold mb-6">الدخول للإدارة</h3>
-     <input type="password" id="admin-password" placeholder="كلمة المرور" class="w-full px-4 py-3 rounded-xl input-field outline-none mb-4 text-center tracking-widest">
-     <div class="flex gap-2">
-       <button onclick="checkAdminPassword()" class="flex-1 btn-primary py-2 rounded-xl font-bold">دخول</button>
-       <button onclick="closeAdminLogin()" class="flex-1 bg-gray-700 hover:bg-gray-600 py-2 rounded-xl font-bold transition-colors">إلغاء</button>
-     </div>
-    </div>
-   </div>
+   <div id="admin-panel" class="hidden fixed inset-0 z-50 bg-[#121212] overflow-y-auto">
+     <div class="p-4 max-w-2xl mx-auto">
+       <header class="flex justify-between items-center mb-8 border-b border-gray-800 pb-4 sticky top-0 bg-[#121212] z-10 pt-4">
+         <h2 class="text-2xl font-bold text-brand flex items-center gap-2"><span class="bg-brand text-white text-xs px-2 py-1 rounded">ADMIN</span> لوحة القيادة</h2>
+         <button onclick="toggleAdmin()" class="text-gray-400 hover:text-white transition">خروج</button>
+       </header>
 
-   <div id="admin-page" class="hidden min-h-screen bg-[#121212]">
-    <header class="p-4 border-b border-gray-800 flex justify-between items-center bg-[#1e1e1e] sticky top-0 z-50">
-      <h1 class="font-bold flex items-center gap-2 text-white"><span class="bg-brand px-2 py-1 rounded text-xs font-bold text-white">ADMIN</span> لوحة القيادة</h1>
-      <button onclick="exitAdmin()" class="text-sm text-gray-400 hover:text-white transition-colors">خروج 🚪</button>
-    </header>
-    
-    <div class="max-w-4xl mx-auto p-4">
-      <div class="flex gap-2 mb-6 bg-[#1e1e1e] p-1 rounded-xl border border-gray-800">
-        <button onclick="showAdminTab('products')" id="btn-tab-products" class="flex-1 py-2 rounded-lg text-sm font-bold transition-all bg-brand text-white">المنتجات</button>
-        <button onclick="showAdminTab('orders')" id="btn-tab-orders" class="flex-1 py-2 rounded-lg text-sm font-bold transition-all text-gray-400 hover:bg-gray-800">الطلبات</button>
-        <button onclick="showAdminTab('add')" id="btn-tab-add" class="flex-1 py-2 rounded-lg text-sm font-bold transition-all text-gray-400 hover:bg-gray-800">إضافة +</button>
-      </div>
+       <div class="bg-gray-900 p-4 rounded-xl mb-8 border border-gray-800">
+           <h3 class="font-bold text-sm text-gray-400 mb-3">💾 أدوات البيانات (Backup)</h3>
+           <div class="flex gap-3">
+               <button onclick="exportData()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
+                   <span>📥</span> تحميل نسخة
+               </button>
+               <button onclick="document.getElementById('import-file').click()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
+                   <span>📤</span> استيراد نسخة
+               </button>
+               <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(this)">
+           </div>
+       </div>
 
-      <div id="admin-products" class="space-y-3 animate-fade-in"></div>
-      
-      <div id="admin-orders" class="hidden space-y-3 animate-fade-in"></div>
-      
-      <div id="admin-add" class="hidden bg-[#1e1e1e] p-6 rounded-xl border border-gray-700 animate-fade-in shadow-xl">
-        <h3 class="font-bold mb-6 text-brand-light text-lg border-b border-gray-800 pb-2">إضافة موديل جديد</h3>
-        <div class="space-y-5">
-          
-          <div>
-            <label class="block text-sm text-white font-bold mb-2">صور الموديل (يمكنك اختيار حتى 4 صور)</label>
-            <div class="border-2 border-dashed border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-brand transition-colors relative bg-black/20 group">
-                <input type="file" id="product-files" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="previewFiles()">
-                
-                <div id="upload-placeholder" class="group-hover:scale-105 transition-transform">
-                    <div class="text-4xl mb-2">📷</div>
-                    <span class="text-sm text-gray-400 font-bold">اضغط هنا لفتح الكاميرا أو الاستوديو</span>
-                    <p class="text-xs text-gray-500 mt-1">JGP, PNG</p>
-                </div>
-                
-                <div id="preview-container" class="hidden grid grid-cols-4 gap-2 mt-0 relative z-20"></div>
-            </div>
-          </div>
-
-          <div>
-             <label class="block text-xs text-gray-400 mb-1">اسم الموديل</label>
-             <input id="new-product-name" placeholder="مثال: حذاء كلاسيك أسود" class="w-full p-3 input-field rounded-xl outline-none">
-          </div>
-          
-          <div class="flex gap-4">
-            <div class="flex-1">
-                <label class="block text-xs text-gray-400 mb-1">السعر (ج.م)</label>
-                <input id="new-product-price" type="number" placeholder="00" class="w-full p-3 input-field rounded-xl outline-none font-bold text-brand">
-            </div>
-            <div class="flex-1">
-                <label class="block text-xs text-gray-400 mb-1">القسم</label>
-                <select id="new-product-category" class="w-full p-3 input-field rounded-xl outline-none appearance-none">
-                  <option value="رجالي">رجالي</option>
-                  <option value="حريمي">حريمي</option>
-                  <option value="أطفالي">أطفالي</option>
-                </select>
-            </div>
-          </div>
-          
-          <div>
-            <label class="block text-xs text-gray-400 mb-2">المقاسات المتوفرة (اضغط للاختيار):</label>
-            <div id="size-selector" class="flex flex-wrap gap-2 p-3 bg-black/20 rounded-xl border border-gray-700"></div>
-          </div>
-          
-          <button onclick="addNewProduct()" id="save-btn" class="w-full btn-primary py-4 rounded-xl font-bold mt-4 text-lg shadow-lg hover:shadow-brand/40">حفظ الموديل ✅</button>
-        </div>
-      </div>
-    </div>
-   </div>
-
-   <div id="success-toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-brand px-6 py-3 rounded-full shadow-2xl translate-y-[-200%] transition-transform z-[80] flex items-center gap-3 border border-brand-light min-w-[200px] justify-center">
-    <span class="text-xl">✅</span><span id="toast-message" class="font-bold text-white">تم بنجاح</span>
-   </div>
-   
-   <div id="confirm-delete-modal" class="fixed inset-0 z-[70] hidden modal-overlay flex items-center justify-center p-4">
-    <div class="bg-[#1e1e1e] border border-gray-700 rounded-xl p-6 text-center max-w-xs w-full shadow-2xl">
-     <div class="text-4xl mb-3">⚠️</div>
-     <h3 class="font-bold mb-4 text-white">هل تريد حذف هذا العنصر؟</h3>
-     <div class="flex gap-2">
-       <button onclick="confirmDelete()" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-sm font-bold transition-colors">نعم، احذف</button>
-       <button onclick="cancelDelete()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-lg text-sm font-bold transition-colors">تراجع</button>
-     </div>
-    </div>
-   </div>
-
-  </div>
-
-  <script>
-    const defaultConfig = { store_name: 'أحمد الشيخ', whatsapp_number: '01000000000' };
-    let products = [], orders = [], currentCategory = '', selectedSizes = [], deleteCallback = null, uploadedImages = [];
-
-    // التعامل مع البيانات
-    const dataHandler = {
-      onDataChanged(data) {
-        products = data.filter(i => i.type === 'product');
-        orders = data.filter(i => i.is_order === true);
-        if (currentCategory) renderProducts(currentCategory);
-        renderAdminProducts(); renderAdminOrders();
-      }
-    };
-
-    async function initApp() {
-      // محاولة الاتصال بالـ SDK الوهمي للتخزين (إن وجد)
-      if (window.dataSdk) await window.dataSdk.init(dataHandler);
-      updateSizeSelector();
-    }
-
-    // --- منطق رفع الصور وضغطها ---
-    function previewFiles() {
-        const input = document.getElementById('product-files');
-        const container = document.getElementById('preview-container');
-        const placeholder = document.getElementById('upload-placeholder');
-        
-        container.innerHTML = '';
-        uploadedImages = [];
-        
-        if (input.files && input.files.length > 0) {
-            placeholder.classList.add('hidden');
-            container.classList.remove('hidden');
-            
-            // نأخذ أول 4 صور فقط
-            const files = Array.from(input.files).slice(0, 4);
-            
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // ضغط الصورة لتقليل حجم التخزين (مهم جداً)
-                    resizeImage(e.target.result, 600, (compressedDataUrl) => {
-                        uploadedImages.push(compressedDataUrl);
-                        container.innerHTML += `
-                          <div class="aspect-square rounded-lg bg-cover bg-center border border-gray-600 shadow-sm relative group" style="background-image: url('${compressedDataUrl}')">
-                            <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors rounded-lg"></div>
-                          </div>
-                        `;
-                    });
-                };
-                reader.readAsDataURL(file);
-            });
-        } else {
-            placeholder.classList.remove('hidden');
-            container.classList.add('hidden');
-        }
-    }
-
-    // دالة مساعدة لضغط الصور باستخدام Canvas
-    function resizeImage(base64Str, maxWidth, callback) {
-        const img = new Image();
-        img.src = base64Str;
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const scale = maxWidth / img.width;
-            // إذا كانت الصورة أصغر من الحد الأقصى، لا نكبرها
-            const finalScale = scale < 1 ? scale : 1;
-            
-            canvas.width = img.width * finalScale;
-            canvas.height = img.height * finalScale;
-            
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            // تحويل إلى JPEG بجودة 70%
-            callback(canvas.toDataURL('image/jpeg', 0.7)); 
-        };
-    }
-
-    // --- عرض المنتجات ---
-    function selectCategory(cat) {
-      currentCategory = cat;
-      document.getElementById('products-section').classList.remove('hidden');
-      document.getElementById('category-title').textContent = cat;
-      renderProducts(cat);
-      document.getElementById('products-section').scrollIntoView({behavior:'smooth'});
-    }
-    
-    function goHome() {
-      document.getElementById('products-section').classList.add('hidden');
-      window.scrollTo({top:0, behavior:'smooth'});
-    }
-
-    function renderProducts(cat) {
-      const grid = document.getElementById('products-grid');
-      const items = products.filter(p => p.category === cat);
-      grid.innerHTML = items.length ? items.map(p => {
-          // جلب أول صورة للعرض في الشبكة
-          let displayImage = '<div class="text-4xl text-gray-600">👟</div>';
-          let imagesArr = [];
-          
-          if(p.images) {
-             try { imagesArr = JSON.parse(p.images); } catch(e){}
-             if(imagesArr.length > 0) displayImage = `<img src="${imagesArr[0]}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">`;
-          } else if(p.image) { 
-              displayImage = `<img src="${p.image}" class="w-full h-full object-cover">`;
-          }
-
-          return `
-            <div class="product-card rounded-xl overflow-hidden cursor-pointer group" onclick="openProductModal('${p.__backendId}')">
-              <div class="h-44 bg-[#1a1a1a] flex items-center justify-center overflow-hidden relative">
-                ${displayImage}
-                <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-1 rounded-md border border-white/10">جديد</div>
-                <div class="absolute bottom-0 right-0 bg-brand text-white text-sm px-3 py-1 rounded-tl-xl font-bold shadow-lg">${p.price} ج.م</div>
-              </div>
-              <div class="p-3 text-center">
-                <h4 class="font-bold text-sm truncate text-gray-200 group-hover:text-brand transition-colors">${p.name}</h4>
-              </div>
-            </div>
-          `;
-      }).join('') : '';
-      document.getElementById('no-products').classList.toggle('hidden', items.length > 0);
-    }
-
-    // --- نافذة التفاصيل (Modal) ---
-    let selProd = null, selSize = null;
-    
-    function openProductModal(id) {
-      selProd = products.find(p => p.__backendId === id);
-      if(!selProd) return;
-      selSize = null;
-      
-      document.getElementById('modal-product-name').textContent = selProd.name;
-      document.getElementById('modal-product-price').textContent = selProd.price + ' جنيه';
-      
-      // إعداد المعرض
-      const mainContainer = document.getElementById('main-image-container');
-      const thumbsContainer = document.getElementById('thumbnails-container');
-      
-      let imagesArr = [];
-      if(selProd.images) {
-          try { imagesArr = JSON.parse(selProd.images); } catch(e){}
-      } else if (selProd.image) {
-          imagesArr = [selProd.image];
-      }
-
-      if(imagesArr.length > 0) {
-          // عرض الصورة الأولى
-          updateMainImage(imagesArr[0]);
-          // عرض المصغرات
-          thumbsContainer.innerHTML = imagesArr.map((img, idx) => `
-            <div onclick="updateMainImage('${img}', this)" 
-                 class="thumbnail w-14 h-14 rounded-lg bg-cover bg-center cursor-pointer bg-gray-800 shadow-md ${idx===0?'active':''}" 
-                 style="background-image: url('${img}')">
-            </div>
-          `).join('');
-      } else {
-          mainContainer.innerHTML = '<span class="text-6xl">👟</span>';
-          thumbsContainer.innerHTML = '';
-      }
-
-      // المقاسات
-      const sizes = selProd.sizes ? selProd.sizes.split(',') : [];
-      const allSizes = getSizesForCategory(selProd.category);
-      document.getElementById('modal-sizes').innerHTML = allSizes.map(s => {
-        const avail = sizes.includes(s.toString());
-        return `
-            <button onclick="${avail?`selectSize('${s}', this)`:''}" 
-                    class="w-10 h-10 rounded-lg font-bold text-sm flex items-center justify-center size-btn shadow-sm ${avail?'available bg-[#2a2a2a] text-white hover:bg-[#333]':'unavailable'}">
-                ${s}
-            </button>`;
-      }).join('');
-      
-      // تنظيف الفورم
-      document.getElementById('customer-name').value = '';
-      document.getElementById('customer-phone').value = '';
-      document.getElementById('customer-address').value = '';
-      
-      document.getElementById('product-modal').classList.remove('hidden');
-    }
-
-    // تحديث الصورة الرئيسية
-    window.updateMainImage = function(src, el) {
-        document.getElementById('main-image-container').innerHTML = `<img src="${src}" class="max-h-full max-w-full object-contain animate-fade-in shadow-2xl">`;
-        if(el) {
-            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-        } else {
-             // لو مفيش عنصر (أول مرة)، ننشط الأول يدوياً لو لزم الأمر
-        }
-    }
-
-    function selectSize(s, btn) {
-      selSize = s;
-      document.querySelectorAll('#modal-sizes button').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-    }
-    
-    function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
-
-    async function submitOrder() {
-      const name = document.getElementById('customer-name').value.trim();
-      const phone = document.getElementById('customer-phone').value.trim();
-      const addr = document.getElementById('customer-address').value.trim();
-      
-      if(!selProd || !selSize) return showToast('⚠️ يرجى اختيار المقاس');
-      if(!name || !phone || !addr) return showToast('⚠️ يرجى كتابة بياناتك كاملة');
-      
-      if(window.dataSdk) {
-        await window.dataSdk.create({
-          type: 'order', is_order: true,
-          name: selProd.name, price: selProd.price, category: selProd.category,
-          selected_size: selSize, customer_name: name, customer_phone: phone, customer_address: addr,
-          order_date: new Date().toISOString()
-        });
-        
-        showToast('✅ تم استلام طلبك بنجاح');
-        closeProductModal();
-        
-        // إرسال واتساب
-        const msg = `مرحباً، أريد تأكيد طلب:\n\n👟 الموديل: ${selProd.name}\n📏 المقاس: ${selSize}\n💰 السعر: ${selProd.price}\n\n👤 الاسم: ${name}\n📍 العنوان: ${addr}`;
-        window.open(`https://wa.me/${defaultConfig.whatsapp_number}?text=${encodeURIComponent(msg)}`, '_blank');
-      }
-    }
-
-    // --- الإدارة ---
-    function showAdminLogin() { document.getElementById('admin-login-modal').classList.remove('hidden'); }
-    function closeAdminLogin() { document.getElementById('admin-login-modal').classList.add('hidden'); }
-    
-    function checkAdminPassword() {
-      if(document.getElementById('admin-password').value === 'admin123') {
-        closeAdminLogin(); document.getElementById('admin-page').classList.remove('hidden'); showAdminTab('products');
-      } else {
-          alert('كلمة المرور خطأ');
-      }
-    }
-    function exitAdmin() { document.getElementById('admin-page').classList.add('hidden'); }
-    
-    function showAdminTab(tab) {
-      // إخفاء كل التبويبات
-      ['products','orders','add'].forEach(t => {
-          document.getElementById('admin-'+t).classList.add('hidden');
-          const btn = document.getElementById('btn-tab-'+t);
-          if(btn) {
-             btn.classList.remove('bg-brand', 'text-white');
-             btn.classList.add('text-gray-400');
-          }
-      });
-      
-      // إظهار التبويب المطلوب
-      document.getElementById('admin-'+tab).classList.remove('hidden');
-      const activeBtn = document.getElementById('btn-tab-'+tab);
-      if(activeBtn) {
-          activeBtn.classList.remove('text-gray-400');
-          activeBtn.classList.add('bg-brand', 'text-white');
-      }
-
-      if(tab==='add') {
-          updateSizeSelector();
-          // إعادة تهيئة حقل الرفع
-          uploadedImages = [];
-          document.getElementById('preview-container').innerHTML = '';
-          document.getElementById('upload-placeholder').classList.remove('hidden');
-          document.getElementById('product-files').value = '';
-      }
-    }
-
-    function renderAdminProducts() {
-      const container = document.getElementById('admin-products');
-      if(products.length === 0) {
-          container.innerHTML = '<p class="text-center text-gray-500 py-10">لا توجد منتجات.. أضف واحد جديد!</p>';
-          return;
-      }
-      
-      container.innerHTML = products.map(p => {
-          let thumb = '<div class="text-2xl">👟</div>';
-          if(p.images) {
-              try {
-                  const imgs = JSON.parse(p.images);
-                  if(imgs.length) thumb = `<img src="${imgs[0]}" class="w-full h-full object-cover">`;
-              } catch(e){}
-          } else if (p.image) {
-              thumb = `<img src="${p.image}" class="w-full h-full object-cover">`;
-          }
-          
-          return `
-            <div class="bg-[#1e1e1e] p-4 rounded-xl flex justify-between items-center border border-gray-700 shadow-sm">
-              <div class="flex items-center gap-4">
-                 <div class="w-16 h-16 bg-gray-800 rounded-lg overflow-hidden border border-gray-600">${thumb}</div>
-                 <div>
-                    <div class="font-bold text-white text-base">${p.name}</div>
-                    <div class="text-sm font-bold text-brand">${p.price} ج.م</div>
-                    <div class="text-xs text-gray-500 mt-1">${p.category}</div>
+       <div class="bg-[#1e1e1e] p-5 rounded-xl mb-8 border border-gray-700 shadow-lg">
+         <h3 class="font-bold mb-4 text-lg border-b border-gray-800 pb-2">➕ إضافة موديل جديد</h3>
+         <div class="space-y-4">
+           
+           <div>
+               <label class="block text-xs text-gray-400 mb-2">صور الموديل (حتى 4 صور)</label>
+               <div class="border-2 border-dashed border-gray-600 bg-black/20 p-6 text-center rounded-xl cursor-pointer hover:border-brand transition group relative" onclick="document.getElementById('file-in').click()">
+                 <input type="file" id="file-in" multiple accept="image/*" class="hidden" onchange="handleFiles(this)">
+                 <div id="upload-placeholder" class="group-hover:scale-105 transition-transform">
+                     <span class="text-3xl block mb-2">📷</span>
+                     <span class="text-sm text-gray-400 font-bold">اضغط هنا لاختيار الصور</span>
                  </div>
-              </div>
-              <button onclick="confirmDel('product','${p.__backendId}')" class="w-10 h-10 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">🗑️</button>
-            </div>
-          `;
-      }).join('');
+                 <div id="preview" class="grid grid-cols-4 gap-2 mt-2 hidden"></div>
+               </div>
+               <p id="file-msg" class="text-xs text-brand mt-1 hidden"></p>
+           </div>
+
+           <input id="new-name" placeholder="اسم الموديل (مثال: حذاء كلاسيك أسود)" class="input-field">
+           
+           <div class="flex gap-3">
+             <div class="flex-1">
+                 <input id="new-price" type="number" placeholder="السعر" class="input-field">
+             </div>
+             <div class="flex-1">
+                 <select id="new-cat" class="input-field appearance-none">
+                   <option value="رجالي">رجالي</option>
+                   <option value="حريمي">حريمي</option>
+                   <option value="أطفالي">أطفالي</option>
+                 </select>
+             </div>
+           </div>
+           
+           <div>
+               <label class="block text-xs text-gray-400 mb-2">المقاسات المتوفرة:</label>
+               <div id="size-options" class="flex flex-wrap gap-2 p-3 bg-black/30 rounded-lg border border-gray-800"></div>
+           </div>
+           
+           <button onclick="addProduct()" id="add-btn" class="btn-primary w-full py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-brand/50 transition">حفظ الموديل ✅</button>
+         </div>
+       </div>
+
+       <h3 class="font-bold mb-4 text-xl flex items-center gap-2">📦 المنتجات الحالية <span id="count-badge" class="text-sm bg-brand text-white px-2 py-0.5 rounded-full">0</span></h3>
+       <div id="admin-list" class="space-y-3 pb-10"></div>
+     </div>
+   </div>
+
+   <script>
+    // === IndexedDB Setup (المحرك القوي للتخزين) ===
+    const dbName = "AhmedShoesStoreDB_V1";
+    const storeName = "products";
+    let db;
+
+    // فتح قاعدة البيانات
+    function openDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(dbName, 1);
+            request.onupgradeneeded = (event) => {
+                db = event.target.result;
+                if (!db.objectStoreNames.contains(storeName)) {
+                    db.createObjectStore(storeName, { keyPath: "id" });
+                }
+            };
+            request.onsuccess = (event) => {
+                db = event.target.result;
+                resolve(db);
+            };
+            request.onerror = (event) => reject("DB Error");
+        });
     }
-    
-    function renderAdminOrders() {
-      const container = document.getElementById('admin-orders');
-      if(orders.length === 0) {
-          container.innerHTML = '<p class="text-center text-gray-500 py-10">لا توجد طلبات جديدة</p>';
+
+    // دوال التعامل مع البيانات
+    function saveProductToDB(product) {
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction([storeName], "readwrite");
+            tx.objectStore(storeName).put(product);
+            tx.oncomplete = () => resolve(true);
+            tx.onerror = () => reject(false);
+        });
+    }
+
+    function getAllProducts() {
+        return new Promise((resolve) => {
+            if(!db) return resolve([]);
+            const tx = db.transaction([storeName], "readonly");
+            tx.objectStore(storeName).getAll().onsuccess = (e) => resolve(e.target.result || []);
+        });
+    }
+
+    function deleteProductFromDB(id) {
+        return new Promise((resolve) => {
+            const tx = db.transaction([storeName], "readwrite");
+            tx.objectStore(storeName).delete(id);
+            tx.oncomplete = () => resolve(true);
+        });
+    }
+
+    // === متغيرات التطبيق ===
+    let products = [];
+    let currentProd = null, currentSize = null, newImages = [], newSizes = [];
+    const whatsapp = "01000000000"; // رقم الواتساب
+
+    // === بدء التشغيل ===
+    async function init() {
+        await openDB();
+        products = await getAllProducts();
+        updateSizeOpts();
+    }
+    init();
+
+    // === معالجة الصور (Core Logic) ===
+    function handleFiles(input) {
+      const files = [...input.files].slice(0, 4);
+      const preview = document.getElementById('preview');
+      const placeholder = document.getElementById('upload-placeholder');
+      const msg = document.getElementById('file-msg');
+      
+      placeholder.classList.add('hidden');
+      preview.classList.remove('hidden');
+      preview.innerHTML = '<div class="col-span-4 text-center text-brand animate-pulse">جاري معالجة الصور وضغطها...</div>';
+      msg.classList.remove('hidden');
+      msg.innerText = "يرجى الانتظار...";
+      
+      newImages = []; 
+      let processedCount = 0;
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // ضغط ذكي (Smart Compression)
+            const maxWidth = 800; 
+            let width = img.width;
+            let height = img.height;
+            
+            if (width > maxWidth) {
+                height *= maxWidth / width;
+                width = maxWidth;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // تحويل لـ JPEG بجودة 70%
+            newImages.push(canvas.toDataURL('image/jpeg', 0.7));
+            processedCount++;
+            
+            if(processedCount === files.length) {
+                renderPreview();
+                msg.innerText = `✅ تم تجهيز ${files.length} صور بنجاح`;
+                msg.classList.replace('text-brand', 'text-green-500');
+            }
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderPreview() {
+        const preview = document.getElementById('preview');
+        preview.innerHTML = '';
+        newImages.forEach(img => {
+            preview.innerHTML += `<div class="aspect-square rounded-lg bg-cover bg-center border border-gray-600 shadow-sm" style="background-image: url('${img}')"></div>`;
+        });
+    }
+
+    // === وظائف الأدمن ===
+    async function addProduct() {
+      const btn = document.getElementById('add-btn');
+      const name = document.getElementById('new-name').value;
+      const price = document.getElementById('new-price').value;
+      
+      if(!name || !price) return alert('⚠️ يرجى كتابة اسم الموديل والسعر');
+      if(newImages.length === 0) return alert('⚠️ يرجى اختيار صور للموديل');
+      if(newSizes.length === 0) return alert('⚠️ يرجى اختيار مقاس واحد على الأقل');
+      
+      btn.innerText = "⏳ جاري الحفظ في قاعدة البيانات...";
+      btn.classList.add('btn-disabled');
+      btn.disabled = true;
+
+      const newItem = {
+        id: Date.now(),
+        name, price,
+        category: document.getElementById('new-cat').value,
+        images: newImages,
+        sizes: newSizes
+      };
+
+      await saveProductToDB(newItem);
+      products = await getAllProducts(); // تحديث القائمة
+      
+      alert('✅ تم حفظ الموديل بنجاح!');
+      
+      // تنظيف النموذج
+      document.getElementById('new-name').value = '';
+      document.getElementById('new-price').value = '';
+      document.getElementById('upload-placeholder').classList.remove('hidden');
+      document.getElementById('preview').classList.add('hidden');
+      document.getElementById('file-msg').classList.add('hidden');
+      newImages = []; newSizes = []; updateSizeOpts();
+      renderAdminList();
+      
+      btn.innerText = "حفظ الموديل ✅";
+      btn.classList.remove('btn-disabled');
+      btn.disabled = false;
+    }
+
+    async function deleteProduct(id) {
+      if(confirm('هل أنت متأكد من حذف هذا الموديل نهائياً؟')) {
+        await deleteProductFromDB(id);
+        products = await getAllProducts();
+        renderAdminList();
+      }
+    }
+
+    function renderAdminList() {
+      const list = document.getElementById('admin-list');
+      document.getElementById('count-badge').innerText = products.length;
+      
+      if(products.length === 0) {
+          list.innerHTML = '<p class="text-center text-gray-500 py-4">لا توجد منتجات مضافة.</p>';
           return;
       }
 
-      container.innerHTML = orders.map(o => `
-        <div class="bg-[#1e1e1e] p-4 rounded-xl border-r-4 border-brand mb-3 shadow-md">
-          <div class="flex justify-between items-start mb-2">
+      list.innerHTML = products.map(p => `
+        <div class="bg-[#2a2a2a] p-3 rounded-xl flex justify-between items-center border border-gray-700 shadow-sm hover:border-brand transition">
+          <div class="flex gap-4 items-center">
+            <img src="${p.images[0]}" class="w-14 h-14 rounded-lg object-cover border border-gray-600">
             <div>
-               <span class="font-bold text-white text-lg">${o.name}</span>
-               <span class="bg-brand/20 text-brand px-2 py-0.5 rounded text-xs mr-2 font-bold">مقاس ${o.selected_size}</span>
+                <div class="font-bold text-white text-base">${p.name}</div>
+                <div class="text-xs text-brand font-bold">${p.price} ج.م</div>
+                <div class="text-xs text-gray-500">${p.category} | ${p.sizes.length} مقاس</div>
             </div>
-            <button onclick="confirmDel('order','${o.__backendId}')" class="text-red-400 hover:text-red-300">🗑️</button>
           </div>
-          <div class="text-sm text-gray-300 space-y-1 bg-black/20 p-3 rounded-lg">
-             <p>👤 <strong>العميل:</strong> ${o.customer_name}</p>
-             <p>📞 <strong>الهاتف:</strong> ${o.customer_phone}</p>
-             <p>📍 <strong>العنوان:</strong> ${o.customer_address}</p>
-             <p class="text-xs text-gray-500 mt-2 text-left" dir="ltr">${new Date(o.order_date).toLocaleDateString('ar-EG')}</p>
+          <button onclick="deleteProduct(${p.id})" class="text-red-500 hover:text-white hover:bg-red-600 p-2 rounded-lg transition">🗑️ حذف</button>
+        </div>
+      `).join('');
+    }
+
+    // === النسخ الاحتياطي (Backup) ===
+    async function exportData() {
+        if(products.length === 0) return alert('لا توجد بيانات لتصديرها!');
+        const dataStr = JSON.stringify(products);
+        const blob = new Blob([dataStr], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `backup_ahmed_shoes_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    function importData(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (Array.isArray(imported)) {
+                    if(confirm(`⚠️ سيتم استيراد ${imported.length} منتج. هل تريد المتابعة؟`)) {
+                        for (const p of imported) await saveProductToDB(p);
+                        products = await getAllProducts();
+                        renderAdminList();
+                        alert('✅ تم استعادة البيانات بنجاح!');
+                    }
+                }
+            } catch (err) { alert('❌ الملف غير صالح'); }
+        };
+        reader.readAsText(file);
+    }
+
+    // === واجهة المستخدم ===
+    function updateSizeOpts() {
+      const cat = document.getElementById('new-cat').value;
+      // مقاسات ذكية حسب الفئة
+      let sizes = cat === 'رجالي' ? [40,41,42,43,44,45] : (cat === 'حريمي' ? [37,38,39,40,41] : [25,26,27,28,29,30,31,32,33,34,35]);
+      newSizes = [];
+      document.getElementById('size-options').innerHTML = sizes.map(s => 
+        `<button onclick="toggleNewSize(${s}, this)" class="w-10 h-10 rounded-lg bg-[#2a2a2a] text-sm font-bold transition hover:bg-gray-700">${s}</button>`
+      ).join('');
+    }
+
+    function toggleNewSize(s, btn) {
+      if(newSizes.includes(s)) {
+        newSizes = newSizes.filter(x => x !== s);
+        btn.classList.remove('bg-brand', 'text-white');
+      } else {
+        newSizes.push(s);
+        btn.classList.add('bg-brand', 'text-white');
+      }
+    }
+
+    document.getElementById('new-cat').addEventListener('change', updateSizeOpts);
+
+    async function showCategory(cat) {
+      document.getElementById('home-view').classList.add('hidden');
+      const pView = document.getElementById('products-view');
+      pView.classList.remove('hidden');
+      document.getElementById('cat-title').innerText = cat;
+      document.getElementById('loading-msg').classList.remove('hidden');
+      document.getElementById('grid').innerHTML = '';
+
+      // ضمان تحميل أحدث البيانات
+      products = await getAllProducts();
+      
+      const items = products.filter(p => p.category === cat);
+      document.getElementById('loading-msg').classList.add('hidden');
+      
+      if(items.length === 0) {
+        document.getElementById('empty-msg').classList.remove('hidden');
+        return;
+      }
+      
+      document.getElementById('empty-msg').classList.add('hidden');
+      document.getElementById('grid').innerHTML = items.map(p => `
+        <div onclick="openModal(${p.id})" class="product-card rounded-xl overflow-hidden cursor-pointer group">
+          <div class="h-48 bg-[#1a1a1a] relative overflow-hidden">
+            <img src="${p.images[0]}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute bottom-0 right-0 bg-brand text-white px-3 py-1 text-sm font-bold rounded-tl-xl shadow-lg">${p.price}</div>
+          </div>
+          <div class="p-3 text-center">
+             <h4 class="font-bold text-sm text-gray-200 truncate">${p.name}</h4>
           </div>
         </div>
       `).join('');
     }
 
-    function getSizesForCategory(c) { 
-        if(c==='رجالي') return [40,41,42,43,44,45];
-        if(c==='حريمي') return [37,38,39,40,41];
-        if(c==='أطفالي') return Array.from({length:16},(_,i)=>i+20); // من 20 لـ 35
-        return [];
+    function goHome() {
+      document.getElementById('products-view').classList.add('hidden');
+      document.getElementById('home-view').classList.remove('hidden');
     }
 
-    function updateSizeSelector() {
-      const c = document.getElementById('new-product-category').value;
-      selectedSizes = [];
-      document.getElementById('size-selector').innerHTML = getSizesForCategory(c).map(s => 
-        `<button onclick="toggleNewSize(${s},this)" class="w-10 h-10 bg-[#2a2a2a] rounded-lg text-sm text-white font-bold transition-all hover:bg-[#333] border border-transparent">${s}</button>`
-      ).join('');
+    async function toggleAdmin() {
+      const p = document.getElementById('admin-panel');
+      if(p.classList.contains('hidden')) {
+        const pass = prompt('كلمة المرور:');
+        if(pass === 'admin123') {
+           p.classList.remove('hidden');
+           products = await getAllProducts();
+           renderAdminList();
+        } else alert('❌ كلمة المرور غير صحيحة');
+      } else p.classList.add('hidden');
     }
 
-    function toggleNewSize(s, btn) {
-      if(selectedSizes.includes(s)) { 
-          selectedSizes = selectedSizes.filter(x=>x!==s); 
-          btn.classList.remove('bg-brand', 'border-brand-light');
-          btn.classList.add('bg-[#2a2a2a]');
-      } else { 
-          selectedSizes.push(s); 
-          btn.classList.remove('bg-[#2a2a2a]');
-          btn.classList.add('bg-brand', 'border-brand-light');
-      }
-    }
-    
-    async function addNewProduct() {
-      const name = document.getElementById('new-product-name').value;
-      const price = document.getElementById('new-product-price').value;
+    // === المودال والتفاصيل ===
+    function openModal(id) {
+      currentProd = products.find(p => p.id === id);
+      const modal = document.getElementById('modal');
+      modal.classList.remove('hidden');
       
-      // تحقق صارم
-      if(!name || !price) return showToast('⚠️ يرجى كتابة الاسم والسعر');
-      if(uploadedImages.length === 0) return showToast('⚠️ يرجى رفع صورة واحدة على الأقل');
-      if(selectedSizes.length === 0) return showToast('⚠️ يرجى اختيار المقاسات');
+      document.getElementById('m-name').innerText = currentProd.name;
+      document.getElementById('m-price').innerText = currentProd.price + ' جنيه';
       
-      const saveBtn = document.getElementById('save-btn');
-      saveBtn.innerText = 'جاري الرفع والمعالجة...';
-      saveBtn.disabled = true;
+      // الصور
+      const main = document.getElementById('main-img');
+      main.src = currentProd.images[0];
       
-      await window.dataSdk.create({
-        type:'product', is_order:false, name, price, 
-        category: document.getElementById('new-product-category').value,
-        images: JSON.stringify(uploadedImages), // تخزين الصور كمصفوفة
-        sizes: selectedSizes.join(',')
-      });
-      
-      showToast('✅ تم إضافة الموديل بنجاح'); 
-      showAdminTab('products');
-      
-      saveBtn.innerText = 'حفظ الموديل ✅';
-      saveBtn.disabled = false;
+      const thumbs = document.getElementById('thumbs');
+      thumbs.innerHTML = currentProd.images.map(src => `
+        <div onclick="document.getElementById('main-img').src='${src}'" 
+             class="w-14 h-14 rounded-lg border border-gray-600 cursor-pointer overflow-hidden bg-black hover:border-brand transition">
+             <img src="${src}" class="w-full h-full object-cover opacity-80 hover:opacity-100">
+        </div>
+      `).join('');
+
+      // المقاسات
+      currentSize = null;
+      document.getElementById('m-sizes').innerHTML = currentProd.sizes.map(s => `
+        <button onclick="selectSize(${s}, this)" class="w-10 h-10 rounded-lg bg-[#2a2a2a] text-sm font-bold text-white transition hover:bg-gray-700 border border-transparent">${s}</button>
+      `).join('');
     }
 
-    // --- الحذف ---
-    function confirmDel(type, id) {
-      document.getElementById('confirm-delete-modal').classList.remove('hidden');
-      deleteCallback = async () => {
-        const item = (type==='product'?products:orders).find(i=>i.__backendId===id);
-        if(item) await window.dataSdk.delete(item);
-        document.getElementById('confirm-delete-modal').classList.add('hidden');
-      };
-    }
-    function cancelDelete() { document.getElementById('confirm-delete-modal').classList.add('hidden'); }
-    function confirmDelete() { if(deleteCallback) deleteCallback(); }
-    
-    // --- التنبيهات ---
-    function showToast(m) { 
-        const t = document.getElementById('success-toast'); 
-        document.getElementById('toast-message').innerText = m; 
-        t.style.transform = 'translate(-50%, 50%)'; 
-        setTimeout(()=> t.style.transform = 'translate(-50%, -200%)', 2500); 
+    function selectSize(s, btn) {
+      currentSize = s;
+      document.querySelectorAll('#m-sizes button').forEach(b => b.classList.remove('bg-brand', 'scale-110'));
+      btn.classList.add('bg-brand', 'scale-110');
     }
 
-    document.getElementById('new-product-category').addEventListener('change', updateSizeSelector);
-    
-    // تشغيل التطبيق
-    initApp();
-  </script>
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+    function sendOrder() {
+      const name = document.getElementById('c-name').value;
+      const addr = document.getElementById('c-address').value;
+      const phone = document.getElementById('c-phone').value;
+      
+      if(!currentSize) return alert('⚠️ يرجى اختيار المقاس المناسب');
+      if(!name || !addr || !phone) return alert('⚠️ يرجى كتابة بيانات الشحن كاملة');
+      
+      const msg = `مرحباً، أريد طلب جديد: \n\n👟 الموديل: ${currentProd.name}\n📏 المقاس: ${currentSize}\n💰 السعر: ${currentProd.price}\n\n👤 الاسم: ${name}\n📞 الهاتف: ${phone}\n📍 العنوان: ${addr}`;
+      window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
+      closeModal();
+    }
+   </script>
  </body>
 </html>
