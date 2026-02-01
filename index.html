@@ -4,55 +4,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>أحمد الشيخ - للأحذية</title>
-  
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
-  
   <script>
     tailwind.config = {
       theme: { 
         extend: { 
-          colors: { 
-            brand: { 
-              light: '#F3F4F6', 
-              DEFAULT: '#4b5f28', // الزيتي الغامق
-              text: '#2d3748',
-              accent: '#708238' 
-            } 
-          },
-          boxShadow: {
-            'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-          }
+          colors: { brand: { light: '#F3F4F6', DEFAULT: '#4b5f28', text: '#2d3748', accent: '#708238' } },
+          boxShadow: { 'soft': '0 4px 6px -1px rgba(0,0,0,0.05)', 'button': '0 10px 15px -3px rgba(0,0,0,0.05)' }
         } 
       } 
     }
   </script>
-  
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f0f2f5; color: #1a1a1a; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px; }
     .profile-container { width: 140px; height: 140px; margin: 0 auto; border-radius: 50%; background: white; padding: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 4px solid white; position: relative; overflow: hidden; }
     .profile-img { width: 100%; height: 100%; border-radius: 50%; object-fit: contain; background-color: #fff; }
-    .link-btn { display: flex; align-items: center; gap: 1.5rem; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 1rem 1.5rem; border-radius: 1.5rem; margin-bottom: 1rem; border: 1px solid #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+    .link-btn { display: flex; align-items: center; gap: 1.5rem; width: 100%; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 1rem 1.5rem; border-radius: 1.5rem; margin-bottom: 1rem; border: 1px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.3s; cursor: pointer; }
     .link-btn:hover { transform: translateY(-3px); border-color: #4b5f28; }
     .btn-icon-box { width: 50px; height: 50px; background: #f8fafc; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #e2e8f0; flex-shrink: 0; }
     .btn-icon-img { width: 100%; height: 100%; object-fit: cover; }
-    .link-btn h3 { font-size: 1.1rem; font-weight: 800; color: #3f4a20; flex-grow: 1; text-align: right; }
+    .link-btn h3 { font-size: 1.1rem; font-weight: 800; color: #3f4a20; text-transform: uppercase; flex-grow: 1; text-align: right; }
     .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
     .verified-badge { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: #4b5f28; color: white; border-radius: 50%; font-size: 12px; margin-right: 5px; }
-    /* ستايلات الأدمن */
-    .admin-tab { padding: 10px 20px; border-radius: 10px; font-weight: bold; transition: 0.3s; cursor: pointer; flex: 1; text-align: center; border: 1px solid #333; }
-    .admin-tab.active { background-color: #4b5f28; color: white; border-color: #4b5f28; }
-    .admin-tab.inactive { background-color: transparent; color: #888; }
   </style>
  </head>
  <body class="h-full min-h-screen overflow-auto">
 
    <div id="home-view" class="max-w-md mx-auto px-6 py-10 min-h-screen flex flex-col items-center">
-     <div class="w-full flex justify-end mb-4">
-        <button onclick="toggleAdmin()" class="text-xs text-gray-400 hover:text-brand transition">🔐 Admin</button>
-     </div>
-
-     <div class="text-center mb-10 w-full relative">
+     <div class="text-center mb-10 w-full relative pt-10">
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-brand-accent/10 rounded-full blur-3xl -z-10"></div>
         <div class="profile-container mb-4">
             <img src="احمد الشيخ (3).png" class="profile-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2589/2589903.png'">
@@ -65,22 +45,28 @@
 
      <div class="w-full space-y-4">
        <button onclick="showCategory('رجالي')" class="link-btn group">
-         <div class="btn-icon-box group-hover:scale-110 transition"><img src="man.png" class="btn-icon-img" onerror="this.parentElement.innerHTML='👞'"></div>
+         <div class="btn-icon-box shadow-sm group-hover:scale-110 transition"><img src="man.png" class="btn-icon-img" onerror="this.parentElement.innerHTML='👞'"></div>
          <h3>MEN COLLECTION</h3><span class="text-gray-400">→</span>
        </button>
        <button onclick="showCategory('حريمي')" class="link-btn group">
-         <div class="btn-icon-box group-hover:scale-110 transition"><img src="women.png" class="btn-icon-img" onerror="this.parentElement.innerHTML='👠'"></div>
+         <div class="btn-icon-box shadow-sm group-hover:scale-110 transition"><img src="women.png" class="btn-icon-img" onerror="this.parentElement.innerHTML='👠'"></div>
          <h3>WOMEN COLLECTION</h3><span class="text-gray-400">→</span>
        </button>
        <button onclick="showCategory('أطفالي')" class="link-btn group">
-         <div class="btn-icon-box group-hover:scale-110 transition"><img src="kids.png" class="btn-icon-img" onerror="this.parentElement.innerHTML='👟'"></div>
+         <div class="btn-icon-box shadow-sm group-hover:scale-110 transition"><img src="kids.png" class="btn-icon-img" onerror="this.parentElement.innerHTML='👟'"></div>
          <h3>KIDS COLLECTION</h3><span class="text-gray-400">→</span>
        </button>
 
        <div class="flex gap-3 mt-6 w-full">
-           <a href="https://wa.me/201020468021" class="flex-1 bg-white p-4 rounded-xl flex justify-center shadow-sm text-green-600">Whatsapp</a>
-           <a href="https://www.facebook.com/share/14VSGdA8ufc/" class="flex-1 bg-white p-4 rounded-xl flex justify-center shadow-sm text-blue-600">Facebook</a>
-           <a href="https://www.instagram.com/elshekh_store?igsh=YWVkM2ExY3owc2Vl" class="flex-1 bg-white p-4 rounded-xl flex justify-center shadow-sm text-pink-600">Instagram</a>
+           <a href="https://wa.me/201020468021" target="_blank" class="flex-1 bg-white p-4 rounded-xl flex justify-center shadow-sm text-green-600 hover:shadow-md transition">
+               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+           </a>
+           <a href="https://www.facebook.com/share/14VSGdA8ufc/" target="_blank" class="flex-1 bg-white p-4 rounded-xl flex justify-center items-center shadow-sm text-blue-600 hover:shadow-md transition">
+               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+           </a>
+           <a href="https://www.instagram.com/elshekh_store?igsh=YWVkM2ExY3owc2Vl" target="_blank" class="flex-1 bg-white p-4 rounded-xl flex justify-center items-center shadow-sm text-pink-600 hover:shadow-md transition">
+               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+           </a>
        </div>
      </div>
    </div>
@@ -92,7 +78,7 @@
            <h3 id="cat-title" class="text-xl font-bold text-brand-dark"></h3>
        </div>
      </div>
-     <div id="loading-msg" class="text-center py-20 text-brand hidden font-bold">جاري تحميل البيانات من السيرفر...</div>
+     <div id="loading-msg" class="text-center py-20 text-brand hidden font-bold">جاري تحميل الموديلات...</div>
      <div id="grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
      <div id="empty-msg" class="hidden text-center py-20"><p class="text-gray-400 font-bold">لا توجد موديلات حالياً</p></div>
    </div>
@@ -107,67 +93,23 @@
          <div class="mb-6 text-center"><p class="text-xs text-gray-400 mb-2 font-bold uppercase">اختر المقاس</p><div id="m-sizes" class="flex flex-wrap justify-center gap-2"></div></div>
          <div class="mb-6 p-4 bg-white border-2 border-dashed border-green-300 rounded-2xl text-center shadow-sm">
              <p class="text-xs text-gray-500 font-bold mb-1">💳 الدفع فودافون كاش</p>
-             <p class="text-xl font-black text-green-600 font-mono">01020468021</p>
+             <p class="text-xl font-black text-green-600 font-mono select-all">01020468021</p>
          </div>
          <div class="space-y-3 pt-2">
-           <input id="c-name" placeholder="الاسم" class="w-full bg-gray-50 border p-4 rounded-xl text-sm outline-none focus:border-brand">
-           <input id="c-phone" type="tel" placeholder="رقم الهاتف" class="w-full bg-gray-50 border p-4 rounded-xl text-sm outline-none focus:border-brand">
-           <input id="c-address" placeholder="العنوان" class="w-full bg-gray-50 border p-4 rounded-xl text-sm outline-none focus:border-brand">
+           <input id="c-name" placeholder="الاسم ثلاثي" class="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl text-sm font-bold outline-none focus:border-brand">
+           <input id="c-phone" type="tel" placeholder="رقم الهاتف" class="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl text-sm font-bold outline-none focus:border-brand">
+           <input id="c-address" placeholder="العنوان بالتفصيل" class="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl text-sm font-bold outline-none focus:border-brand">
            <button onclick="sendOrder()" id="order-btn" class="w-full py-4 rounded-xl font-bold mt-2 text-lg shadow-xl text-white bg-brand hover:bg-brand-accent transition">تأكيد الطلب ✅</button>
          </div>
        </div>
      </div>
    </div>
 
-   <div id="admin-panel" class="hidden fixed inset-0 z-50 bg-[#1a1a1a] overflow-y-auto text-white">
-     <div class="p-4 max-w-2xl mx-auto">
-       <header class="flex justify-between items-center mb-8 border-b border-gray-800 pb-4 sticky top-0 bg-[#1a1a1a] z-10 pt-4">
-         <h2 class="text-2xl font-bold text-brand">لوحة التحكم (أونلاين)</h2>
-         <button onclick="toggleAdmin()" class="text-gray-400 hover:text-white">إغلاق</button>
-       </header>
-
-       <div class="flex gap-2 mb-6">
-           <div onclick="switchAdminTab('products')" id="tab-products" class="admin-tab active">📦 المنتجات</div>
-           <div onclick="switchAdminTab('orders')" id="tab-orders" class="admin-tab inactive">🛒 الطلبات</div>
-       </div>
-
-       <div id="admin-products-section">
-           <div class="bg-gray-900 p-6 rounded-xl mb-8 border border-gray-800">
-             <h3 class="font-bold mb-4 text-brand-light">➕ إضافة موديل جديد</h3>
-             <div class="space-y-4">
-               <div class="border-2 border-dashed border-gray-700 bg-gray-800/50 p-6 text-center rounded-xl cursor-pointer" onclick="document.getElementById('file-in').click()">
-                 <input type="file" id="file-in" multiple accept="image/*" class="hidden" onchange="handleFiles(this)">
-                 <span class="text-gray-400 text-sm">اضغط لإضافة صور</span>
-                 <div id="preview" class="flex gap-2 justify-center mt-2"></div>
-                 <p id="img-status" class="text-xs text-yellow-500 mt-1 hidden">جاري المعالجة...</p>
-               </div>
-               
-               <input id="new-name" placeholder="اسم الموديل" class="w-full bg-gray-800 border border-gray-700 p-3 rounded-xl text-white outline-none">
-               <div class="flex gap-3">
-                 <input id="new-price" type="number" placeholder="السعر" class="flex-1 bg-gray-800 border border-gray-700 p-3 rounded-xl text-white outline-none">
-                 <select id="new-cat" class="flex-1 bg-gray-800 border border-gray-700 p-3 rounded-xl text-white outline-none">
-                   <option value="رجالي">رجالي</option><option value="حريمي">حريمي</option><option value="أطفالي">أطفالي</option>
-                 </select>
-               </div>
-               <div id="size-options" class="flex flex-wrap gap-2 p-3 bg-gray-800 rounded-xl"></div>
-               <button onclick="addProduct()" id="save-btn" class="w-full py-3 rounded-xl font-bold bg-brand text-white hover:bg-brand-accent transition">حفظ ورفع للسيرفر ☁️</button>
-             </div>
-           </div>
-           <h3 class="font-bold mb-4 text-gray-400">المنتجات الحالية:</h3>
-           <div id="admin-list" class="space-y-3 pb-10"></div>
-       </div>
-
-       <div id="admin-orders-section" class="hidden">
-           <div id="admin-orders-list" class="space-y-3 pb-10"></div>
-       </div>
-     </div>
-   </div>
-
    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // ✅✅ تم إضافة كود الكونفيجريشن الخاص بك هنا ✅✅
+    // ✅ كود الربط بقاعدة البيانات (نفس الكود اللي فوق)
     const firebaseConfig = {
       apiKey: "AIzaSyASO-AN5XaSGn4SaCZ8VlHr6zsFCIxPCzs",
       authDomain: "ahmed-shoes.firebaseapp.com",
@@ -178,201 +120,15 @@
       measurementId: "G-S50TX0VMKE"
     };
 
-    // تهيئة فايربيس
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // متغيرات عالمية
-    window.newImages = []; 
-    window.newSizes = [];
+    // متغيرات
+    let products = [];
     window.currentProd = null;
     window.currentSize = null;
 
-    // دوال النظام
-    window.toggleAdmin = function() {
-        const p = document.getElementById('admin-panel');
-        if(p.classList.contains('hidden')) {
-            const pass = prompt('كلمة المرور:');
-            if(pass === 'admin123') {
-                p.classList.remove('hidden');
-                switchAdminTab('products');
-                updateSizeOpts();
-            } else alert('خطأ');
-        } else p.classList.add('hidden');
-    }
-
-    window.switchAdminTab = function(t) {
-        document.getElementById('admin-products-section').classList.toggle('hidden', t !== 'products');
-        document.getElementById('admin-orders-section').classList.toggle('hidden', t !== 'orders');
-        document.getElementById('tab-products').className = t === 'products' ? 'admin-tab active' : 'admin-tab inactive';
-        document.getElementById('tab-orders').className = t === 'orders' ? 'admin-tab active' : 'admin-tab inactive';
-        if(t === 'products') loadProductsAdmin();
-        if(t === 'orders') loadOrdersAdmin();
-    }
-
-    // --- المنتجات ---
-    window.updateSizeOpts = function() {
-        const cat = document.getElementById('new-cat').value;
-        const sizes = cat === 'رجالي' ? [40,41,42,43,44,45] : (cat === 'حريمي' ? [37,38,39,40,41] : [26,27,28,29,30,31,32,33,34,35]);
-        window.newSizes = [];
-        document.getElementById('size-options').innerHTML = sizes.map(s => `<button onclick="toggleSize(${s}, this)" class="px-3 py-1 rounded bg-gray-700 text-sm border border-gray-600 hover:border-green-500">${s}</button>`).join('');
-    }
-    window.toggleSize = function(s, btn) {
-        if(window.newSizes.includes(s)) { window.newSizes = window.newSizes.filter(x=>x!==s); btn.style.borderColor='#4b5563'; }
-        else { window.newSizes.push(s); btn.style.borderColor='#708238'; }
-    }
-    document.getElementById('new-cat').addEventListener('change', window.updateSizeOpts);
-
-    window.handleFiles = function(input) {
-        window.newImages = [];
-        document.getElementById('preview').innerHTML = '';
-        document.getElementById('img-status').classList.remove('hidden');
-        
-        let processed = 0;
-        const files = [...input.files].slice(0,4);
-        
-        files.forEach(f => {
-            const r = new FileReader();
-            r.onload = e => {
-                const img = new Image(); img.src=e.target.result;
-                img.onload = () => {
-                    const c = document.createElement('canvas'); const ctx=c.getContext('2d');
-                    // ضغط قوي للصورة لتناسب فايربيس
-                    const maxWidth = 600;
-                    c.width=maxWidth; c.height=img.height*(maxWidth/img.width);
-                    ctx.drawImage(img,0,0,c.width,c.height);
-                    const d = c.toDataURL('image/jpeg', 0.6);
-                    window.newImages.push(d);
-                    document.getElementById('preview').innerHTML+=`<img src="${d}" class="w-10 h-10 rounded border border-gray-500">`;
-                    processed++;
-                    if(processed === files.length) {
-                        document.getElementById('img-status').innerText = "✅ الصور جاهزة";
-                        document.getElementById('img-status').classList.replace('text-yellow-500', 'text-green-500');
-                    }
-                }
-            }; r.readAsDataURL(f);
-        });
-    }
-
-    window.addProduct = async function() {
-        const btn = document.getElementById('save-btn');
-        const name = document.getElementById('new-name').value;
-        const price = document.getElementById('new-price').value;
-        
-        if(!name || !price || !window.newImages.length) return alert('أكمل البيانات');
-        
-        btn.innerText = "جاري الرفع للسيرفر...";
-        btn.disabled = true;
-
-        try {
-            await addDoc(collection(db, "products"), {
-                name: name,
-                price: price,
-                category: document.getElementById('new-cat').value,
-                images: window.newImages,
-                sizes: window.newSizes,
-                timestamp: Date.now()
-            });
-            alert('تم الرفع بنجاح! سيظهر الآن عند جميع العملاء.');
-            // Reset
-            document.getElementById('new-name').value = '';
-            document.getElementById('preview').innerHTML = '';
-            window.newImages = [];
-        } catch (e) {
-            alert('حدث خطأ: ' + e.message);
-        }
-        btn.innerText = "حفظ ورفع للسيرفر ☁️";
-        btn.disabled = false;
-    }
-
-    function loadProductsAdmin() {
-        const q = query(collection(db, "products"), orderBy("timestamp", "desc"));
-        onSnapshot(q, (snapshot) => {
-            const list = document.getElementById('admin-list');
-            list.innerHTML = "";
-            snapshot.forEach((doc) => {
-                const p = doc.data();
-                list.innerHTML += `
-                    <div class="bg-[#2d2d2d] p-3 rounded flex justify-between items-center border border-gray-600">
-                        <div class="flex gap-2 items-center">
-                            <img src="${p.images[0]}" class="w-12 h-12 rounded object-cover">
-                            <div><div class="font-bold">${p.name}</div><div class="text-xs text-gray-400">${p.price} ج.م</div></div>
-                        </div>
-                        <button onclick="delProd('${doc.id}')" class="text-red-400 text-sm border border-red-900 p-1 rounded">حذف</button>
-                    </div>
-                `;
-            });
-        });
-    }
-
-    window.delProd = async function(id) {
-        if(confirm('حذف نهائي من السيرفر؟')) {
-            await deleteDoc(doc(db, "products", id));
-        }
-    }
-
-    // --- الطلبات ---
-    async function sendOrder() {
-        const name = document.getElementById('c-name').value;
-        const addr = document.getElementById('c-address').value;
-        const phone = document.getElementById('c-phone').value;
-        
-        if(!window.currentSize || !name || !addr) return alert('أكمل البيانات');
-        
-        document.getElementById('order-btn').innerText = "جاري الإرسال...";
-        
-        try {
-            await addDoc(collection(db, "orders"), {
-                productName: window.currentProd.name,
-                productPrice: window.currentProd.price,
-                size: window.currentSize,
-                customerName: name,
-                customerPhone: phone,
-                customerAddress: addr,
-                timestamp: Date.now()
-            });
-            alert('✅ تم استلام طلبك بنجاح! سنتواصل معك قريباً.');
-            closeModal();
-        } catch (e) {
-            alert('حدث خطأ في الاتصال، حاول مرة أخرى.');
-        }
-        document.getElementById('order-btn').innerText = "تأكيد الطلب ✅";
-    }
-
-    function loadOrdersAdmin() {
-        const q = query(collection(db, "orders"), orderBy("timestamp", "desc"));
-        onSnapshot(q, (snapshot) => {
-            const list = document.getElementById('admin-orders-list');
-            list.innerHTML = "";
-            if(snapshot.empty) list.innerHTML = '<p class="text-center text-gray-500">لا توجد طلبات</p>';
-            snapshot.forEach((doc) => {
-                const o = doc.data();
-                list.innerHTML += `
-                    <div class="bg-[#2d2d2d] p-4 rounded-xl border-r-4 border-[#708238]">
-                        <div class="flex justify-between mb-2">
-                            <span class="text-xs text-gray-400">${new Date(o.timestamp).toLocaleString('ar-EG')}</span>
-                            <button onclick="delOrder('${doc.id}')" class="text-red-400 text-xs">تم التسليم (حذف)</button>
-                        </div>
-                        <div class="font-bold text-lg text-white mb-1">${o.productName}</div>
-                        <div class="text-[#708238] text-sm mb-3">السعر: ${o.productPrice} | مقاس: ${o.size}</div>
-                        <div class="bg-black/30 p-2 rounded text-sm text-gray-300">
-                            <p>👤 ${o.customerName}</p>
-                            <p>📞 <a href="tel:${o.customerPhone}" class="text-blue-400">${o.customerPhone}</a></p>
-                            <p>📍 ${o.customerAddress}</p>
-                        </div>
-                    </div>
-                `;
-            });
-        });
-    }
-
-    window.delOrder = async function(id) {
-        if(confirm('هل تم تسليم الطلب؟ سيتم حذفه.')) {
-            await deleteDoc(doc(db, "orders", id));
-        }
-    }
-
-    // --- واجهة العميل ---
+    // دوال العرض
     window.showCategory = async function(cat) {
         document.getElementById('home-view').classList.add('hidden');
         document.getElementById('products-view').classList.remove('hidden');
@@ -382,11 +138,11 @@
 
         const q = query(collection(db, "products"), orderBy("timestamp", "desc"));
         const snapshot = await getDocs(q);
-        window.products = [];
-        snapshot.forEach(doc => window.products.push({id: doc.id, ...doc.data()}));
+        products = [];
+        snapshot.forEach(doc => products.push({id: doc.id, ...doc.data()}));
 
         document.getElementById('loading-msg').classList.add('hidden');
-        const items = window.products.filter(p => p.category === cat);
+        const items = products.filter(p => p.category === cat);
         
         if(!items.length) { document.getElementById('empty-msg').classList.remove('hidden'); return; }
         document.getElementById('empty-msg').classList.add('hidden');
@@ -400,8 +156,9 @@
     }
 
     window.goHome = function() { document.getElementById('products-view').classList.add('hidden'); document.getElementById('home-view').classList.remove('hidden'); }
+
     window.openModal = function(id) {
-        window.currentProd = window.products.find(p => p.id === id);
+        window.currentProd = products.find(p => p.id === id);
         document.getElementById('modal').classList.remove('hidden');
         document.getElementById('m-name').innerText = window.currentProd.name;
         document.getElementById('m-price').innerText = window.currentProd.price + ' ج.م';
@@ -409,8 +166,41 @@
         document.getElementById('thumbs').innerHTML = window.currentProd.images.map(src => `<div onclick="document.getElementById('main-img').src='${src}'" class="w-12 h-12 rounded-lg border cursor-pointer overflow-hidden"><img src="${src}" class="w-full h-full object-cover"></div>`).join('');
         document.getElementById('m-sizes').innerHTML = window.currentProd.sizes.map(s => `<button onclick="selectSize(${s}, this)" class="w-8 h-8 rounded-lg bg-gray-100 text-xs font-bold text-gray-600 hover:bg-brand hover:text-white transition">${s}</button>`).join('');
     }
-    window.selectSize = function(s, btn) { window.currentSize = s; document.querySelectorAll('#m-sizes button').forEach(b => b.classList.remove('bg-brand', 'text-white')); btn.classList.add('bg-brand', 'text-white'); }
+
+    window.selectSize = function(s, btn) {
+        window.currentSize = s;
+        document.querySelectorAll('#m-sizes button').forEach(b => b.classList.remove('bg-brand', 'text-white'));
+        btn.classList.add('bg-brand', 'text-white');
+    }
+
     window.closeModal = function() { document.getElementById('modal').classList.add('hidden'); }
+
+    window.sendOrder = async function() {
+        const name = document.getElementById('c-name').value;
+        const addr = document.getElementById('c-address').value;
+        const phone = document.getElementById('c-phone').value;
+        
+        if(!window.currentSize || !name || !addr || !phone) return alert('أكمل البيانات');
+        
+        document.getElementById('order-btn').innerText = "جاري الإرسال...";
+        
+        try {
+            await addDoc(collection(db, "orders"), {
+                productName: window.currentProd.name,
+                productPrice: window.currentProd.price,
+                size: window.currentSize,
+                customerName: name,
+                customerPhone: phone,
+                customerAddress: addr,
+                timestamp: Date.now()
+            });
+            alert('✅ تم استلام طلبك بنجاح! سيظهر في لوحة التحكم.');
+            closeModal();
+        } catch (e) {
+            alert('حدث خطأ في الاتصال، حاول مرة أخرى.');
+        }
+        document.getElementById('order-btn').innerText = "تأكيد الطلب ✅";
+    }
    </script>
  </body>
 </html>
