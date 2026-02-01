@@ -16,7 +16,7 @@
     .tab.active { border-color: #708238; color: #4a5d23; font-weight: bold; }
   </style>
  </head>
- <body class="p-4 max-w-3xl mx-auto">
+ <body class="p-4 max-w-2xl mx-auto md:max-w-3xl">
 
    <div id="login-screen" class="fixed inset-0 bg-white flex items-center justify-center z-50">
        <div class="bg-[#f9faf8] p-8 rounded-xl text-center w-full max-w-sm border border-[#e5e7e0] shadow-sm">
@@ -86,6 +86,10 @@
        </div>
 
        <div id="sec-orders" class="hidden">
+           <div class="mb-4 flex justify-between items-center">
+               <h3 class="font-bold text-[#4a5d23]">الطلبات الواردة</h3>
+               <span id="orders-count" class="text-sm text-[#6b7c3a]">0 طلب</span>
+           </div>
            <div id="orders-list" class="space-y-4">
                <p class="text-center text-[#6b7c3a] py-4">جاري تحميل الطلبات...</p>
            </div>
@@ -126,7 +130,7 @@
     window.newSizes = [];
 
     window.login = function() {
-        if(document.getElementById('admin-pass').value === 'admin123') {
+        if(document.getElementById('admin-pass').value === 'AM') {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
             loadProducts();
@@ -354,21 +358,51 @@
         onSnapshot(q, (snapshot) => {
             const list = document.getElementById('orders-list');
             list.innerHTML = "";
-            if(snapshot.empty) list.innerHTML = '<p class="text-center text-[#6b7c3a]">لا توجد طلبات</p>';
-            snapshot.forEach((doc) => {
+            document.getElementById('orders-count').innerText = snapshot.size + ' طلب';
+            if(snapshot.empty) list.innerHTML = '<p class="text-center text-[#6b7c3a] py-8">لا توجد طلبات</p>';
+            snapshot.forEach((doc, idx) => {
                 const o = doc.data();
+                const orderNum = snapshot.size - idx;
+                const ph = String(o.customerPhone||'').replace(/\D/g,'');
+                const waNum = ph.startsWith('20') ? ph : '20' + ph.replace(/^0/,'');
+                const isMulti = o.items && o.items.length;
+                const itemsHtml = isMulti ? o.items.map((it,i) => `
+                    <div class="flex justify-between py-2 border-b border-[#e5e7e0] last:border-0">
+                        <span class="text-sm text-[#4a5d23]">${i+1}. ${it.productName} - ${it.color} | مقاس ${it.size} × ${it.qty||1}</span>
+                        <span class="text-[#708238] font-bold">${(it.price*(it.qty||1))} ج.م</span>
+                    </div>
+                `).join('') : `
+                    <div class="flex justify-between py-2">
+                        <span class="text-sm text-[#4a5d23]">${o.productName || '-'} ${o.color ? '- ' + o.color : ''} | مقاس ${o.size || '-'}</span>
+                        <span class="text-[#708238] font-bold">${o.productPrice || 0} ج.م</span>
+                    </div>
+                `;
+                const total = isMulti ? o.total : (o.productPrice || 0);
                 list.innerHTML += `
-                    <div class="bg-[#f9faf8] p-4 rounded-xl border-r-4 border-[#708238] border border-[#e5e7e0]">
-                        <div class="flex justify-between mb-2">
-                            <span class="text-xs text-[#6b7c3a]">${new Date(o.timestamp).toLocaleString('ar-EG')}</span>
-                            <button onclick="delOrder('${doc.id}')" class="text-red-600 text-xs hover:text-red-700">تم التسليم (حذف)</button>
+                    <div class="bg-white rounded-xl border border-[#e5e7e0] overflow-hidden shadow-sm hover:shadow-md transition">
+                        <div class="bg-[#708238] text-white px-4 py-2 flex justify-between items-center">
+                            <span class="font-bold">#${orderNum} - طلب جديد</span>
+                            <span class="text-sm opacity-90">${new Date(o.timestamp).toLocaleString('ar-EG')}</span>
                         </div>
-                        <div class="font-bold text-lg text-[#4a5d23] mb-1">${o.productName}</div>
-                        <div class="text-[#708238] text-sm mb-3">السعر: ${o.productPrice} | مقاس: ${o.size}${o.color ? ' | لون: ' + o.color : ''}</div>
-                        <div class="bg-white/80 p-2 rounded text-sm text-[#4a5d23] border border-[#e5e7e0]">
-                            <p>👤 ${o.customerName}</p>
-                            <p>📞 <a href="tel:${o.customerPhone}" class="text-[#708238] hover:underline">${o.customerPhone}</a></p>
-                            <p>📍 ${o.customerAddress}</p>
+                        <div class="p-4">
+                            <div class="bg-[#f9faf8] rounded-lg p-3 mb-4">
+                                <p class="text-xs font-bold text-[#6b7c3a] mb-2">المنتجات</p>
+                                ${itemsHtml}
+                                <div class="flex justify-between pt-2 mt-2 border-t-2 border-[#e5e7e0]">
+                                    <span class="font-bold text-[#4a5d23]">الإجمالي</span>
+                                    <span class="font-black text-[#708238]">${total} ج.م</span>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-3 mb-4">
+                                <p class="text-xs font-bold text-gray-500 mb-2">بيانات العميل</p>
+                                <p class="text-sm">👤 ${o.customerName}</p>
+                                <p class="text-sm">📞 <a href="tel:${o.customerPhone}" class="text-[#708238] hover:underline font-bold">${o.customerPhone}</a></p>
+                                <p class="text-sm">📍 ${o.customerAddress}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="https://wa.me/${waNum}" target="_blank" class="flex-1 py-2 rounded-lg bg-green-600 text-white text-center text-sm font-bold hover:bg-green-700">واتساب</a>
+                                <button onclick="delOrder('${doc.id}')" class="flex-1 py-2 rounded-lg border border-red-300 text-red-600 text-sm font-bold hover:bg-red-50">تم التسليم</button>
+                            </div>
                         </div>
                     </div>
                 `;
