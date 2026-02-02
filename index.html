@@ -53,13 +53,13 @@
     .img-zoom-wrap.zoomed { cursor: zoom-out; overflow: auto; }
     .img-zoom-wrap.zoomed img { transform: scale(2); }
 
-    /* --- تعديلات السلة الجديدة --- */
-    #cart-modal { align-items: flex-end; /* لظهور السلة من الأسفل */ }
+    /* --- تعديلات السلة (CSS) --- */
+    #cart-modal { align-items: flex-end; z-index: 60; } /* z-index عالي لتغطية الزر العائم */
     #cart-modal .modal-content {
         width: 100%;
         max-width: 100%;
-        border-radius: 2rem 2rem 0 0; /* تدوير من الأعلى فقط */
-        max-height: 90vh; /* مساحة أكبر */
+        border-radius: 2rem 2rem 0 0; 
+        max-height: 90vh; 
         display: flex;
         flex-direction: column;
         animation: slideUp 0.3s ease-out;
@@ -90,9 +90,13 @@
         border: 1px solid #e5e7eb;
     }
     .cart-qty-btn:active { background: #d1d5db; transform: scale(0.95); }
-    
-    /* أنيميشن لزر السلة العائم */
+
+    /* تنسيق الزر العائم */
     .floating-cart-btn {
+        position: fixed; /* ضروري عشان يعوم */
+        bottom: 24px;
+        left: 24px;
+        z-index: 50; /* أعلى من المحتوى العادي */
         animation: floatBtn 3s ease-in-out infinite;
     }
     @keyframes floatBtn {
@@ -104,7 +108,7 @@
  <body class="h-full min-h-screen overflow-auto transition-colors duration-300">
    <div id="toast-container"></div>
 
-   <button onclick="openCart()" class="floating-cart-btn fixed bottom-6 left-6 z-40 w-16 h-16 bg-[#4b5f28] text-white rounded-full shadow-[0_10px_20px_rgba(75,95,40,0.4)] flex items-center justify-center hover:scale-110 transition duration-300 border-4 border-white/50 backdrop-blur-sm group">
+   <button onclick="openCart()" class="floating-cart-btn w-16 h-16 bg-[#4b5f28] text-white rounded-full shadow-[0_10px_20px_rgba(75,95,40,0.4)] flex items-center justify-center hover:scale-110 transition duration-300 border-4 border-white/50 backdrop-blur-sm group">
      <svg class="w-8 h-8 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
      <span id="cart-badge" class="absolute -top-1 -right-1 w-6 h-6 bg-red-600 rounded-full text-white text-xs font-bold flex items-center justify-center border-2 border-white shadow-sm hidden">0</span>
    </button>
@@ -140,6 +144,12 @@
        <div class="flex gap-3 mt-6 w-full relative z-10">
            <a href="https://wa.me/201020468021" target="_blank" class="flex-1 glass-btn p-4 rounded-xl flex justify-center text-green-600 hover:scale-105 transition">
                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+           </a>
+           <a href="https://www.facebook.com/share/14VSGdA8ufc/" target="_blank" class="flex-1 glass-btn p-4 rounded-xl flex justify-center items-center text-blue-600 hover:scale-105 transition">
+               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+           </a>
+           <a href="https://www.instagram.com/elshekh_store?igsh=YWVkM2ExY3owc2Vl" target="_blank" class="flex-1 glass-btn p-4 rounded-xl flex justify-center items-center text-pink-600 hover:scale-105 transition">
+               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
            </a>
        </div>
      </div>
@@ -277,13 +287,15 @@
     window.currentSize = null;
     window.currentColor = null;
     
-    // تحميل السلة مع إصلاح المنتجات القديمة بإضافة ID لها
+    // --- ✅ إصلاح السلة النهائي: تحميل + تنظيف + إعطاء ID مميز ---
     try { 
-        window.cart = JSON.parse(localStorage.getItem('cart')||'[]');
-        // إصلاح: التأكد من أن كل عنصر له كود تعريف فريد
-        window.cart.forEach(item => {
-            if(!item.cartId) item.cartId = Date.now() + Math.random().toString(36).substr(2, 9);
-        });
+        let rawCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        if (!Array.isArray(rawCart)) rawCart = [];
+        // تأكد أن كل عنصر له كود تعريف (ID) فريد، لو ملوش اديله واحد جديد
+        window.cart = rawCart.map(item => ({
+            ...item,
+            cartId: item.cartId || (Date.now() + Math.random().toString(36).substr(2, 9))
+        }));
         localStorage.setItem('cart', JSON.stringify(window.cart));
     } catch(e) { window.cart = []; }
 
@@ -334,49 +346,45 @@
     window.addToCart = function() {
         if(!window.currentSize) return toast('اختر المقاس أولاً', 'error');
         const color = window.currentColor || 'افتراضي';
-        const existing = window.cart.find(i => i.productId === window.currentProd.id && i.color === color && i.size === window.currentSize);
-        if(existing) { 
-            existing.qty = (existing.qty||1) + 1; 
-            toast('تم تحديث الكمية ✓ - المنتج موجود في السلة');
-        } else {
-            window.cart.push({
-                cartId: Date.now() + Math.random().toString(36).substr(2, 9), // كود فريد للمنتج في السلة
-                productId: window.currentProd.id,
-                productName: window.currentProd.name,
-                price: parseInt(window.currentProd.price) || 0,
-                color, size: window.currentSize,
-                image: (window.currentProd.images||[])[0],
-                qty: 1
-            });
-            toast('تمت الإضافة للسلة ✓');
-        }
+        // إضافة منتج جديد دائماً لضمان عدم التداخل، أو دمج الكميات فقط لو نفس الـ ID (بس هنا هنعمل جديد)
+        window.cart.push({
+            cartId: Date.now() + Math.random().toString(36).substr(2, 9), // ID فريد ومستحيل يتكرر
+            productId: window.currentProd.id,
+            productName: window.currentProd.name,
+            price: parseInt(window.currentProd.price) || 0,
+            color, size: window.currentSize,
+            image: (window.currentProd.images||[])[0],
+            qty: 1
+        });
+        toast('تمت الإضافة للسلة ✓');
         updateCartBadge();
         saveCart();
         closeModal();
     }
 
-    // تعديل الكمية باستخدام ID لضمان الدقة
-    window.updateCartQty = function(cartId, delta) {
-        const item = window.cart.find(i => i.cartId === cartId);
-        if (!item) return;
+    // --- ✅ دوال السلة المحسنة (تعتمد على cartId) ---
+    window.updateCartQty = function(cId, delta) {
+        // البحث عن المنتج باستخدام الكود الفريد
+        const idx = window.cart.findIndex(i => i.cartId === cId);
+        if (idx === -1) return;
         
-        item.qty = (item.qty||1) + delta;
-        if(item.qty < 1) { 
-            // حذف المنتج نهائياً إذا أصبحت الكمية 0
-            window.cart = window.cart.filter(i => i.cartId !== cartId);
+        window.cart[idx].qty = (window.cart[idx].qty || 1) + delta;
+        
+        if (window.cart[idx].qty < 1) {
+            // حذف نهائي لو الكمية 0
+            window.cart.splice(idx, 1);
         }
         
         renderCart();
         updateCartBadge();
-        saveCart();
+        saveCart(); // حفظ فوري
     }
 
-    // حذف المنتج باستخدام ID
-    window.removeFromCart = function(cartId) {
-        window.cart = window.cart.filter(i => i.cartId !== cartId);
+    window.removeFromCart = function(cId) {
+        window.cart = window.cart.filter(i => i.cartId !== cId);
         renderCart();
         updateCartBadge();
-        saveCart();
+        saveCart(); // حفظ فوري
         toast('تم الحذف من السلة');
     }
 
@@ -396,7 +404,6 @@
         const totalStr = total + ' ج.م';
         document.getElementById('cart-total-confirm').innerText = totalStr;
 
-        // تم التحديث لاستخدام cartId
         el.innerHTML = window.cart.map((item) => `
             <div class="cart-item-big relative group rounded-xl mb-3 border border-gray-100 shadow-sm">
                 <img src="${item.image||''}" class="w-32 h-32 rounded-xl object-cover shadow-sm bg-gray-100 shrink-0" onerror="this.src='https://via.placeholder.com/150'">
