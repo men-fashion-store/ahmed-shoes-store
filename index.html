@@ -217,11 +217,6 @@
        <div class="p-4 border-t border-gray-100 bg-white">
          <button onclick="closeCart()" class="w-full py-2 mb-3 text-gray-400 text-xs hover:text-brand transition text-center">← اضغط هنا للعودة ومشاهدة المزيد من الموديلات</button>
          
-         <div class="p-4 bg-brand/5 border border-brand/20 rounded-xl mb-3 flex justify-between items-center">
-           <p class="text-sm font-bold text-gray-600">المجموع النهائي</p>
-           <p id="cart-total" class="text-2xl font-black text-brand">0 ج.م</p>
-         </div>
-         
          <div class="p-4 bg-gray-50 rounded-xl space-y-3 mb-3">
            <p class="text-sm font-bold text-gray-600">بيانات التوصيل</p>
            <input id="c-name" placeholder="الاسم ثلاثي" class="w-full bg-white border border-gray-200 p-3 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-brand transition">
@@ -367,7 +362,6 @@
         if (!Array.isArray(window.cart) || !window.cart.length) {
             el.innerHTML = '';
             empty.classList.remove('hidden');
-            document.getElementById('cart-total').innerText = '0 ج.م';
             document.getElementById('cart-total-confirm').innerText = '0 ج.م';
             return;
         }
@@ -375,34 +369,34 @@
         empty.classList.add('hidden');
         const total = window.cart.reduce((s, i) => s + (i.price * (i.qty||1)), 0);
         const totalStr = total + ' ج.م';
-        document.getElementById('cart-total').innerText = totalStr;
         document.getElementById('cart-total-confirm').innerText = totalStr;
 
+        // تم تكبير الصور هنا (w-32 h-32) وزيادة حجم النصوص
         el.innerHTML = window.cart.map((item, idx) => `
             <div class="cart-item-big relative group rounded-xl mb-3 border border-gray-100 shadow-sm">
-                <img src="${item.image||''}" class="w-24 h-24 rounded-xl object-cover shadow-sm bg-gray-100 shrink-0" onerror="this.src='https://via.placeholder.com/100'">
+                <img src="${item.image||''}" class="w-32 h-32 rounded-xl object-cover shadow-sm bg-gray-100 shrink-0" onerror="this.src='https://via.placeholder.com/150'">
                 
                 <div class="flex-1 min-w-0 flex flex-col justify-between py-1 h-full gap-2">
                     <div>
-                        <p class="font-black text-lg text-gray-800 truncate leading-tight">${item.productName}</p>
-                        <p class="text-sm text-gray-500 font-bold mt-1">
+                        <p class="font-black text-xl text-gray-800 truncate leading-tight">${item.productName}</p>
+                        <p class="text-base text-gray-500 font-bold mt-1">
                            ${item.color} | مقاس <span class="text-brand bg-brand/10 px-1 rounded">${item.size}</span>
                         </p>
                     </div>
                     
                     <div class="flex items-center justify-between">
-                        <p class="text-brand font-black text-xl">${item.price * (item.qty||1)} <span class="text-xs text-gray-400">ج.م</span></p>
+                        <p class="text-brand font-black text-2xl">${item.price * (item.qty||1)} <span class="text-sm text-gray-400">ج.م</span></p>
                         
                         <div class="flex items-center gap-3 bg-gray-50 rounded-full px-2 py-1 border border-gray-200">
                             <button onclick="updateCartQty(${idx}, -1)" class="cart-qty-btn hover:bg-red-100 hover:text-red-500 hover:border-red-200">−</button>
-                            <span class="text-lg font-black w-6 text-center text-gray-700">${item.qty||1}</span>
+                            <span class="text-xl font-black w-6 text-center text-gray-700">${item.qty||1}</span>
                             <button onclick="updateCartQty(${idx}, 1)" class="cart-qty-btn bg-brand text-white hover:bg-brand-accent hover:text-white border-transparent shadow-md">+</button>
                         </div>
                     </div>
                 </div>
 
                 <button onclick="removeFromCart(${idx})" class="absolute top-2 left-2 text-gray-300 hover:text-red-500 p-2 bg-white/80 rounded-full hover:bg-red-50 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
             </div>
         `).join('');
