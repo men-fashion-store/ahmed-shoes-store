@@ -52,6 +52,44 @@
     .img-zoom-wrap img { transition: transform 0.3s ease; }
     .img-zoom-wrap.zoomed { cursor: zoom-out; overflow: auto; }
     .img-zoom-wrap.zoomed img { transform: scale(2); }
+
+    /* --- تعديلات السلة الجديدة --- */
+    #cart-modal { align-items: flex-end; /* لظهور السلة من الأسفل */ }
+    #cart-modal .modal-content {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 2rem 2rem 0 0; /* تدوير من الأعلى فقط */
+        max-height: 90vh; /* مساحة أكبر */
+        display: flex;
+        flex-direction: column;
+        animation: slideUp 0.3s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    
+    .cart-item-big {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background: #fff;
+        border-bottom: 1px solid #f0f0f0;
+        align-items: center;
+        position: relative;
+    }
+    .cart-qty-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #4b5f28;
+        transition: 0.2s;
+        border: 1px solid #e5e7eb;
+    }
+    .cart-qty-btn:active { background: #d1d5db; transform: scale(0.95); }
   </style>
  </head>
  <body class="h-full min-h-screen overflow-auto transition-colors duration-300">
@@ -161,39 +199,45 @@
      </div>
    </div>
 
-   <div id="cart-modal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
-     <div class="bg-white w-full max-w-md rounded-[2rem] overflow-hidden shadow-2xl max-h-[95vh] overflow-y-auto relative flex flex-col">
-       <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+   <div id="cart-modal" class="hidden fixed inset-0 z-50 modal-overlay flex p-0">
+     <div class="modal-content bg-white overflow-hidden shadow-2xl relative flex flex-col">
+       <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
          <h2 class="text-xl font-bold text-gray-800">🛒 سلة المشتريات</h2>
-         <button onclick="closeCart()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 hover:bg-red-50 hover:text-red-500">✕</button>
+         <button onclick="closeCart()" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center font-bold text-gray-600 hover:bg-red-50 hover:text-red-500">✕</button>
        </div>
-       <div id="cart-items" class="p-4 flex-1 overflow-y-auto max-h-64">
+       
+       <div id="cart-items" class="p-4 flex-1 overflow-y-auto bg-white">
          <div id="cart-empty" class="text-center py-12">
            <div class="text-7xl mb-4 opacity-20">🛒</div>
            <p class="text-gray-500 font-bold mb-2">السلة فارغة</p>
            <p class="text-sm text-gray-400">اضف منتجات من المتجر</p>
          </div>
        </div>
-       <div class="p-4 border-t border-gray-100 space-y-3">
-         <p class="text-xs text-gray-500 text-center mb-2">عدّل كمياتك أو احذف منتجات كما تشاء قبل التأكيد</p>
-         <div class="p-4 bg-brand/10 border-2 border-brand/30 rounded-xl">
-           <p class="text-sm font-bold text-gray-600 mb-1">المبلغ الإجمالي للدفع</p>
+       
+       <div class="p-4 border-t border-gray-100 bg-white">
+         <button onclick="closeCart()" class="w-full py-2 mb-3 text-gray-400 text-xs hover:text-brand transition text-center">← اضغط هنا للعودة ومشاهدة المزيد من الموديلات</button>
+         
+         <div class="p-4 bg-brand/5 border border-brand/20 rounded-xl mb-3 flex justify-between items-center">
+           <p class="text-sm font-bold text-gray-600">المجموع النهائي</p>
            <p id="cart-total" class="text-2xl font-black text-brand">0 ج.م</p>
          </div>
-         <button onclick="closeCart()" class="w-full py-2 rounded-xl border-2 border-brand/50 text-brand font-bold text-sm hover:bg-brand/10 transition">🛍 استمر بالتسوق لإضافة المزيد</button>
-         <div class="p-4 bg-gray-50 rounded-xl space-y-3">
+         
+         <div class="p-4 bg-gray-50 rounded-xl space-y-3 mb-3">
            <p class="text-sm font-bold text-gray-600">بيانات التوصيل</p>
            <input id="c-name" placeholder="الاسم ثلاثي" class="w-full bg-white border border-gray-200 p-3 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-brand transition">
-           <input id="c-phone" type="tel" placeholder="رقم الهاتف" class="w-full bg-white border border-gray-200 p-3 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-brand transition">
+           <input id="c-phone" type="tel" placeholder="رقم الهاتف (11 رقم)" maxlength="11" class="w-full bg-white border border-gray-200 p-3 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-brand transition">
            <input id="c-address" placeholder="العنوان بالتفصيل" class="w-full bg-white border border-gray-200 p-3 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-brand transition">
          </div>
-         <div class="flex justify-between items-center p-3 bg-brand/5 border-2 border-brand/20 rounded-xl">
-           <span class="font-bold text-gray-700">المبلغ المستحق:</span>
-           <span id="cart-total-confirm" class="text-xl font-black text-brand">0 ج.م</span>
+         
+         <div class="flex justify-between items-center p-3 mb-3">
+             <span class="font-bold text-gray-700">المبلغ المستحق للدفع:</span>
+             <span id="cart-total-confirm" class="text-xl font-black text-brand">0 ج.م</span>
          </div>
-         <div class="p-3 bg-green-50 border border-green-200 rounded-xl text-center">
-           <p class="text-xs text-gray-600 font-bold mb-1">💳 الدفع فودافون كاش: <span class="text-green-600 font-mono">01020468021</span></p>
+         
+         <div class="p-3 bg-green-50 border border-green-200 rounded-xl text-center mb-3">
+           <p class="text-xs text-gray-600 font-bold">💳 الدفع فودافون كاش: <span class="text-green-600 font-mono text-lg" dir="ltr">01020468021</span></p>
          </div>
+         
          <button onclick="confirmOrder()" id="confirm-order-btn" class="w-full py-4 rounded-xl font-bold text-lg shadow-xl text-white bg-gradient-to-r from-brand to-brand-accent hover:shadow-2xl transition">
            تأكيد الطلب وإرسال ✅
          </button>
@@ -216,7 +260,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // ✅ كود الفايربيس (تم دمجه)
     const firebaseConfig = {
       apiKey: "AIzaSyASO-AN5XaSGn4SaCZ8VlHr6zsFCIxPCzs",
       authDomain: "ahmed-shoes.firebaseapp.com",
@@ -257,12 +300,6 @@
 
     window.toggleImgZoom = function() { document.getElementById('img-zoom-wrap').classList.toggle('zoomed'); }
 
-    window.shareProduct = function() {
-        if(!window.currentProd) return;
-        const msg = `شوف الموديل ده من أحمد الشيخ:\n${window.currentProd.name} - ${window.currentProd.price} ج.م\n`;
-        window.open('https://wa.me/?text='+encodeURIComponent(msg), '_blank');
-    }
-
     window.copyOrderNumber = function() {
         const n = document.getElementById('order-number-display').textContent;
         navigator.clipboard?.writeText(n).then(() => toast('تم النسخ!'));
@@ -275,7 +312,7 @@
     function updateCartBadge() {
         const badge = document.getElementById('cart-badge');
         if(!badge) return;
-        const count = window.cart.reduce((s, i) => s + (i.qty || 1), 0);
+        const count = Array.isArray(window.cart) ? window.cart.reduce((s, i) => s + (i.qty || 1), 0) : 0;
         badge.innerText = count;
         badge.classList.toggle('hidden', count === 0);
     }
@@ -305,6 +342,7 @@
     }
 
     window.updateCartQty = function(idx, delta) {
+        if (!window.cart[idx]) return;
         const item = window.cart[idx];
         item.qty = (item.qty||1) + delta;
         if(item.qty < 1) { window.cart.splice(idx, 1); }
@@ -321,35 +359,51 @@
         toast('تم الحذف من السلة');
     }
 
+    // --- دالة عرض السلة الجديدة (بتصميم أكبر وواضح) ---
     function renderCart() {
         const el = document.getElementById('cart-items');
         const empty = document.getElementById('cart-empty');
-        if(!window.cart.length) {
+        
+        if (!Array.isArray(window.cart) || !window.cart.length) {
             el.innerHTML = '';
             empty.classList.remove('hidden');
             document.getElementById('cart-total').innerText = '0 ج.م';
             document.getElementById('cart-total-confirm').innerText = '0 ج.م';
             return;
         }
+        
         empty.classList.add('hidden');
         const total = window.cart.reduce((s, i) => s + (i.price * (i.qty||1)), 0);
         const totalStr = total + ' ج.م';
         document.getElementById('cart-total').innerText = totalStr;
         document.getElementById('cart-total-confirm').innerText = totalStr;
+
         el.innerHTML = window.cart.map((item, idx) => `
-            <div class="flex gap-3 p-3 bg-gray-50 rounded-xl mb-2">
-                <img src="${item.image||'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}" class="w-14 h-14 rounded-lg object-cover shrink-0 bg-gray-100" onerror="this.style.display='none'">
-                <div class="flex-1 min-w-0">
-                    <p class="font-bold text-sm text-gray-800 truncate">${item.productName}</p>
-                    <p class="text-xs text-gray-500">${item.color} | مقاس ${item.size}</p>
-                    <div class="flex items-center gap-1 mt-1">
-                        <button onclick="updateCartQty(${idx}, -1)" class="w-6 h-6 rounded bg-gray-200 flex items-center justify-center text-sm font-bold hover:bg-gray-300">−</button>
-                        <span class="text-sm font-bold px-2">${item.qty||1}</span>
-                        <button onclick="updateCartQty(${idx}, 1)" class="w-6 h-6 rounded bg-brand text-white flex items-center justify-center text-sm font-bold hover:opacity-90">+</button>
+            <div class="cart-item-big relative group rounded-xl mb-3 border border-gray-100 shadow-sm">
+                <img src="${item.image||''}" class="w-24 h-24 rounded-xl object-cover shadow-sm bg-gray-100 shrink-0" onerror="this.src='https://via.placeholder.com/100'">
+                
+                <div class="flex-1 min-w-0 flex flex-col justify-between py-1 h-full gap-2">
+                    <div>
+                        <p class="font-black text-lg text-gray-800 truncate leading-tight">${item.productName}</p>
+                        <p class="text-sm text-gray-500 font-bold mt-1">
+                           ${item.color} | مقاس <span class="text-brand bg-brand/10 px-1 rounded">${item.size}</span>
+                        </p>
                     </div>
-                    <p class="text-brand font-bold text-sm mt-1">${item.price * (item.qty||1)} ج.م</p>
+                    
+                    <div class="flex items-center justify-between">
+                        <p class="text-brand font-black text-xl">${item.price * (item.qty||1)} <span class="text-xs text-gray-400">ج.م</span></p>
+                        
+                        <div class="flex items-center gap-3 bg-gray-50 rounded-full px-2 py-1 border border-gray-200">
+                            <button onclick="updateCartQty(${idx}, -1)" class="cart-qty-btn hover:bg-red-100 hover:text-red-500 hover:border-red-200">−</button>
+                            <span class="text-lg font-black w-6 text-center text-gray-700">${item.qty||1}</span>
+                            <button onclick="updateCartQty(${idx}, 1)" class="cart-qty-btn bg-brand text-white hover:bg-brand-accent hover:text-white border-transparent shadow-md">+</button>
+                        </div>
+                    </div>
                 </div>
-                <button onclick="removeFromCart(${idx})" class="text-red-500 p-2 hover:bg-red-50 rounded-lg self-start">✕</button>
+
+                <button onclick="removeFromCart(${idx})" class="absolute top-2 left-2 text-gray-300 hover:text-red-500 p-2 bg-white/80 rounded-full hover:bg-red-50 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
             </div>
         `).join('');
     }
@@ -363,12 +417,19 @@
         document.getElementById('cart-modal').classList.add('hidden');
     }
 
+    // --- دالة تأكيد الطلب مع التحقق من الرقم (11 خانة) ---
     window.confirmOrder = async function() {
         const name = document.getElementById('c-name').value?.trim();
         const phone = document.getElementById('c-phone').value?.trim();
         const address = document.getElementById('c-address').value?.trim();
+
         if(!window.cart.length) return toast('السلة فارغة', 'error');
-        if(!name || !phone || !address) return toast('أكمل بيانات التوصيل', 'error');
+        if(!name || !address) return toast('أكمل الاسم والعنوان', 'error');
+
+        // التحقق من صحة الرقم (11 رقم)
+        if (!phone || !/^\d{11}$/.test(phone)) {
+            return toast('رقم الهاتف يجب أن يكون 11 رقم صحيح', 'error');
+        }
         
         const btn = document.getElementById('confirm-order-btn');
         btn.disabled = true;
@@ -383,7 +444,7 @@
                 qty: i.qty || 1
             }));
             let total = window.cart.reduce((s, i) => s + (i.price * (i.qty||1)), 0);
-            if(window.appliedCoupon) total = Math.round(total * (100 - window.appliedCoupon) / 100);
+            
             const orderData = {
                 items,
                 total,
@@ -394,15 +455,23 @@
             };
             const docRef = await addDoc(collection(db, "orders"), orderData);
             const orderId = docRef.id.slice(-6).toUpperCase();
+            
+            // رسالة واتساب
             const msg = `🛒 *طلب جديد #${orderId} - أحمد الشيخ*\n\n` + items.map((it,i) => `${i+1}. ${it.productName}\n   اللون: ${it.color} | المقاس: ${it.size} | الكمية: ${it.qty} | ${it.price*it.qty} ج.م`).join('\n\n') + `\n\n💰 الإجمالي: ${total} ج.م\n👤 الاسم: ${name}\n📞 الهاتف: ${phone}\n📍 العنوان: ${address}`;
+            
             window.open('https://wa.me/201020468021?text=' + encodeURIComponent(msg), '_blank');
             closeCart();
+            
             document.getElementById('order-number-display').textContent = '#' + orderId;
             document.getElementById('order-success-modal').classList.remove('hidden');
+            
             toast('تم استلام طلبك! تم فتح واتساب');
             window.cart = [];
             updateCartBadge();
             saveCart();
+            document.getElementById('c-name').value = '';
+            document.getElementById('c-phone').value = '';
+            document.getElementById('c-address').value = '';
         } catch (e) {
             toast('حدث خطأ: ' + e.message, 'error');
         }
