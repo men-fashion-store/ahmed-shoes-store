@@ -174,7 +174,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // ✅ كود الفايربيس (تم دمجه)
     const firebaseConfig = {
       apiKey: "AIzaSyASO-AN5XaSGn4SaCZ8VlHr6zsFCIxPCzs",
       authDomain: "ahmed-shoes.firebaseapp.com",
@@ -227,39 +226,20 @@
         navigator.clipboard?.writeText(text).then(()=> toast('تم النسخ'));
     }
 
-    let lastOrderCount = 0;
-    function notifyNewOrder() {
-        playNewOrderSound();
-        toast('🛒 طلب جديد وصل!', 'success');
-        if(document.hidden) showBrowserNotification();
-        document.title = '🔔 طلب جديد! - أحمد الشيخ';
-        setTimeout(() => { document.title = 'لوحة التحكم - أحمد الشيخ'; }, 3000);
-        const tabOrders = document.getElementById('tab-orders');
-        if(tabOrders && !tabOrders.classList.contains('active')) {
-            tabOrders.innerHTML = '🛒 الطلبات الواردة <span class="animate-pulse text-red-500">●</span>';
-            setTimeout(() => { tabOrders.innerHTML = '🛒 الطلبات الواردة'; }, 5000);
+    // --- نظام الإشعارات والصوت الجديد ---
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
         }
     }
-    function playNewOrderSound() {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const playBeep = (freq, start, dur) => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0, ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 0.02);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
-                osc.start(ctx.currentTime + start);
-                osc.stop(ctx.currentTime + start + dur);
-            };
-            playBeep(880, 0, 0.15);
-            playBeep(880, 0.2, 0.15);
-            playBeep(1100, 0.4, 0.25);
-        } catch(e){}
-    }
+    // تفعيل الصوت عند أول نقرة
+    document.body.addEventListener('click', initAudio);
+    document.body.addEventListener('touchstart', initAudio);
+
     function showBrowserNotification() {
         if(!('Notification' in window)) return;
         if(Notification.permission === 'granted') {
@@ -269,11 +249,52 @@
         }
     }
 
+    function playNewOrderSound() {
+        try {
+            if (!audioCtx) initAudio();
+            const playBeep = (freq, start, dur, type = 'sine') => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+                osc.start(audioCtx.currentTime + start);
+                osc.stop(audioCtx.currentTime + start + dur);
+            };
+            // نغمة تنبيه
+            playBeep(800, 0, 0.2, 'triangle'); 
+            playBeep(600, 0.25, 0.4, 'triangle');
+        } catch(e){ console.log('Audio blocked', e); }
+    }
+
+    let lastOrderCount = 0;
+    function notifyNewOrder() {
+        playNewOrderSound();
+        toast('🛒 طلب جديد وصل!', 'success');
+        if(document.hidden) showBrowserNotification();
+        
+        // وميض العنوان
+        let blink = setInterval(() => {
+            document.title = (document.title === '🔔 طلب جديد!') ? 'لوحة التحكم' : '🔔 طلب جديد!';
+        }, 1000);
+        setTimeout(() => { clearInterval(blink); document.title = 'لوحة التحكم - أحمد الشيخ'; }, 10000);
+
+        const tabOrders = document.getElementById('tab-orders');
+        if(tabOrders) {
+            tabOrders.innerHTML = '🛒 الطلبات الواردة <span class="animate-pulse text-red-600 font-bold text-xl">●</span>';
+        }
+    }
+
     window.login = function() {
         if(document.getElementById('admin-pass').value === 'AM') {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
             if('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+            initAudio(); // محاولة تشغيل الصوت
             loadProducts();
             loadOrders();
         } else toast('كلمة مرور خاطئة', 'error');
@@ -284,6 +305,7 @@
         document.getElementById('sec-orders').classList.toggle('hidden', t !== 'orders');
         document.getElementById('tab-products').className = t === 'products' ? 'tab active' : 'tab';
         document.getElementById('tab-orders').className = t === 'orders' ? 'tab active' : 'tab';
+        if(t === 'orders') document.getElementById('tab-orders').innerHTML = '🛒 الطلبات الواردة';
     }
 
     window.addColor = function(name) {
