@@ -54,7 +54,7 @@
     .img-zoom-wrap.zoomed img { transform: scale(2); }
 
     /* --- تنسيق السلة والزر العائم --- */
-    #cart-modal { align-items: flex-end; z-index: 9999 !important; } /* خليناها أعلى حاجة */
+    #cart-modal { align-items: flex-end; z-index: 9999 !important; }
     #cart-modal .modal-content {
         width: 100%;
         max-width: 100%;
@@ -88,6 +88,7 @@
         color: #4b5f28;
         transition: 0.2s;
         border: 1px solid #e5e7eb;
+        cursor: pointer; /* مهم عشان التاتش */
     }
     .cart-qty-btn:active { background: #d1d5db; transform: scale(0.95); }
 
@@ -96,8 +97,8 @@
         position: fixed;
         bottom: 25px;
         left: 25px;
-        z-index: 9990; /* رقم عالي جدا عشان يظهر فوق كل حاجة */
-        display: flex !important; /* ضمان الظهور */
+        z-index: 9990; 
+        display: flex !important;
         animation: floatBtn 3s ease-in-out infinite;
     }
     @keyframes floatBtn {
@@ -212,7 +213,10 @@
      <div class="modal-content bg-white overflow-hidden shadow-2xl relative flex flex-col">
        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
          <h2 class="text-xl font-bold text-gray-800">🛒 سلة المشتريات</h2>
-         <button onclick="closeCart()" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center font-bold text-gray-600 hover:bg-red-50 hover:text-red-500">✕</button>
+         <div class="flex gap-2">
+             <button onclick="clearCart()" class="text-red-500 text-xs font-bold border border-red-200 px-2 py-1 rounded hover:bg-red-50">تفريغ السلة</button>
+             <button onclick="closeCart()" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center font-bold text-gray-600 hover:bg-red-50 hover:text-red-500">✕</button>
+         </div>
        </div>
        
        <div id="cart-items" class="p-4 flex-1 overflow-y-auto bg-white">
@@ -282,30 +286,20 @@
     window.currentSize = null;
     window.currentColor = null;
     
-    // --- ✅ حل جذري للتعليق: تنظيف السلة لو فيها بيانات بايظة ---
+    // --- ✅ تحميل السلة (مع تنظيف البيانات التالفة) ---
     try { 
-        let rawCart = localStorage.getItem('cart');
-        if (rawCart) {
-            let parsed = JSON.parse(rawCart);
-            // لو البيانات مش مصفوفة، امسحها وابدأ من جديد
-            if (!Array.isArray(parsed)) {
-                window.cart = [];
-                localStorage.setItem('cart', '[]');
-            } else {
-                // إصلاح البيانات القديمة بإضافة ID جديد
-                window.cart = parsed.map(item => ({
-                    ...item,
-                    cartId: item.cartId || (Date.now() + Math.random().toString(36).substr(2, 9))
-                }));
-            }
-        } else {
+        let raw = JSON.parse(localStorage.getItem('cart') || '[]');
+        if (!Array.isArray(raw)) {
             window.cart = [];
+        } else {
+            // فلترة أي منتج بايظ وتصحيح الأرقام
+            window.cart = raw.filter(i => i && i.productName).map(i => ({
+                ...i,
+                qty: parseInt(i.qty) || 1, // إجبار الكمية تكون رقم
+                price: parseInt(i.price) || 0 // إجبار السعر يكون رقم
+            }));
         }
-    } catch(e) { 
-        // لو حصل خطأ في القراءة، فرمت السلة فوراً
-        window.cart = []; 
-        localStorage.removeItem('cart');
-    }
+    } catch(e) { window.cart = []; }
 
     function toast(msg, type='success') {
         const c = document.getElementById('toast-container');
@@ -316,7 +310,9 @@
         setTimeout(() => { t.remove(); }, 3000);
     }
 
-    function saveCart() { try { localStorage.setItem('cart', JSON.stringify(window.cart)); } catch(e) {} }
+    function saveCart() { 
+        try { localStorage.setItem('cart', JSON.stringify(window.cart)); } catch(e) {} 
+    }
 
     window.toggleDark = function() {
         document.body.classList.toggle('dark');
@@ -351,51 +347,71 @@
     }
     updateCartBadge();
 
+    // ✅ زر تفريغ السلة بالكامل (للطوارئ)
+    window.clearCart = function() {
+        if(!confirm('هل تريد مسح كل المنتجات من السلة؟')) return;
+        window.cart = [];
+        saveCart();
+        renderCart();
+        updateCartBadge();
+    }
+
     window.addToCart = function() {
         if(!window.currentSize) return toast('اختر المقاس أولاً', 'error');
         const color = window.currentColor || 'افتراضي';
         
-        // استخدام معرف فريد لكل عملية إضافة
-        window.cart.push({
-            cartId: Date.now() + Math.random().toString(36).substr(2, 9), 
-            productId: window.currentProd.id,
-            productName: window.currentProd.name,
-            price: parseInt(window.currentProd.price) || 0,
-            color, size: window.currentSize,
-            image: (window.currentProd.images||[])[0],
-            qty: 1
-        });
-        toast('تمت الإضافة للسلة ✓');
+        // البحث عن منتج مطابق (بنفس الاسم واللون والمقاس)
+        const existingIdx = window.cart.findIndex(i => i.productId === window.currentProd.id && i.color === color && i.size === window.currentSize);
+        
+        if(existingIdx > -1) {
+            window.cart[existingIdx].qty += 1;
+            toast('تم زيادة الكمية ✓');
+        } else {
+            window.cart.push({
+                productId: window.currentProd.id,
+                productName: window.currentProd.name,
+                price: parseInt(window.currentProd.price) || 0,
+                color, 
+                size: window.currentSize,
+                image: (window.currentProd.images||[])[0],
+                qty: 1
+            });
+            toast('تمت الإضافة للسلة ✓');
+        }
         updateCartBadge();
         saveCart();
         closeModal();
     }
 
-    // --- ✅ دوال السلة المحسنة (تعتمد على cartId) لمنع التداخل ---
-    window.updateCartQty = function(cId, delta) {
-        const idx = window.cart.findIndex(i => i.cartId === cId);
-        if (idx === -1) return; // حماية ضد الأخطاء
+    // --- ✅ دوال التعديل باستخدام (Index) - الحل الأضمن ---
+    window.updateCartQty = function(idx, delta) {
+        // تأمين: لو الفهرس غلط اخرج
+        if (!window.cart[idx]) return;
+
+        // تعديل الكمية وإجبارها تكون رقم
+        let newQty = (parseInt(window.cart[idx].qty) || 0) + delta;
         
-        window.cart[idx].qty = (window.cart[idx].qty || 1) + delta;
-        
-        if (window.cart[idx].qty < 1) {
+        if (newQty < 1) {
+            // لو الكمية بقت صفر، احذف المنتج
             window.cart.splice(idx, 1);
+        } else {
+            window.cart[idx].qty = newQty;
         }
         
-        renderCart();
+        saveCart();
+        renderCart(); // إعادة رسم السلة فوراً
         updateCartBadge();
-        saveCart(); 
     }
 
-    window.removeFromCart = function(cId) {
-        window.cart = window.cart.filter(i => i.cartId !== cId);
+    window.removeFromCart = function(idx) {
+        window.cart.splice(idx, 1);
+        saveCart();
         renderCart();
         updateCartBadge();
-        saveCart(); 
-        toast('تم الحذف من السلة');
+        toast('تم الحذف');
     }
 
-    // ✅ دالة عرض السلة مع حماية ضد المنتجات التالفة
+    // ✅ دالة عرض السلة (تم تبسيطها)
     function renderCart() {
         const el = document.getElementById('cart-items');
         const empty = document.getElementById('cart-empty');
@@ -409,14 +425,12 @@
         
         empty.classList.add('hidden');
         
-        // تصفية أي منتج بايظ (null) عشان الصفحة متهنجش
-        const validItems = window.cart.filter(item => item && item.price);
-        
-        const total = validItems.reduce((s, i) => s + (i.price * (i.qty||1)), 0);
-        const totalStr = total + ' ج.م';
-        document.getElementById('cart-total-confirm').innerText = totalStr;
+        // حساب المجموع
+        const total = window.cart.reduce((s, i) => s + ( (parseInt(i.price)||0) * (parseInt(i.qty)||1) ), 0);
+        document.getElementById('cart-total-confirm').innerText = total + ' ج.م';
 
-        el.innerHTML = validItems.map((item) => `
+        // عرض المنتجات باستخدام الـ Index (idx)
+        el.innerHTML = window.cart.map((item, idx) => `
             <div class="cart-item-big relative group rounded-xl mb-3 border border-gray-100 shadow-sm">
                 <img src="${item.image||''}" class="w-32 h-32 rounded-xl object-cover shadow-sm bg-gray-100 shrink-0" onerror="this.src='https://via.placeholder.com/150'">
                 
@@ -429,17 +443,17 @@
                     </div>
                     
                     <div class="flex items-center justify-between">
-                        <p class="text-brand font-black text-2xl">${item.price * (item.qty||1)} <span class="text-sm text-gray-400">ج.م</span></p>
+                        <p class="text-brand font-black text-2xl">${(parseInt(item.price)||0) * (parseInt(item.qty)||1)} <span class="text-sm text-gray-400">ج.م</span></p>
                         
                         <div class="flex items-center gap-3 bg-gray-50 rounded-full px-2 py-1 border border-gray-200">
-                            <button onclick="updateCartQty('${item.cartId}', -1)" class="cart-qty-btn hover:bg-red-100 hover:text-red-500 hover:border-red-200">−</button>
+                            <button onclick="updateCartQty(${idx}, -1)" class="cart-qty-btn hover:bg-red-100 hover:text-red-500 hover:border-red-200">−</button>
                             <span class="text-xl font-black w-6 text-center text-gray-700">${item.qty||1}</span>
-                            <button onclick="updateCartQty('${item.cartId}', 1)" class="cart-qty-btn bg-brand text-white hover:bg-brand-accent hover:text-white border-transparent shadow-md">+</button>
+                            <button onclick="updateCartQty(${idx}, 1)" class="cart-qty-btn bg-brand text-white hover:bg-brand-accent hover:text-white border-transparent shadow-md">+</button>
                         </div>
                     </div>
                 </div>
 
-                <button onclick="removeFromCart('${item.cartId}')" class="absolute top-2 left-2 text-gray-300 hover:text-red-500 p-2 bg-white/80 rounded-full hover:bg-red-50 transition">
+                <button onclick="removeFromCart(${idx})" class="absolute top-2 left-2 text-gray-300 hover:text-red-500 p-2 bg-white/80 rounded-full hover:bg-red-50 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
             </div>
@@ -474,12 +488,12 @@
         try {
             const items = window.cart.map(i => ({
                 productName: i.productName,
-                price: i.price,
+                price: parseInt(i.price),
                 color: i.color,
                 size: i.size,
-                qty: i.qty || 1
+                qty: parseInt(i.qty)
             }));
-            let total = window.cart.reduce((s, i) => s + (i.price * (i.qty||1)), 0);
+            let total = items.reduce((s, i) => s + (i.price * i.qty), 0);
             
             const orderData = {
                 items,
