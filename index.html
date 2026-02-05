@@ -287,13 +287,19 @@
     window.currentSize = null;
     window.currentColor = null;
 
+    // دالة toast مشتركة (ستستخدم من card.js)
     function toast(msg, type='success') {
         const c = document.getElementById('toast-container');
+        if(!c) return;
+        
         const t = document.createElement('div');
         t.className = `toast ${type}`;
         t.textContent = msg;
         c.appendChild(t);
-        setTimeout(() => { t.remove(); }, 3000);
+        
+        setTimeout(() => {
+            if(t.parentNode === c) c.removeChild(t);
+        }, 3000);
     }
 
     window.toggleDark = function() {
@@ -306,30 +312,24 @@
 
     window.toggleImgZoom = function() { document.getElementById('img-zoom-wrap').classList.toggle('zoomed'); }
 
-    window.copyOrderNumber = function() {
-        const n = document.getElementById('order-number-display').textContent;
-        navigator.clipboard?.writeText(n).then(() => toast('تم النسخ!'));
-    }
+    // هذه الدوال تأتي الآن من card.js
+    // window.copyOrderNumber = function() { ... } - موجودة في card.js
+    // window.closeOrderSuccess = function() { ... } - موجودة في card.js
 
-    window.closeOrderSuccess = function() {
-        document.getElementById('order-success-modal').classList.add('hidden');
-    }
-
-    window.openCart = function() {
-        renderCart();
-        document.getElementById('cart-modal').classList.remove('hidden');
-    }
-
-    window.closeCart = function() {
-        document.getElementById('cart-modal').classList.add('hidden');
-    }
+    // تأكد من أن هذه الدوال تأتي من card.js
+    // window.openCart = function() { ... } - موجودة في card.js
+    // window.closeCart = function() { ... } - موجودة في card.js
+    // window.addToCart = function() { ... } - موجودة في card.js
+    // window.updateCartQty = function() { ... } - موجودة في card.js
+    // window.removeFromCart = function() { ... } - موجودة في card.js
+    // window.clearCart = function() { ... } - موجودة في card.js
 
     window.confirmOrder = async function() {
         const name = document.getElementById('c-name').value?.trim();
         const phone = document.getElementById('c-phone').value?.trim();
         const address = document.getElementById('c-address').value?.trim();
 
-        if(!window.cart.length) return toast('السلة فارغة', 'error');
+        if(!window.cart || !window.cart.length) return toast('السلة فارغة', 'error');
         if(!name || !address) return toast('أكمل الاسم والعنوان', 'error');
 
         if (!phone || !/^\d{11}$/.test(phone)) {
@@ -343,11 +343,12 @@
         try {
             const items = window.cart.map(i => ({
                 productName: i.productName,
-                price: parseInt(i.price),
-                color: i.color,
-                size: i.size,
-                qty: parseInt(i.qty)
+                price: parseInt(i.price) || 0,
+                color: i.color || 'افتراضي',
+                size: i.size || 'غير محدد',
+                qty: parseInt(i.qty) || 1
             }));
+            
             let total = items.reduce((s, i) => s + (i.price * i.qty), 0);
             
             const orderData = {
@@ -358,10 +359,13 @@
                 customerAddress: address,
                 timestamp: Date.now()
             };
+            
             const docRef = await addDoc(collection(db, "orders"), orderData);
             const orderId = docRef.id.slice(-6).toUpperCase();
             
-            const msg = `🛒 *طلب جديد #${orderId} - أحمد الشيخ*\n\n` + items.map((it,i) => `${i+1}. ${it.productName}\n   اللون: ${it.color} | المقاس: ${it.size} | الكمية: ${it.qty} | ${it.price*it.qty} ج.م`).join('\n\n') + `\n\n💰 الإجمالي: ${total} ج.م\n👤 الاسم: ${name}\n📞 الهاتف: ${phone}\n📍 العنوان: ${address}`;
+            const msg = `🛒 *طلب جديد #${orderId} - أحمد الشيخ*\n\n` + 
+                items.map((it,i) => `${i+1}. ${it.productName}\n   اللون: ${it.color} | المقاس: ${it.size} | الكمية: ${it.qty} | ${it.price*it.qty} ج.م`).join('\n\n') + 
+                `\n\n💰 الإجمالي: ${total} ج.م\n👤 الاسم: ${name}\n📞 الهاتف: ${phone}\n📍 العنوان: ${address}`;
             
             window.open('https://wa.me/201020468021?text=' + encodeURIComponent(msg), '_blank');
             closeCart();
@@ -370,9 +374,16 @@
             document.getElementById('order-success-modal').classList.remove('hidden');
             
             toast('تم استلام طلبك! تم فتح واتساب');
-            window.cart = [];
-            updateCartBadge();
-            saveCart();
+            
+            // تفريغ السلة بعد تأكيد الطلب
+            if(window.cart) {
+                window.cart = [];
+                saveCart();
+                updateCartBadge();
+                renderCart();
+            }
+            
+            // تفريغ الحقول
             document.getElementById('c-name').value = '';
             document.getElementById('c-phone').value = '';
             document.getElementById('c-address').value = '';
@@ -392,11 +403,15 @@
 
     function renderProductsGrid(items) {
         const grid = document.getElementById('grid');
-        if(!items.length) { document.getElementById('empty-msg').classList.remove('hidden'); grid.innerHTML=''; return; }
+        if(!items.length) { 
+            document.getElementById('empty-msg').classList.remove('hidden'); 
+            grid.innerHTML=''; 
+            return; 
+        }
         document.getElementById('empty-msg').classList.add('hidden');
         grid.innerHTML = items.map(p => `
                 <div onclick="openModal('${p.id}')" class="bg-white rounded-2xl overflow-hidden cursor-pointer shadow-soft hover:shadow-lg transition border border-gray-100">
-                    <div class="h-44 bg-gray-50 relative"><img src="${(p.images||[])[0]}" class="w-full h-full object-cover mix-blend-multiply"></div>
+                    <div class="h-44 bg-gray-50 relative"><img src="${(p.images||[])[0]}" class="w-full h-full object-cover mix-blend-multiply" onerror="this.src='https://via.placeholder.com/150'"></div>
                     <div class="p-4"><h4 class="font-bold text-sm truncate">${p.name}</h4><span class="text-brand font-black text-sm">${p.price} ج.م</span></div>
                 </div>
             `).join('');
@@ -406,7 +421,12 @@
         document.getElementById('home-view').classList.add('hidden');
         document.getElementById('products-view').classList.remove('hidden');
         document.getElementById('cat-title').innerText = cat;
-        updateCartBadge();
+        
+        // تحديث عداد السلة
+        if(typeof updateCartBadge === 'function') {
+            updateCartBadge();
+        }
+        
         document.getElementById('loading-msg').classList.add('hidden');
         document.getElementById('loading-skeleton').classList.remove('hidden');
         document.getElementById('grid').innerHTML = '';
@@ -444,7 +464,10 @@
         updateCategoryCounts();
     }).catch(()=>{});
 
-    window.goHome = function() { document.getElementById('products-view').classList.add('hidden'); document.getElementById('home-view').classList.remove('hidden'); }
+    window.goHome = function() { 
+        document.getElementById('products-view').classList.add('hidden'); 
+        document.getElementById('home-view').classList.remove('hidden'); 
+    }
 
     window.openModal = function(id) {
         window.currentProd = products.find(p => p.id === id);
@@ -455,11 +478,23 @@
         document.getElementById('m-name').innerText = window.currentProd.name;
         document.getElementById('m-price').innerText = window.currentProd.price + ' ج.م';
         document.getElementById('main-img').src = (window.currentProd.images||[])[0];
-        document.getElementById('thumbs').innerHTML = (window.currentProd.images||[]).map(src => `<div onclick="event.stopPropagation(); document.getElementById('main-img').src='${src}'" class="w-12 h-12 rounded-lg border cursor-pointer overflow-hidden"><img src="${src}" class="w-full h-full object-cover"></div>`).join('');
+        
+        // معالجة الصور المصغرة
+        const thumbsContainer = document.getElementById('thumbs');
+        if(thumbsContainer) {
+            thumbsContainer.innerHTML = (window.currentProd.images||[]).map(src => 
+                `<div onclick="event.stopPropagation(); document.getElementById('main-img').src='${src}'" class="w-12 h-12 rounded-lg border cursor-pointer overflow-hidden">
+                    <img src="${src}" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                </div>`
+            ).join('');
+        }
+        
         const colors = window.currentProd.colors;
         if(colors && colors.length > 1) {
             document.getElementById('m-colors-wrap').classList.remove('hidden');
-            document.getElementById('m-colors').innerHTML = colors.map(c => `<button onclick="selectColor('${c.name}', this)" class="px-4 py-2 rounded-lg text-sm font-bold border-2 border-gray-200 hover:border-brand transition">${c.name}</button>`).join('');
+            document.getElementById('m-colors').innerHTML = colors.map(c => 
+                `<button onclick="selectColor('${c.name}', this)" class="px-4 py-2 rounded-lg text-sm font-bold border-2 border-gray-200 hover:border-brand transition">${c.name}</button>`
+            ).join('');
             document.getElementById('m-sizes').innerHTML = '<p class="text-gray-400 text-sm">اختر اللون أولاً</p>';
         } else if(colors && colors.length === 1) {
             document.getElementById('m-colors-wrap').classList.add('hidden');
@@ -470,9 +505,13 @@
             renderSizesForColor(window.currentProd.sizes || []);
         }
     }
+    
     function renderSizesForColor(sizes) {
-        document.getElementById('m-sizes').innerHTML = sizes.map(s => `<button onclick="selectSize(${s}, this)" class="w-8 h-8 rounded-lg bg-gray-100 text-xs font-bold text-gray-600 hover:bg-brand hover:text-white transition">${s}</button>`).join('');
+        document.getElementById('m-sizes').innerHTML = sizes.map(s => 
+            `<button onclick="selectSize(${s}, this)" class="w-8 h-8 rounded-lg bg-gray-100 text-xs font-bold text-gray-600 hover:bg-brand hover:text-white transition">${s}</button>`
+        ).join('');
     }
+    
     window.selectColor = function(colorName, btn) {
         window.currentColor = colorName;
         window.currentSize = null;
@@ -481,13 +520,27 @@
         const color = window.currentProd.colors.find(c => c.name === colorName);
         renderSizesForColor(color ? color.sizes : []);
     }
+    
     window.selectSize = function(s, btn) {
         window.currentSize = s;
         document.querySelectorAll('#m-sizes button').forEach(b => b.classList.remove('bg-brand', 'text-white'));
         btn.classList.add('bg-brand', 'text-white');
     }
 
-    window.closeModal = function() { document.getElementById('modal').classList.add('hidden'); }
+    window.closeModal = function() { 
+        document.getElementById('modal').classList.add('hidden'); 
+    }
+    
+    // تهيئة عند تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+        // التأكد من تحميل دوال السلة
+        if(typeof updateCartBadge === 'function') {
+            updateCartBadge();
+        }
+        if(typeof renderCart === 'function') {
+            renderCart();
+        }
+    });
    </script>
  </body>
 </html>
