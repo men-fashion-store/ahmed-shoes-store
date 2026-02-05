@@ -18,6 +18,7 @@ function updateCartBadge() {
     badge.textContent = count;
     if(count === 0) {
         badge.classList.add('hidden');
+        badge.classList.remove('flex');
     } else {
         badge.classList.remove('hidden');
         badge.classList.add('flex');
@@ -33,10 +34,11 @@ window.addToCart = function() {
     
     const color = window.currentColor || 'افتراضي';
     const price = parseInt(window.currentProd.price) || 0;
+    const productId = window.currentProd.id;
     
     // البحث عن منتج مطابق
     const existingIdx = window.cart.findIndex(i => 
-        i.productId === window.currentProd.id && 
+        i.productId === productId && 
         i.size === window.currentSize && 
         i.color === color
     );
@@ -45,7 +47,7 @@ window.addToCart = function() {
         window.cart[existingIdx].qty = (parseInt(window.cart[existingIdx].qty) || 0) + 1;
     } else {
         window.cart.push({
-            productId: window.currentProd.id,
+            productId: productId,
             productName: window.currentProd.name,
             price: price,
             color: color,
@@ -57,7 +59,7 @@ window.addToCart = function() {
     
     saveCart();
     updateCartBadge();
-    renderCart(); // إعادة رسم السلة فوراً
+    renderCart();
     showToast('تمت الإضافة للسلة ✓', 'success');
     closeModal();
 };
@@ -71,15 +73,14 @@ function renderCart() {
     
     if(!window.cart.length) {
         wrap.innerHTML = '';
-        empty?.classList.remove('hidden');
+        if(empty) empty.classList.remove('hidden');
         const totalEl = document.getElementById('cart-total-confirm');
         if(totalEl) totalEl.innerText = '0 ج.م';
         return;
     }
     
-    empty?.classList.add('hidden');
+    if(empty) empty.classList.add('hidden');
     
-    // حساب المجموع الكلي
     let total = 0;
     
     wrap.innerHTML = window.cart.map((item, idx) => {
@@ -159,8 +160,8 @@ window.clearCart = function() {
 
 /* =============== OPEN/CLOSE CART ================= */
 window.openCart = function() {
-    renderCart(); // تأكيد إعادة الرسم عند الفتح
-    updateCartBadge(); // تحديث العداد
+    renderCart();
+    updateCartBadge();
     document.getElementById('cart-modal').classList.remove('hidden');
 };
 
@@ -183,8 +184,27 @@ function showToast(msg, type='success') {
     }, 3000);
 }
 
+// دالة مساعدة لنسخ النص
+window.copyOrderNumber = function() {
+    const n = document.getElementById('order-number-display')?.textContent;
+    if(n && navigator.clipboard) {
+        navigator.clipboard.writeText(n).then(() => showToast('تم النسخ!'));
+    }
+};
+
+// إغلاق نافذة النجاح
+window.closeOrderSuccess = function() {
+    document.getElementById('order-success-modal')?.classList.add('hidden');
+};
+
 // تهيئة السلة عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
     updateCartBadge();
     renderCart();
 });
+
+// تعريض الدوال للاستخدام العام
+window.saveCart = saveCart;
+window.updateCartBadge = updateCartBadge;
+window.renderCart = renderCart;
+window.showToast = showToast;
