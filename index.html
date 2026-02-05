@@ -88,7 +88,7 @@
         color: #4b5f28;
         transition: 0.2s;
         border: 1px solid #e5e7eb;
-        cursor: pointer; /* مهم عشان التاتش */
+        cursor: pointer;
     }
     .cart-qty-btn:active { background: #d1d5db; transform: scale(0.95); }
 
@@ -264,6 +264,7 @@
      </div>
    </div>
 
+   <script src="card.js"></script>
    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -285,21 +286,6 @@
     window.currentProd = null;
     window.currentSize = null;
     window.currentColor = null;
-    
-    // --- ✅ تحميل السلة (مع تنظيف البيانات التالفة) ---
-    try { 
-        let raw = JSON.parse(localStorage.getItem('cart') || '[]');
-        if (!Array.isArray(raw)) {
-            window.cart = [];
-        } else {
-            // فلترة أي منتج بايظ وتصحيح الأرقام
-            window.cart = raw.filter(i => i && i.productName).map(i => ({
-                ...i,
-                qty: parseInt(i.qty) || 1, // إجبار الكمية تكون رقم
-                price: parseInt(i.price) || 0 // إجبار السعر يكون رقم
-            }));
-        }
-    } catch(e) { window.cart = []; }
 
     function toast(msg, type='success') {
         const c = document.getElementById('toast-container');
@@ -308,10 +294,6 @@
         t.textContent = msg;
         c.appendChild(t);
         setTimeout(() => { t.remove(); }, 3000);
-    }
-
-    function saveCart() { 
-        try { localStorage.setItem('cart', JSON.stringify(window.cart)); } catch(e) {} 
     }
 
     window.toggleDark = function() {
@@ -331,133 +313,6 @@
 
     window.closeOrderSuccess = function() {
         document.getElementById('order-success-modal').classList.add('hidden');
-    }
-
-    function updateCartBadge() {
-        const badge = document.getElementById('cart-badge');
-        if(!badge) return;
-        const count = Array.isArray(window.cart) ? window.cart.reduce((s, i) => s + (i.qty || 1), 0) : 0;
-        badge.innerText = count;
-        if(count === 0) {
-            badge.classList.add('hidden');
-        } else {
-            badge.classList.remove('hidden');
-            badge.classList.add('flex');
-        }
-    }
-    updateCartBadge();
-
-    // ✅ زر تفريغ السلة بالكامل (للطوارئ)
-    window.clearCart = function() {
-        if(!confirm('هل تريد مسح كل المنتجات من السلة؟')) return;
-        window.cart = [];
-        saveCart();
-        renderCart();
-        updateCartBadge();
-    }
-
-    window.addToCart = function() {
-        if(!window.currentSize) return toast('اختر المقاس أولاً', 'error');
-        const color = window.currentColor || 'افتراضي';
-        
-        // البحث عن منتج مطابق (بنفس الاسم واللون والمقاس)
-        const existingIdx = window.cart.findIndex(i => i.productId === window.currentProd.id && i.color === color && i.size === window.currentSize);
-        
-        if(existingIdx > -1) {
-            window.cart[existingIdx].qty += 1;
-            toast('تم زيادة الكمية ✓');
-        } else {
-            window.cart.push({
-                productId: window.currentProd.id,
-                productName: window.currentProd.name,
-                price: parseInt(window.currentProd.price) || 0,
-                color, 
-                size: window.currentSize,
-                image: (window.currentProd.images||[])[0],
-                qty: 1
-            });
-            toast('تمت الإضافة للسلة ✓');
-        }
-        updateCartBadge();
-        saveCart();
-        closeModal();
-    }
-
-    // --- ✅ دوال التعديل باستخدام (Index) - الحل الأضمن ---
-    window.updateCartQty = function(idx, delta) {
-        // تأمين: لو الفهرس غلط اخرج
-        if (!window.cart[idx]) return;
-
-        // تعديل الكمية وإجبارها تكون رقم
-        let newQty = (parseInt(window.cart[idx].qty) || 0) + delta;
-        
-        if (newQty < 1) {
-            // لو الكمية بقت صفر، احذف المنتج
-            window.cart.splice(idx, 1);
-        } else {
-            window.cart[idx].qty = newQty;
-        }
-        
-        saveCart();
-        renderCart(); // إعادة رسم السلة فوراً
-        updateCartBadge();
-    }
-
-    window.removeFromCart = function(idx) {
-        window.cart.splice(idx, 1);
-        saveCart();
-        renderCart();
-        updateCartBadge();
-        toast('تم الحذف');
-    }
-
-    // ✅ دالة عرض السلة (تم تبسيطها)
-    function renderCart() {
-        const el = document.getElementById('cart-items');
-        const empty = document.getElementById('cart-empty');
-        
-        if (!Array.isArray(window.cart) || !window.cart.length) {
-            el.innerHTML = '';
-            empty.classList.remove('hidden');
-            document.getElementById('cart-total-confirm').innerText = '0 ج.م';
-            return;
-        }
-        
-        empty.classList.add('hidden');
-        
-        // حساب المجموع
-        const total = window.cart.reduce((s, i) => s + ( (parseInt(i.price)||0) * (parseInt(i.qty)||1) ), 0);
-        document.getElementById('cart-total-confirm').innerText = total + ' ج.م';
-
-        // عرض المنتجات باستخدام الـ Index (idx)
-        el.innerHTML = window.cart.map((item, idx) => `
-            <div class="cart-item-big relative group rounded-xl mb-3 border border-gray-100 shadow-sm">
-                <img src="${item.image||''}" class="w-32 h-32 rounded-xl object-cover shadow-sm bg-gray-100 shrink-0" onerror="this.src='https://via.placeholder.com/150'">
-                
-                <div class="flex-1 min-w-0 flex flex-col justify-between py-1 h-full gap-2">
-                    <div>
-                        <p class="font-black text-xl text-gray-800 truncate leading-tight">${item.productName}</p>
-                        <p class="text-base text-gray-500 font-bold mt-1">
-                           ${item.color} | مقاس <span class="text-brand bg-brand/10 px-1 rounded">${item.size}</span>
-                        </p>
-                    </div>
-                    
-                    <div class="flex items-center justify-between">
-                        <p class="text-brand font-black text-2xl">${(parseInt(item.price)||0) * (parseInt(item.qty)||1)} <span class="text-sm text-gray-400">ج.م</span></p>
-                        
-                        <div class="flex items-center gap-3 bg-gray-50 rounded-full px-2 py-1 border border-gray-200">
-                            <button onclick="updateCartQty(${idx}, -1)" class="cart-qty-btn hover:bg-red-100 hover:text-red-500 hover:border-red-200">−</button>
-                            <span class="text-xl font-black w-6 text-center text-gray-700">${item.qty||1}</span>
-                            <button onclick="updateCartQty(${idx}, 1)" class="cart-qty-btn bg-brand text-white hover:bg-brand-accent hover:text-white border-transparent shadow-md">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <button onclick="removeFromCart(${idx})" class="absolute top-2 left-2 text-gray-300 hover:text-red-500 p-2 bg-white/80 rounded-full hover:bg-red-50 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                </button>
-            </div>
-        `).join('');
     }
 
     window.openCart = function() {
