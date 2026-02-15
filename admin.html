@@ -3,139 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم الذكية | أحمد الشيخ</title>
+    <title>لوحة التحكم | أحمد الشيخ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Cairo', sans-serif; background: #f3f4f6; }
-        
-        /* Custom Checkbox Style for Sizes */
-        .size-checkbox:checked + div {
-            background-color: #4b5f28;
-            color: white;
-            border-color: #4b5f28;
-            transform: scale(1.05);
-            box-shadow: 0 4px 6px rgba(75, 95, 40, 0.3);
-        }
-        
-        /* Color Button Selection */
-        .color-btn.active {
-            ring: 4px solid #c5a059;
-            transform: scale(1.1);
-        }
-
-        /* Loader */
-        .loader { border-top-color: #4b5f28; -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
-        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .tab { cursor: pointer; padding: 12px; border-bottom: 3px solid transparent; font-weight: bold; color: #888; transition: 0.3s; }
+        .tab.active { border-color: #4b5f28; color: #4b5f28; background: #e8f5e9; }
+        .size-checkbox:checked + div { background-color: #4b5f28; color: white; border-color: #4b5f28; transform: scale(1.05); }
+        .color-btn.active { ring: 4px solid #c5a059; transform: scale(1.1); }
+        .loader { border-top-color: #4b5f28; animation: spinner 1s linear infinite; }
+        @keyframes spinner { 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="p-6 max-w-5xl mx-auto">
+<body class="bg-gray-100 min-h-screen pb-20">
 
-    <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-2xl shadow-sm">
-        <h1 class="text-2xl font-black text-[#4b5f28]">لوحة التحكم ⚙️</h1>
-        <div class="flex gap-2">
-            <a href="index.html" target="_blank" class="px-4 py-2 bg-gray-100 rounded-xl font-bold text-sm hover:bg-gray-200">معاينة المتجر 👁️</a>
-        </div>
-    </header>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <div class="lg:col-span-2 space-y-6">
-            
-            <div class="bg-white p-6 rounded-2xl shadow-sm">
-                <h3 class="font-bold text-gray-800 mb-4 border-b pb-2">1. تفاصيل المنتج</h3>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs font-bold text-gray-500">اسم الموديل</label>
-                        <input id="prod-name" class="w-full bg-gray-50 border p-3 rounded-xl font-bold focus:border-[#4b5f28] outline-none" placeholder="مثال: نايك اير جوردن">
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-gray-500">السعر</label>
-                        <input id="prod-price" type="number" class="w-full bg-gray-50 border p-3 rounded-xl font-bold focus:border-[#4b5f28] outline-none" placeholder="00">
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <label class="text-xs font-bold text-gray-500">القسم (يحدد المقاسات تلقائياً)</label>
-                    <select id="prod-cat" onchange="updateSizeGrid()" class="w-full bg-green-50 border border-green-200 text-[#4b5f28] p-3 rounded-xl font-bold focus:outline-none cursor-pointer">
-                        <option value="رجالي">رجالي (41 - 49)</option>
-                        <option value="حريمي">حريمي (37 - 41)</option>
-                        <option value="أطفالي">أطفالي (17 - 32)</option>
-                    </select>
-                </div>
+    <div id="dashboard" class="max-w-6xl mx-auto p-4">
+        <header class="flex flex-wrap justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm">
+            <div>
+                <h1 class="text-2xl font-black text-[#4b5f28]">لوحة التحكم ⚙️</h1>
+                <p class="text-xs text-gray-500 font-bold">إدارة المنتجات والطلبات</p>
             </div>
+            <div class="flex gap-2">
+                <a href="index.html" target="_blank" class="px-4 py-2 bg-gray-100 rounded-lg font-bold text-sm hover:bg-gray-200">المتجر 👁️</a>
+                <button onclick="location.reload()" class="px-4 py-2 bg-red-50 text-red-500 rounded-lg font-bold text-sm hover:bg-red-100">تحديث</button>
+            </div>
+        </header>
 
-            <div class="bg-white p-6 rounded-2xl shadow-sm border-2 border-[#4b5f28]/10">
-                <h3 class="font-bold text-gray-800 mb-4 border-b pb-2 flex justify-between">
-                    <span>2. الألوان والمقاسات</span>
-                    <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">اضغط اللون ثم اختر مقاساته</span>
-                </h3>
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-orange-500 text-center"><p class="text-2xl font-black text-orange-500" id="stat-orders">0</p><p class="text-xs font-bold text-gray-400">الطلبات</p></div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-[#4b5f28] text-center"><p class="text-2xl font-black text-[#4b5f28]" id="stat-products">0</p><p class="text-xs font-bold text-gray-400">المنتجات</p></div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-blue-500 text-center"><p class="text-2xl font-black text-blue-500" id="stat-banners">0</p><p class="text-xs font-bold text-gray-400">البنرات</p></div>
+        </div>
 
-                <div class="mb-6">
-                    <p class="text-xs font-bold text-gray-400 mb-2">أولاً: اختر لون لتعديل مقاساته</p>
-                    <div class="flex flex-wrap gap-3" id="color-palette">
-                        <button onclick="activateColor('أسود', '#000000')" class="color-btn w-10 h-10 rounded-full bg-black shadow-md transition hover:scale-105" title="أسود"></button>
-                        <button onclick="activateColor('أبيض', '#ffffff')" class="color-btn w-10 h-10 rounded-full bg-white border border-gray-300 shadow-md transition hover:scale-105" title="أبيض"></button>
-                        <button onclick="activateColor('كحلي', '#1e3a8a')" class="color-btn w-10 h-10 rounded-full bg-blue-900 shadow-md transition hover:scale-105" title="كحلي"></button>
-                        <button onclick="activateColor('بني', '#78350f')" class="color-btn w-10 h-10 rounded-full bg-amber-900 shadow-md transition hover:scale-105" title="بني"></button>
-                        <button onclick="activateColor('بيج', '#f5f5dc')" class="color-btn w-10 h-10 rounded-full bg-[#f5f5dc] border border-gray-300 shadow-md transition hover:scale-105" title="بيج"></button>
-                        <button onclick="activateColor('رمادي', '#6b7280')" class="color-btn w-10 h-10 rounded-full bg-gray-500 shadow-md transition hover:scale-105" title="رمادي"></button>
-                        <button onclick="activateColor('هافان', '#d97706')" class="color-btn w-10 h-10 rounded-full bg-amber-600 shadow-md transition hover:scale-105" title="هافان"></button>
+        <div class="flex border-b border-gray-200 mb-6 bg-white rounded-t-xl overflow-hidden">
+            <button onclick="window.switchTab('orders')" id="tab-orders" class="tab active flex-1">🛒 الطلبات الواردة</button>
+            <button onclick="window.switchTab('products')" id="tab-products" class="tab flex-1">📦 المنتجات</button>
+            <button onclick="window.switchTab('banners')" id="tab-banners" class="tab flex-1">🖼️ العروض</button>
+        </div>
+
+        <div id="sec-orders">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-xl text-gray-800">إدارة الطلبات</h3>
+                <span id="orders-badge" class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold">0 طلب</span>
+            </div>
+            <div id="orders-list" class="space-y-4">
+                <p class="text-center text-gray-500 py-10">جاري تحميل الطلبات...</p>
+            </div>
+        </div>
+
+        <div id="sec-products" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-800 mb-4">1. بيانات المنتج</h3>
+                        <div class="flex gap-4 mb-4">
+                            <input id="prod-name" class="w-full p-3 border rounded-xl" placeholder="اسم الموديل">
+                            <input id="prod-price" type="number" class="w-full p-3 border rounded-xl" placeholder="السعر">
+                        </div>
+                        <select id="prod-cat" onchange="window.updateSizeGrid()" class="w-full p-3 border rounded-xl bg-gray-50 cursor-pointer">
+                            <option value="رجالي">رجالي (41-49)</option>
+                            <option value="حريمي">حريمي (37-41)</option>
+                            <option value="أطفالي">أطفالي (17-32)</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-800 mb-4">2. الألوان والمقاسات</h3>
+                        <div class="flex flex-wrap gap-2 mb-4" id="color-palette">
+                            <button onclick="window.activateColor('أسود')" class="color-btn w-8 h-8 rounded-full bg-black shadow-md"></button>
+                            <button onclick="window.activateColor('أبيض')" class="color-btn w-8 h-8 rounded-full bg-white border border-gray-300 shadow-md"></button>
+                            <button onclick="window.activateColor('كحلي')" class="color-btn w-8 h-8 rounded-full bg-blue-900 shadow-md"></button>
+                            <button onclick="window.activateColor('بني')" class="color-btn w-8 h-8 rounded-full bg-amber-900 shadow-md"></button>
+                            <button onclick="window.activateColor('بيج')" class="color-btn w-8 h-8 rounded-full bg-[#f5f5dc] border border-gray-300 shadow-md"></button>
+                            <div class="flex items-center gap-1 border-r pr-2"><input id="custom-color" class="w-16 p-1 text-xs border rounded" placeholder="لون.."><button onclick="window.addCustomColor()" class="bg-[#4b5f28] text-white w-6 h-6 rounded text-xs">+</button></div>
+                        </div>
                         
-                        <div class="flex items-center gap-1 mr-2 border-r pr-2">
-                            <input id="custom-color-name" placeholder="لون آخر.." class="w-20 text-xs p-2 border rounded-lg bg-gray-50">
-                            <button onclick="addCustomColor()" class="bg-[#4b5f28] text-white w-8 h-8 rounded-lg text-lg font-bold">+</button>
+                        <div id="size-section" class="hidden bg-gray-50 p-4 rounded-xl">
+                            <div class="flex justify-between mb-2"><span class="font-bold text-sm">مقاسات <span id="active-color-name" class="text-[#4b5f28]"></span></span><button onclick="window.selectAllSizes()" class="text-xs text-blue-500 underline">الكل</button></div>
+                            <div id="sizes-grid" class="grid grid-cols-6 gap-2"></div>
                         </div>
+                        <div id="stock-summary" class="mt-2 text-xs text-gray-500 flex flex-wrap gap-2"></div>
                     </div>
                 </div>
 
-                <div id="size-section" class="hidden">
-                    <div class="flex justify-between items-center mb-3">
-                        <p class="font-bold text-gray-800">
-                            مقاسات اللون: <span id="active-color-name" class="text-[#4b5f28] text-lg">...</span>
-                        </p>
-                        <button onclick="selectAllSizes()" class="text-xs text-blue-500 underline">تحديد الكل</button>
-                    </div>
-                    
-                    <div id="sizes-grid" class="grid grid-cols-6 gap-2">
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-800 mb-4">3. الصور</h3>
+                        <div class="border-2 border-dashed border-[#4b5f28] bg-green-50 p-6 rounded-xl text-center cursor-pointer hover:bg-green-100" onclick="document.getElementById('img-file').click()">
+                            <input type="file" id="img-file" hidden multiple onchange="window.handleImg(this)">
+                            <span class="text-[#4b5f28] font-bold">اضغط لرفع صور</span>
                         </div>
-                </div>
-                
-                <div id="no-color-msg" class="text-center py-8 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-                    <p class="text-gray-400">👈 اضغط على أي لون فوق عشان تفتح المقاسات</p>
-                </div>
-            </div>
-
-            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                <h4 class="font-bold text-gray-700 mb-2 text-sm">ملخص المخزون (هيظهر للعميل كدا):</h4>
-                <div id="stock-summary" class="flex flex-wrap gap-2 text-sm text-gray-500">
-                    لا يوجد بيانات مدخلة بعد..
+                        <div id="preview-area" class="grid grid-cols-3 gap-2 mt-4"></div>
+                    </div>
+                    <button onclick="window.uploadProduct()" id="upload-btn" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition">نشر المنتج 🚀</button>
                 </div>
             </div>
+            
+            <h3 class="font-bold text-xl mb-4">المنتجات الحالية</h3>
+            <div id="products-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
 
-        <div class="space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm">
-                <h3 class="font-bold text-gray-800 mb-4 border-b pb-2">3. صور المنتج</h3>
-                <div class="border-2 border-dashed border-[#4b5f28] bg-green-50 rounded-xl p-6 text-center cursor-pointer hover:bg-green-100 transition" onclick="document.getElementById('img-file').click()">
-                    <input type="file" id="img-file" multiple hidden onchange="handleImgSelect(this)">
-                    <p class="text-3xl mb-2">📸</p>
-                    <p class="text-sm font-bold text-[#4b5f28]">اضغط لرفع الصور</p>
-                    <p class="text-[10px] text-gray-500">سيتم ضغط الصور تلقائياً لتسريع الرفع</p>
+        <div id="sec-banners" class="hidden">
+            <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 flex items-center gap-4">
+                <div class="border-2 border-dashed border-blue-400 bg-blue-50 p-4 rounded-xl cursor-pointer flex-1 text-center hover:bg-blue-100" onclick="document.getElementById('banner-file').click()">
+                    <input type="file" id="banner-file" hidden onchange="window.uploadBanner(this)"><span class="text-blue-600 font-bold">➕ إضافة عرض جديد (Slider)</span>
                 </div>
-                <div id="preview-area" class="grid grid-cols-3 gap-2 mt-4"></div>
             </div>
-
-            <button onclick="uploadProduct()" id="upload-btn" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold text-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition flex justify-center items-center gap-2">
-                <span>نشر المنتج 🚀</span>
-            </button>
+            <div id="banners-list" class="space-y-3"></div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // 1. إعدادات Firebase
+        // إعدادات Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyASO-AN5XaSGn4SaCZ8VlHr6zsFCIxPCzs",
             authDomain: "ahmed-shoes.firebaseapp.com",
@@ -148,185 +131,149 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // State
+        // متغيرات
         window.tempImages = [];
         window.stockData = {}; 
         window.activeColor = null;
+        window.allOrders = [];
+        const RANGES = { 'رجالي': {min: 41, max: 49}, 'حريمي': {min: 37, max: 41}, 'أطفالي': {min: 17, max: 32} };
 
-        const RANGES = {
-            'رجالي': {min: 41, max: 49},
-            'حريمي': {min: 37, max: 41},
-            'أطفالي': {min: 17, max: 32}
-        };
+        // --- 1. تشغيل البيانات مباشرة (بدون لوجن) ---
+        loadData();
 
-        // --- دالة ضغط الصور (لتسريع الرفع وحل مشكلة التعليق) ---
-        const compressImage = (file) => {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 800; // أقصى عرض 800 بيكسل
-                        const scaleSize = MAX_WIDTH / img.width;
-                        canvas.width = MAX_WIDTH;
-                        canvas.height = img.height * scaleSize;
-                        
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        
-                        // إرجاع الصورة مضغوطة بجودة 60%
-                        resolve(canvas.toDataURL('image/jpeg', 0.6));
-                    };
-                };
+        window.switchTab = (t) => {
+            ['orders','products','banners'].forEach(x => {
+                document.getElementById('sec-'+x).classList.add('hidden');
+                document.getElementById('tab-'+x).classList.remove('active');
             });
+            document.getElementById('sec-'+t).classList.remove('hidden');
+            document.getElementById('tab-'+t).classList.add('active');
         };
 
-        // --- معالجة الصور ---
-        window.handleImgSelect = async (input) => {
-            const files = [...input.files];
-            document.getElementById('preview-area').innerHTML = '<p class="text-xs text-green-600 col-span-3 text-center">جاري المعالجة والضغط...</p>';
-            window.tempImages = [];
-            
-            for (const file of files) {
-                try {
-                    const compressedBase64 = await compressImage(file);
-                    window.tempImages.push(compressedBase64);
-                    
-                    const div = document.createElement('div');
-                    div.className = "relative group";
-                    div.innerHTML = `<img src="${compressedBase64}" class="w-full h-20 object-cover rounded-lg border shadow-sm">`;
-                    document.getElementById('preview-area').appendChild(div);
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-            // إزالة رسالة الانتظار
-            if(document.querySelector('#preview-area p')) document.querySelector('#preview-area p').remove();
-        };
+        function loadData() {
+            // تحميل الطلبات
+            onSnapshot(query(collection(db, "orders"), orderBy("timestamp", "desc")), (snap) => {
+                window.allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                document.getElementById('stat-orders').innerText = snap.size;
+                document.getElementById('orders-badge').innerText = snap.size + ' طلب';
+                renderOrders();
+            });
 
-        // --- منطق الألوان والمقاسات ---
-        window.activateColor = (colorName, hex) => {
-            window.activeColor = colorName;
-            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active'); 
-            
-            document.getElementById('no-color-msg').classList.add('hidden');
-            document.getElementById('size-section').classList.remove('hidden');
-            document.getElementById('active-color-name').innerText = colorName;
-            
-            if(!window.stockData[colorName]) window.stockData[colorName] = [];
-            
-            renderSizeGrid();
-        };
+            // تحميل المنتجات
+            onSnapshot(query(collection(db, "products"), orderBy("timestamp", "desc")), (snap) => {
+                document.getElementById('stat-products').innerText = snap.size;
+                document.getElementById('products-list').innerHTML = snap.docs.map(d => {
+                    const p = d.data();
+                    return `<div class="bg-white p-3 rounded-xl border flex items-center gap-3">
+                        <img src="${(p.images||[])[0]}" class="w-12 h-12 rounded object-cover">
+                        <div class="flex-1"><h4 class="font-bold text-sm">${p.name}</h4><p class="text-xs text-gray-500">${p.price} ج.م</p></div>
+                        <button onclick="window.delDoc('products','${d.id}')" class="text-red-500 text-xs font-bold border border-red-200 px-2 py-1 rounded hover:bg-red-50">حذف</button>
+                    </div>`;
+                }).join('');
+            });
 
-        window.addCustomColor = () => {
-            const name = document.getElementById('custom-color-name').value.trim();
-            if(!name) return;
-            const btn = document.createElement('button');
-            btn.className = "color-btn w-10 h-10 rounded-full bg-gray-200 border border-gray-400 font-bold text-[10px] flex items-center justify-center shadow-md";
-            btn.innerText = name.substring(0,2);
-            btn.onclick = (e) => window.activateColor(name, '#ccc');
-            document.getElementById('color-palette').insertBefore(btn, document.getElementById('color-palette').lastElementChild);
-            document.getElementById('custom-color-name').value = '';
-            window.activateColor(name, '#ccc');
-        };
-
-        window.renderSizeGrid = () => {
-            const cat = document.getElementById('prod-cat').value;
-            const range = RANGES[cat];
-            const grid = document.getElementById('sizes-grid');
-            grid.innerHTML = '';
-            
-            const currentSelected = window.stockData[window.activeColor] || [];
-
-            for(let i = range.min; i <= range.max; i++) {
-                const isChecked = currentSelected.includes(i) ? 'checked' : '';
-                grid.innerHTML += `
-                    <label class="cursor-pointer select-none">
-                        <input type="checkbox" class="size-checkbox hidden" value="${i}" ${isChecked} onchange="toggleSize(${i})">
-                        <div class="w-full aspect-square flex items-center justify-center rounded-xl bg-gray-100 border-2 border-transparent font-bold text-gray-500 transition-all hover:bg-gray-200">
-                            ${i}
-                        </div>
-                    </label>
-                `;
-            }
-        };
-
-        window.updateSizeGrid = () => { if(window.activeColor) renderSizeGrid(); };
-
-        window.toggleSize = (size) => {
-            if(!window.activeColor) return;
-            const arr = window.stockData[window.activeColor];
-            
-            if(arr.includes(size)) {
-                arr.splice(arr.indexOf(size), 1);
-            } else {
-                arr.push(size);
-                arr.sort((a,b) => a-b);
-            }
-            if(arr.length === 0) delete window.stockData[window.activeColor];
-            updateSummary();
-        };
-        
-        window.selectAllSizes = () => {
-             document.querySelectorAll('.size-checkbox').forEach(input => {
-                 if(!input.checked) { input.checked = true; input.onchange(); }
-             });
+            // تحميل البنرات
+            onSnapshot(query(collection(db, "banners"), orderBy("timestamp", "desc")), (snap) => {
+                document.getElementById('stat-banners').innerText = snap.size;
+                document.getElementById('banners-list').innerHTML = snap.docs.map(d => 
+                    `<div class="relative h-24 rounded-lg overflow-hidden border">
+                        <img src="${d.data().image}" class="w-full h-full object-cover">
+                        <button onclick="window.delDoc('banners','${d.id}')" class="absolute top-1 left-1 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-md">✕</button>
+                    </div>`
+                ).join('');
+            });
         }
 
-        function updateSummary() {
-            const div = document.getElementById('stock-summary');
-            const entries = Object.entries(window.stockData);
-            if(entries.length === 0) { div.innerHTML = 'لا يوجد بيانات مدخلة بعد..'; return; }
-            div.innerHTML = entries.map(([color, sizes]) => {
-                if(sizes.length === 0) return '';
-                return `<span class="bg-white border px-2 py-1 rounded-lg"><b class="text-[#4b5f28]">${color}:</b> ${sizes.join(', ')}</span>`;
+        function renderOrders() {
+            const list = document.getElementById('orders-list');
+            if(!window.allOrders.length) { list.innerHTML = '<p class="text-center text-gray-400 py-10">مفيش طلبات حالياً</p>'; return; }
+            
+            const statusText = { 'new': 'قيد المراجعة', 'processing': 'جاري التجهيز', 'shipped': 'خرج للتوصيل', 'completed': 'تم الاستلام', 'cancelled': 'ملغي' };
+            
+            list.innerHTML = window.allOrders.map(o => {
+                const st = o.status || 'new';
+                // التحقق من تعدد المنتجات
+                const itemsHtml = (o.items && o.items.length) 
+                    ? o.items.map(i => `<div>- ${i.productName} (${i.color}/${i.size}) x${i.qty}</div>`).join('') 
+                    : `<div>- ${o.productName || 'منتج'}</div>`; // دعم الطلبات القديمة
+
+                return `<div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-right">
+                    <div class="flex justify-between border-b pb-2 mb-2">
+                        <span class="font-bold">#${o.id.slice(0,5)}</span>
+                        <span class="text-xs text-gray-500">${new Date(o.timestamp).toLocaleString('ar-EG')}</span>
+                    </div>
+                    <div class="text-sm space-y-1 mb-3">
+                        <p class="font-bold text-gray-700">👤 ${o.customerName}</p>
+                        <p class="text-blue-600 font-bold cursor-pointer" onclick="window.open('tel:${o.customerPhone}')">📞 ${o.customerPhone}</p>
+                        <p class="text-gray-500">📍 ${o.customerAddress}</p>
+                        <div class="bg-gray-50 p-2 rounded mt-2 text-gray-600 text-xs font-bold border">${itemsHtml}</div>
+                        <p class="text-[#4b5f28] font-black text-lg pt-1">المجموع: ${o.total} ج.م</p>
+                    </div>
+                    <div class="flex gap-2 items-center bg-gray-50 p-2 rounded">
+                        <select onchange="window.updateStatus('${o.id}', this.value)" class="p-1 rounded text-sm flex-1 border outline-none bg-white cursor-pointer">
+                            <option value="new" ${st=='new'?'selected':''}>⏳ مراجعة</option>
+                            <option value="processing" ${st=='processing'?'selected':''}>⚙️ تجهيز</option>
+                            <option value="shipped" ${st=='shipped'?'selected':''}>🚚 توصيل</option>
+                            <option value="completed" ${st=='completed'?'selected':''}>✅ استلام</option>
+                            <option value="cancelled" ${st=='cancelled'?'selected':''}>❌ إلغاء</option>
+                        </select>
+                        <a href="https://wa.me/20${o.customerPhone}?text=مرحباً ${o.customerName.split(' ')[0]}، بخصوص طلبك.." target="_blank" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-600">واتساب</a>
+                    </div>
+                </div>`;
             }).join('');
         }
 
-        // --- دالة الرفع ---
+        // --- 2. الوظائف العامة ---
+        window.updateStatus = async (id, st) => { await updateDoc(doc(db, "orders", id), {status: st}); };
+        window.delDoc = async (c, id) => { if(confirm('حذف نهائي؟')) await deleteDoc(doc(db, c, id)); };
+
+        // ضغط الصور
+        const compress = (f) => new Promise(res => {
+            const r = new FileReader(); r.readAsDataURL(f);
+            r.onload = e => { const i = new Image(); i.src=e.target.result; i.onload=()=>{ const c=document.createElement('canvas'); const s=800/i.width; c.width=800; c.height=i.height*s; c.getContext('2d').drawImage(i,0,0,c.width,c.height); res(c.toDataURL('image/jpeg',0.6)); } }
+        });
+
+        window.handleImg = async (inp) => {
+            document.getElementById('preview-area').innerHTML = '<p class="text-xs text-center col-span-3 text-green-600">جاري المعالجة...</p>';
+            window.tempImages = [];
+            for(const f of inp.files) { const c = await compress(f); window.tempImages.push(c); }
+            document.getElementById('preview-area').innerHTML = window.tempImages.map(src => `<img src="${src}" class="w-full h-16 object-cover rounded border">`).join('');
+        };
+
+        window.uploadBanner = async (inp) => {
+            if(!inp.files[0]) return;
+            const img = await compress(inp.files[0]);
+            await addDoc(collection(db, "banners"), { image: img, timestamp: Date.now() });
+            alert('تم رفع البنر ✅');
+        };
+
+        // إدارة المنتج
+        window.activateColor = (n) => { window.activeColor = n; document.getElementById('size-section').classList.remove('hidden'); document.getElementById('active-color-name').innerText = n; document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); if(!window.stockData[n]) window.stockData[n] = []; window.renderGrid(); };
+        window.addCustomColor = () => { const n = document.getElementById('custom-color').value; if(n){ window.activateColor(n); document.getElementById('custom-color').value=''; } };
+        window.renderGrid = () => { const r = RANGES[document.getElementById('prod-cat').value]; const g = document.getElementById('sizes-grid'); g.innerHTML = ''; for(let i=r.min; i<=r.max; i++) { g.innerHTML += `<label class="cursor-pointer select-none"><input type="checkbox" class="size-checkbox hidden" value="${i}" ${window.stockData[window.activeColor].includes(i)?'checked':''} onchange="window.toggleSize(${i})"><div class="w-full aspect-square flex items-center justify-center rounded bg-gray-100 border text-gray-500 font-bold text-sm hover:bg-gray-200 transition">${i}</div></label>`; } };
+        window.updateSizeGrid = () => { if(window.activeColor) window.renderGrid(); };
+        window.toggleSize = (s) => { const a = window.stockData[window.activeColor]; if(a.includes(s)) a.splice(a.indexOf(s), 1); else a.push(s); if(!a.length) delete window.stockData[window.activeColor]; window.renderSummary(); };
+        window.selectAllSizes = () => { document.querySelectorAll('.size-checkbox').forEach(c => { if(!c.checked) { c.checked=true; c.onchange(); } }); };
+        window.renderSummary = () => { document.getElementById('stock-summary').innerHTML = Object.entries(window.stockData).map(([k,v]) => `<span class="bg-white border px-1 rounded"><b>${k}:</b> ${v.join(',')}</span>`).join(' '); };
+
         window.uploadProduct = async () => {
-            const name = document.getElementById('prod-name').value;
-            const price = document.getElementById('prod-price').value;
-            const cat = document.getElementById('prod-cat').value;
+            const name=document.getElementById('prod-name').value, price=document.getElementById('prod-price').value, cat=document.getElementById('prod-cat').value;
             const btn = document.getElementById('upload-btn');
             
-            if(!name || !price) return alert('⚠️ يرجى كتابة اسم المنتج والسعر');
-            if(window.tempImages.length === 0) return alert('⚠️ يرجى اختيار صورة واحدة على الأقل');
-            if(Object.keys(window.stockData).length === 0) return alert('⚠️ يرجى اختيار لون ومقاس واحد على الأقل');
-
-            const colorsArray = Object.entries(window.stockData).map(([k, v]) => ({ name: k, sizes: v }));
-
-            btn.disabled = true;
-            const oldText = btn.innerHTML;
-            btn.innerHTML = '<span class="loader w-5 h-5 rounded-full border-2 border-white inline-block"></span> جاري الرفع...';
-
+            if(!name || !price || !window.tempImages.length || !Object.keys(window.stockData).length) return alert('❌ بيانات ناقصة!');
+            
+            btn.disabled = true; btn.innerText = 'جاري الرفع...';
             try {
                 await addDoc(collection(db, "products"), {
-                    name, 
-                    price: Number(price), 
-                    category: cat,
-                    images: window.tempImages,
-                    colors: colorsArray,
+                    name, price: Number(price), category: cat, images: window.tempImages,
+                    colors: Object.entries(window.stockData).map(([k,v])=>({name:k, sizes:v})),
                     timestamp: Date.now()
                 });
-                
-                alert('تمت الإضافة بنجاح! ✅');
-                location.reload(); 
-            } catch (e) {
-                console.error(e);
-                if (e.message.includes("permission")) {
-                    alert('⛔ خطأ في الصلاحيات! تأكد من تفعيل "Test Mode" في قواعد Firebase.');
-                } else if (e.message.includes("quota") || e.message.includes("size")) {
-                    alert('⛔ الصور كبيرة جداً، حاول تقليل عدد الصور.');
-                } else {
-                    alert('حدث خطأ: ' + e.message);
-                }
-                btn.disabled = false;
-                btn.innerHTML = oldText;
+                alert('تمت الإضافة بنجاح ✅');
+                location.reload();
+            } catch(e) {
+                alert('خطأ: ' + e.message);
+                btn.disabled = false; btn.innerText = 'نشر المنتج 🚀';
             }
         };
     </script>
