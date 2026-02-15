@@ -21,132 +21,156 @@ let state = {
     user: null,
     profile: null,
     currentProduct: null,
-    selection: { color: null, size: null }
+    selection: { color: null, size: null },
+    tempSignupData: null, // لتخزين البيانات مؤقتاً لحد ما يأكد الكود
+    otpCode: null         // الكود العشوائي
 };
 
-// --- AUTH SYSTEM (The Gatekeeper) ---
+// --- AUTH SYSTEM ---
 
 onAuthStateChanged(auth, async (user) => {
     const overlay = document.getElementById('auth-overlay');
     const app = document.getElementById('main-app');
 
     if (user) {
-        // التحقق من تفعيل الإيميل
-        if (!user.emailVerified) {
-            // لو مش مفعل -> نظهرله رسالة ومندخلوش
-            document.getElementById('verify-warning').classList.remove('hidden');
-            document.getElementById('verify-warning').innerText = `⚠️ أهلاً ${user.email}، لازم تأكد حسابك من الرسالة اللي بعتناها على الإيميل عشان تقدر تدخل.`;
-            return; // ستوب هنا، ميكملش دخول
-        }
-
-        // لو مفعل -> هات البيانات وافتح الموقع
         state.user = user;
         const docSnap = await getDoc(doc(db, "users", user.uid));
         if (docSnap.exists()) {
             state.profile = docSnap.data();
             document.getElementById('nav-user-name').innerText = state.profile.name.split(' ')[0];
             
-            // فتح البوابة
+            // Open Gate
             overlay.classList.add('opacity-0', 'pointer-events-none');
             app.classList.remove('filter', 'blur-md', 'pointer-events-none');
         }
     } else {
-        // لو مش مسجل -> اقفل البوابة
+        // Close Gate
         state.user = null;
         overlay.classList.remove('opacity-0', 'pointer-events-none');
         app.classList.add('filter', 'blur-md', 'pointer-events-none');
-        document.getElementById('verify-warning').classList.add('hidden');
     }
 });
 
-// Switch Tabs
+// --- Tabs Switching ---
 window.switchAuth = (tab) => {
     document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
     document.getElementById('signup-form').classList.toggle('hidden', tab !== 'signup');
-    document.getElementById('verify-sent-msg').classList.add('hidden');
     
-    // Style tabs
-    const activeClass = ['bg-white', 'shadow', 'text-[#4b5f28]'];
-    const inactiveClass = ['text-gray-500', 'hover:text-gray-700'];
+    const active = ['bg-white', 'shadow', 'text-[#4b5f28]'];
+    const inactive = ['text-gray-500'];
     
-    const loginBtn = document.getElementById('btn-tab-login');
-    const signupBtn = document.getElementById('btn-tab-signup');
-    
-    if(tab === 'login') {
-        loginBtn.classList.add(...activeClass); loginBtn.classList.remove(...inactiveClass);
-        signupBtn.classList.remove(...activeClass); signupBtn.classList.add(...inactiveClass);
+    if(tab==='login') {
+        document.getElementById('btn-tab-login').classList.add(...active);
+        document.getElementById('btn-tab-login').classList.remove(...inactive);
+        document.getElementById('btn-tab-signup').classList.remove(...active);
     } else {
-        signupBtn.classList.add(...activeClass); signupBtn.classList.remove(...inactiveClass);
-        loginBtn.classList.remove(...activeClass); loginBtn.classList.add(...inactiveClass);
+        document.getElementById('btn-tab-signup').classList.add(...active);
+        document.getElementById('btn-tab-signup').classList.remove(...inactive);
+        document.getElementById('btn-tab-login').classList.remove(...active);
     }
 };
 
-// Signup & Send Verification
-window.handleSignup = async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button');
-    btn.disabled = true; btn.innerText = "جاري الحفظ...";
+// --- OTP Logic (The Magic) ---
 
-    const email = document.getElementById('s-email').value;
-    const pass = document.getElementById('s-pass').value;
+window.handleSignupInitiate = (e) => {
+    e.preventDefault();
     const name = document.getElementById('s-name').value;
     const phone = document.getElementById('s-phone').value;
     const address = document.getElementById('s-address').value;
+    const email = document.getElementById('s-email').value;
+    const pass = document.getElementById('s-pass').value;
 
-    try {
-        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    if(email && email.trim() !== "") {
+        // لو كتب إيميل -> تسجيل عادي
+        registerWithEmail(name, phone, address, email, pass);
+    } else {
+        // لو مكتبش إيميل -> شغل الـ OTP
+        state.tempSignupData = { name, phone, address, pass };
+        // 1. توليد كود عشوائي من 4 أرقام
+        state.otpCode = Math.floor(1000 + Math.random() * 9000);
         
-        // 1. Save Profile
-        await setDoc(doc(db, "users", cred.user.uid), {
-            name, phone, address, email,
-            createdAt: Date.now()
-        });
-
-        // 2. Send Verification Email
-        await sendEmailVerification(cred.user);
-
-        // 3. Show Success & Ask to Verify
+        // 2. إظهار شاشة الـ OTP
         document.getElementById('signup-form').classList.add('hidden');
-        document.getElementById('verify-sent-msg').classList.remove('hidden');
+        document.getElementById('otp-screen').classList.remove('hidden');
+        document.getElementById('otp-phone-display').innerText = phone;
         
-        showToast('تم إنشاء الحساب! راجع إيميلك للتفعيل', 'success');
-
-    } catch (err) {
-        showToast(err.message, 'error');
+        // 3. محاكاة إرسال الرسالة (في الحقيقة بتحتاج خدمة مدفوعة)
+        // هنا هنظهرها في Alert عشان التجربة
+        setTimeout(() => {
+            alert(`💬 رسالة من أحمد الشيخ:\nرمز التحقق الخاص بك هو: ${state.otpCode}`);
+        }, 1000);
     }
-    btn.disabled = false; btn.innerText = "إنشاء حساب وتأكيد ✉️";
 };
 
-// Login
+window.verifyOTP = async () => {
+    const inputCode = document.getElementById('otp-code-input').value;
+    
+    if(parseInt(inputCode) === state.otpCode) {
+        // الكود صح -> سجل الحساب فوراً
+        const d = state.tempSignupData;
+        // بنعمل إيميل وهمي بالرقم عشان Firebase يقبله
+        const fakeEmail = `${d.phone}@ahmedshoes.com`;
+        
+        try {
+            const cred = await createUserWithEmailAndPassword(auth, fakeEmail, d.pass);
+            await setDoc(doc(db, "users", cred.user.uid), {
+                name: d.name, phone: d.phone, address: d.address, email: fakeEmail,
+                isRealEmail: false, createdAt: Date.now()
+            });
+            showToast('تم تفعيل الحساب بنجاح! 🎉', 'success');
+            // onAuthStateChanged هتدخله تلقائي
+        } catch(e) {
+            showToast('حدث خطأ في التسجيل', 'error');
+        }
+    } else {
+        showToast('رمز التحقق غير صحيح ❌', 'error');
+    }
+};
+
+window.resendOTP = () => {
+    state.otpCode = Math.floor(1000 + Math.random() * 9000);
+    alert(`💬 إعادة إرسال:\nرمز التحقق الجديد هو: ${state.otpCode}`);
+};
+
+window.cancelOTP = () => {
+    document.getElementById('otp-screen').classList.add('hidden');
+    document.getElementById('signup-form').classList.remove('hidden');
+};
+
+async function registerWithEmail(name, phone, address, email, pass) {
+    try {
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        await setDoc(doc(db, "users", cred.user.uid), {
+            name, phone, address, email, isRealEmail: true, createdAt: Date.now()
+        });
+        await sendEmailVerification(cred.user);
+        alert('تم التسجيل! راجع إيميلك للتفعيل.');
+        window.location.reload();
+    } catch(e) { showToast(e.message, 'error'); }
+}
+
+// --- Login Logic ---
 window.handleLogin = async (e) => {
     e.preventDefault();
-    const btn = e.target.querySelector('button');
-    btn.disabled = true; btn.innerText = "تحقق...";
+    let user = document.getElementById('l-phone').value;
+    const pass = document.getElementById('l-pass').value;
+    
+    // لو كتب رقم تليفون، حوله للإيميل الوهمي بتاعنا
+    if(!user.includes('@')) {
+        user = `${user}@ahmedshoes.com`;
+    }
     
     try {
-        const cred = await signInWithEmailAndPassword(auth, 
-            document.getElementById('l-email').value,
-            document.getElementById('l-pass').value
-        );
-        
-        if(!cred.user.emailVerified) {
-             // لو الإيميل مش مفعل، مش هيعدي من الـ listener فوق، وهنعمل sign out احتياطي
-             await signOut(auth);
-             document.getElementById('verify-warning').classList.remove('hidden');
-             document.getElementById('verify-warning').innerText = "⚠️ لم يتم تفعيل الحساب بعد! راجع بريدك الإلكتروني.";
-        } else {
-             showToast('تم الدخول بنجاح', 'success');
-        }
-
-    } catch (err) {
-        showToast("بيانات الدخول غير صحيحة", 'error');
+        await signInWithEmailAndPassword(auth, user, pass);
+        showToast('جاري الدخول...', 'success');
+    } catch(e) {
+        showToast('بيانات الدخول خطأ', 'error');
     }
-    btn.disabled = false; btn.innerText = "دخول آمن 🔒";
 };
 
 window.logout = () => signOut(auth);
 
-// --- APP LOGIC (Products & Cart) ---
+// --- Products & Cart Logic ---
 
 async function fetchProducts() {
     try {
@@ -165,7 +189,7 @@ window.loadProducts = async (cat) => {
     document.getElementById('grid-container').innerHTML = list.map(p => `
         <div onclick="openProd('${p.id}')" class="bg-white rounded-2xl p-2 shadow-sm cursor-pointer">
             <img src="${p.images[0]}" class="rounded-xl h-40 w-full object-cover mb-2">
-            <h3 class="font-bold text-sm">${p.name}</h3>
+            <h3 class="font-bold text-sm truncate">${p.name}</h3>
             <p class="text-[#4b5f28] font-black">${p.price} ج.م</p>
         </div>
     `).join('');
@@ -185,13 +209,13 @@ window.openProd = (id) => {
     document.getElementById('modal-price').innerText = p.price + ' ج.م';
     document.getElementById('modal-img').src = p.images[0];
     
-    // Colors
     const cWrap = document.getElementById('modal-colors');
-    cWrap.innerHTML = (p.colors||[]).map(c => 
-        `<button onclick="selColor('${c.name}', this)" class="c-btn border px-3 py-1 rounded-lg text-sm">${c.name}</button>`
-    ).join('');
-    document.getElementById('modal-sizes').innerHTML = '<span class="text-xs text-gray-400">اختر اللون</span>';
-    
+    if(p.colors) {
+        cWrap.innerHTML = p.colors.map(c => 
+            `<button onclick="selColor('${c.name}', this)" class="c-btn border px-3 py-1 rounded-lg text-sm">${c.name}</button>`
+        ).join('');
+        document.getElementById('modal-sizes').innerHTML = '<span class="text-xs text-gray-400">اختر اللون</span>';
+    }
     document.getElementById('product-modal').classList.remove('hidden');
     setTimeout(()=> document.getElementById('modal-content').classList.remove('translate-y-full'), 10);
 };
@@ -245,8 +269,6 @@ function updateCart() {
 window.openCart = () => {
     document.getElementById('cart-modal').classList.remove('hidden');
     setTimeout(()=> document.getElementById('cart-content').classList.remove('translate-x-full'), 10);
-    
-    // Pre-fill Data (Smart Fill)
     if(state.profile) {
         document.getElementById('checkout-name').value = state.profile.name;
         document.getElementById('checkout-phone').value = state.profile.phone;
@@ -266,29 +288,23 @@ window.closeModal = () => {
 
 window.checkout = async () => {
     if(!state.cart.length) return;
-    
     const name = document.getElementById('checkout-name').value;
     const phone = document.getElementById('checkout-phone').value;
     const address = document.getElementById('checkout-address').value;
     const total = document.getElementById('cart-total').innerText;
     
-    // Save Order
     try {
         await addDoc(collection(db, "orders"), {
             customer: { uid: state.user.uid, name, phone, address },
-            items: state.cart,
-            total: parseInt(total),
-            timestamp: Date.now()
+            items: state.cart, total: parseInt(total), timestamp: Date.now()
         });
         
-        // Update Profile Address if changed (Smart Feature)
         if(address !== state.profile.address) {
             updateDoc(doc(db, "users", state.user.uid), { address });
         }
 
-        // WhatsApp
         const msgItems = state.cart.map(i => `${i.name} (${i.selectedColor}/${i.selectedSize})`).join('%0a');
-        const msg = `*طلب جديد (عميل موثق)*%0a${msgItems}%0a*الإجمالي: ${total}*%0a👤 ${name}%0a📞 ${phone}%0a📍 ${address}`;
+        const msg = `*طلب جديد*%0a${msgItems}%0a*الإجمالي: ${total}*%0a👤 ${name}%0a📞 ${phone}%0a📍 ${address}`;
         window.open(`https://wa.me/201020468021?text=${msg}`, '_blank');
         
         state.cart = []; updateCart(); closeCart();
