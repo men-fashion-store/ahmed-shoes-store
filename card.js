@@ -1,94 +1,210 @@
-// --- تعريف متغيرات السلة ---
-window.cart = JSON.parse(localStorage.getItem('myCart')) || [];
-window.currentProd = null;
-window.selColorVar = null;
-window.selSizeVar = null;
+/* ================= CART CORE (FINAL) ================= */
+window.cart = [];
+try {
+    const raw = JSON.parse(localStorage.getItem('cart') || '[]');
+    window.cart = Array.isArray(raw) ? raw : [];
+} catch(e) { window.cart = []; }
 
-// --- إضافة للسلة ---
+function saveCart() {
+    try {
+        localStorage.setItem('cart', JSON.stringify(window.cart));
+    } catch(e) {}
+}
+
+function updateCartBadge() {
+    const badge = document.getElementById('cart-badge');
+    if(!badge) return;
+    const count = window.cart.reduce((s, i) => s + (parseInt(i.qty) || 1), 0);
+    badge.textContent = count;
+    if(count === 0) {
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
+    } else {
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+    }
+}
+
+/* =============== ADD TO CART ================= */
 window.addToCart = function() {
-    if(!window.selColorVar || !window.selSizeVar) {
-        window.toast('يرجى اختيار اللون والمقاس', 'error');
+    if(!window.currentSize) {
+        showToast('اختر المقاس أولاً', 'error');
         return;
     }
     
-    const item = {
-        id: window.currentProd.id,
-        productName: window.currentProd.name,
-        price: parseInt(window.currentProd.price),
-        image: window.currentProd.images[0],
-        color: window.selColorVar,
-        size: window.selSizeVar,
-        qty: 1
-    };
-
-    window.cart.push(item);
-    window.saveCart();
-    window.updateCartBadge();
-    window.renderCart();
+    const color = window.currentColor || 'افتراضي';
+    const price = parseInt(window.currentProd.price) || 0;
+    const productId = window.currentProd.id;
     
-    window.toast('تمت الإضافة للسلة ✅');
+    // البحث عن منتج مطابق
+    const existingIdx = window.cart.findIndex(i => 
+        i.productId === productId && 
+        i.size === window.currentSize && 
+        i.color === color
+    );
     
-    // إغلاق المودال فوراً كما طلبت
-    window.closeModal(); 
+    if(existingIdx > -1) {
+        window.cart[existingIdx].qty = (parseInt(window.cart[existingIdx].qty) || 0) + 1;
+    } else {
+        window.cart.push({
+            productId: productId,
+            productName: window.currentProd.name,
+            price: price,
+            color: color,
+            size: window.currentSize,
+            image: (window.currentProd.images || [])[0],
+            qty: 1
+        });
+    }
+    
+    saveCart();
+    updateCartBadge();
+    renderCart();
+    showToast('تمت الإضافة للسلة ✓', 'success');
+    closeModal();
 };
 
-// --- دوال مساعدة ---
-window.saveCart = function() {
-    localStorage.setItem('myCart', JSON.stringify(window.cart));
-}
-
-window.updateCartBadge = function() {
-    const b = document.getElementById('cart-badge');
-    if(window.cart.length > 0) {
-        b.innerText = window.cart.length;
-        b.classList.remove('hidden');
-    } else {
-        b.classList.add('hidden');
-    }
-}
-
-window.renderCart = function() {
-    const div = document.getElementById('cart-items');
-    const totalEl = document.getElementById('cart-total');
+/* =============== RENDER CART ================= */
+function renderCart() {
+    const wrap = document.getElementById('cart-items');
+    const empty = document.getElementById('cart-empty');
+    
+    if(!wrap) return;
     
     if(!window.cart.length) {
-        div.innerHTML = '<p class="text-center text-gray-400 py-10">السلة فارغة</p>';
+        wrap.innerHTML = '';
+        if(empty) empty.classList.remove('hidden');
+        const totalEl = document.getElementById('cart-total-confirm');
         if(totalEl) totalEl.innerText = '0 ج.م';
         return;
     }
-
+    
+    if(empty) empty.classList.add('hidden');
+    
     let total = 0;
-    div.innerHTML = window.cart.map((i, idx) => {
-        total += i.price * i.qty;
-        return `<div class="flex gap-3 mb-3 bg-white p-2 rounded-lg border relative">
-            <img src="${i.image}" class="w-16 h-16 rounded object-cover">
-            <div>
-                <p class="font-bold text-sm">${i.productName}</p>
-                <p class="text-xs text-gray-500">${i.color} | ${i.size}</p>
-                <p class="font-black text-[#4b5f28]">${i.price} ج.م</p>
+    
+    wrap.innerHTML = window.cart.map((item, idx) => {
+        const itemPrice = parseInt(item.price) || 0;
+        const itemQty = parseInt(item.qty) || 1;
+        const itemTotal = itemPrice * itemQty;
+        total += itemTotal;
+        
+        return `
+            <div class="cart-item-big relative group rounded-xl mb-3 border border-gray-100 shadow-sm">
+                <img src="${item.image || 'https://via.placeholder.com/150'}" class="w-32 h-32 rounded-xl object-cover shadow-sm bg-gray-100 shrink-0" onerror="this.src='https://via.placeholder.com/150'">
+                
+                <div class="flex-1 min-w-0 flex flex-col justify-between py-1 h-full gap-2">
+                    <div>
+                        <p class="font-black text-xl text-gray-800 truncate leading-tight">${item.productName}</p>
+                        <p class="text-base text-gray-500 font-bold mt-1">
+                           ${item.color} | مقاس <span class="text-brand bg-brand/10 px-1 rounded">${item.size}</span>
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <p class="text-brand font-black text-2xl">${itemTotal} <span class="text-sm text-gray-400">ج.م</span></p>
+                        
+                        <div class="flex items-center gap-3 bg-gray-50 rounded-full px-2 py-1 border border-gray-200">
+                            <button onclick="updateCartQty(${idx}, -1)" class="cart-qty-btn hover:bg-red-100 hover:text-red-500 hover:border-red-200">−</button>
+                            <span class="text-xl font-black w-6 text-center text-gray-700">${itemQty}</span>
+                            <button onclick="updateCartQty(${idx}, 1)" class="cart-qty-btn bg-brand text-white hover:bg-brand-accent hover:text-white border-transparent shadow-md">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="removeFromCart(${idx})" class="absolute top-2 left-2 text-gray-300 hover:text-red-500 p-2 bg-white/80 rounded-full hover:bg-red-50 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
             </div>
-            <button onclick="window.delItem(${idx})" class="absolute top-2 left-2 text-red-500 text-xs font-bold border px-2 rounded">حذف</button>
-        </div>`;
+        `;
     }).join('');
     
+    const totalEl = document.getElementById('cart-total-confirm');
     if(totalEl) totalEl.innerText = total + ' ج.م';
 }
 
-window.delItem = function(i) {
-    window.cart.splice(i, 1);
-    window.saveCart();
-    window.renderCart();
-    window.updateCartBadge();
-}
+/* =============== ACTIONS ================= */
+window.updateCartQty = function(idx, delta) {
+    if(!window.cart[idx]) return;
+    
+    let newQty = (parseInt(window.cart[idx].qty) || 0) + delta;
+    
+    if(newQty < 1) {
+        window.cart.splice(idx, 1);
+    } else {
+        window.cart[idx].qty = newQty;
+    }
+    
+    saveCart();
+    renderCart();
+    updateCartBadge();
+    showToast('تم تحديث الكمية', 'success');
+};
 
+window.removeFromCart = function(idx) {
+    window.cart.splice(idx, 1);
+    saveCart();
+    renderCart();
+    updateCartBadge();
+    showToast('تم الحذف من السلة', 'success');
+};
+
+window.clearCart = function() {
+    if(!confirm('هل تريد مسح كل المنتجات من السلة؟')) return;
+    window.cart = [];
+    saveCart();
+    renderCart();
+    updateCartBadge();
+    showToast('تم تفريغ السلة', 'success');
+};
+
+/* =============== OPEN/CLOSE CART ================= */
 window.openCart = function() {
-    window.renderCart();
+    renderCart();
+    updateCartBadge();
     document.getElementById('cart-modal').classList.remove('hidden');
-}
+};
 
 window.closeCart = function() {
     document.getElementById('cart-modal').classList.add('hidden');
+};
+
+/* =============== TOAST HELPER ================= */
+function showToast(msg, type='success') {
+    const c = document.getElementById('toast-container');
+    if(!c) return;
+    
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    
+    setTimeout(() => {
+        if(t.parentNode === c) c.removeChild(t);
+    }, 3000);
 }
 
-// تهيئة أولية
-window.updateCartBadge();
+// دالة مساعدة لنسخ النص
+window.copyOrderNumber = function() {
+    const n = document.getElementById('order-number-display')?.textContent;
+    if(n && navigator.clipboard) {
+        navigator.clipboard.writeText(n).then(() => showToast('تم النسخ!'));
+    }
+};
+
+// إغلاق نافذة النجاح
+window.closeOrderSuccess = function() {
+    document.getElementById('order-success-modal')?.classList.add('hidden');
+};
+
+// تهيئة السلة عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    updateCartBadge();
+    renderCart();
+});
+
+// تعريض الدوال للاستخدام العام
+window.saveCart = saveCart;
+window.updateCartBadge = updateCartBadge;
+window.renderCart = renderCart;
+window.showToast = showToast;
