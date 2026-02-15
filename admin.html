@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة القيادة | أحمد الشيخ</title>
+    <title>لوحة التحكم | أحمد الشيخ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -11,7 +11,6 @@
         #login-screen { position: fixed; inset: 0; z-index: 9999; background: #fff; display: flex; align-items: center; justify-content: center; }
         .tab { cursor: pointer; padding: 12px; border-bottom: 3px solid transparent; font-weight: bold; color: #888; transition: 0.3s; }
         .tab.active { border-color: #4b5f28; color: #4b5f28; background: #e8f5e9; }
-        /* Smart Sizes */
         .size-checkbox:checked + div { background-color: #4b5f28; color: white; border-color: #4b5f28; transform: scale(1.05); }
         .color-btn.active { ring: 4px solid #c5a059; transform: scale(1.1); }
         .loader { border-top-color: #4b5f28; animation: spinner 1s linear infinite; }
@@ -21,11 +20,13 @@
 <body class="bg-gray-100 min-h-screen pb-20">
 
     <div id="login-screen">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center w-full max-w-sm">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center w-full max-w-sm border border-gray-100">
             <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🔐</div>
             <h2 class="text-2xl font-black text-gray-800 mb-6">لوحة الإدارة</h2>
-            <input type="password" id="admin-pass" class="w-full p-3 border rounded-xl text-center font-bold text-lg mb-4 focus:border-[#4b5f28] outline-none" placeholder="كلمة المرور">
-            <button onclick="checkLogin()" class="w-full bg-[#4b5f28] text-white py-3 rounded-xl font-bold hover:bg-[#3a4a1f]">دخول</button>
+            <form onsubmit="event.preventDefault(); window.checkLogin();">
+                <input type="password" id="admin-pass" class="w-full p-3 border rounded-xl text-center font-bold text-lg mb-4 focus:border-[#4b5f28] outline-none" placeholder="كلمة المرور">
+                <button type="submit" class="w-full bg-[#4b5f28] text-white py-3 rounded-xl font-bold hover:bg-[#3a4a1f] transition">دخول</button>
+            </form>
         </div>
     </div>
 
@@ -34,7 +35,7 @@
             <h1 class="text-2xl font-black text-[#4b5f28]">لوحة التحكم ⚙️</h1>
             <div class="flex gap-2">
                 <a href="index.html" target="_blank" class="px-4 py-2 bg-gray-100 rounded-lg font-bold text-sm hover:bg-gray-200">المتجر 👁️</a>
-                <button onclick="location.reload()" class="px-4 py-2 bg-red-50 text-red-500 rounded-lg font-bold text-sm hover:bg-red-100">خروج</button>
+                <button onclick="window.location.reload()" class="px-4 py-2 bg-red-50 text-red-500 rounded-lg font-bold text-sm hover:bg-red-100">خروج</button>
             </div>
         </header>
 
@@ -45,14 +46,14 @@
         </div>
 
         <div class="flex border-b border-gray-200 mb-6 bg-white rounded-t-xl overflow-hidden">
-            <button onclick="switchTab('orders')" id="tab-orders" class="tab active flex-1">🛒 الطلبات</button>
-            <button onclick="switchTab('products')" id="tab-products" class="tab flex-1">📦 المنتجات</button>
-            <button onclick="switchTab('banners')" id="tab-banners" class="tab flex-1">🖼️ العروض</button>
+            <button onclick="window.switchTab('orders')" id="tab-orders" class="tab active flex-1">🛒 الطلبات</button>
+            <button onclick="window.switchTab('products')" id="tab-products" class="tab flex-1">📦 المنتجات</button>
+            <button onclick="window.switchTab('banners')" id="tab-banners" class="tab flex-1">🖼️ العروض</button>
         </div>
 
         <div id="sec-orders">
-            <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-xl">إدارة ومتابعة الطلبات</h3><span id="orders-badge" class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold">0 طلب</span></div>
-            <div id="orders-list" class="space-y-4"></div>
+            <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-xl">إدارة الطلبات</h3><span id="orders-badge" class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold">0 طلب</span></div>
+            <div id="orders-list" class="space-y-4 text-center text-gray-500">جاري التحميل...</div>
         </div>
 
         <div id="sec-products" class="hidden">
@@ -61,19 +62,19 @@
                     <div class="bg-white p-6 rounded-2xl shadow-sm">
                         <h3 class="font-bold mb-4">1. بيانات المنتج</h3>
                         <div class="flex gap-4 mb-4"><input id="prod-name" class="w-full p-3 border rounded-xl" placeholder="اسم الموديل"><input id="prod-price" type="number" class="w-full p-3 border rounded-xl" placeholder="السعر"></div>
-                        <select id="prod-cat" onchange="updateSizeGrid()" class="w-full p-3 border rounded-xl bg-gray-50"><option value="رجالي">رجالي (41-49)</option><option value="حريمي">حريمي (37-41)</option><option value="أطفالي">أطفالي (17-32)</option></select>
+                        <select id="prod-cat" onchange="window.updateSizeGrid()" class="w-full p-3 border rounded-xl bg-gray-50 cursor-pointer"><option value="رجالي">رجالي (41-49)</option><option value="حريمي">حريمي (37-41)</option><option value="أطفالي">أطفالي (17-32)</option></select>
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow-sm">
                         <h3 class="font-bold mb-4">2. الألوان والمقاسات</h3>
                         <div class="flex flex-wrap gap-2 mb-4" id="color-palette">
-                            <button onclick="activateColor('أسود')" class="color-btn w-8 h-8 rounded-full bg-black shadow-md"></button>
-                            <button onclick="activateColor('أبيض')" class="color-btn w-8 h-8 rounded-full bg-white border border-gray-300 shadow-md"></button>
-                            <button onclick="activateColor('كحلي')" class="color-btn w-8 h-8 rounded-full bg-blue-900 shadow-md"></button>
-                            <button onclick="activateColor('بيج')" class="color-btn w-8 h-8 rounded-full bg-[#f5f5dc] border border-gray-300 shadow-md"></button>
-                            <div class="flex items-center border-r pr-2 gap-1"><input id="custom-color" class="w-16 p-1 text-xs border rounded" placeholder="لون.."><button onclick="addCustomColor()" class="bg-[#4b5f28] text-white w-6 h-6 rounded text-xs">+</button></div>
+                            <button onclick="window.activateColor('أسود')" class="color-btn w-8 h-8 rounded-full bg-black shadow-md"></button>
+                            <button onclick="window.activateColor('أبيض')" class="color-btn w-8 h-8 rounded-full bg-white border border-gray-300 shadow-md"></button>
+                            <button onclick="window.activateColor('كحلي')" class="color-btn w-8 h-8 rounded-full bg-blue-900 shadow-md"></button>
+                            <button onclick="window.activateColor('بيج')" class="color-btn w-8 h-8 rounded-full bg-[#f5f5dc] border border-gray-300 shadow-md"></button>
+                            <div class="flex items-center border-r pr-2 gap-1"><input id="custom-color" class="w-16 p-1 text-xs border rounded" placeholder="لون.."><button onclick="window.addCustomColor()" class="bg-[#4b5f28] text-white w-6 h-6 rounded text-xs">+</button></div>
                         </div>
                         <div id="size-section" class="hidden bg-gray-50 p-4 rounded-xl">
-                            <div class="flex justify-between mb-2"><span class="font-bold text-sm">مقاسات <span id="active-color-name" class="text-[#4b5f28]"></span></span><button onclick="selectAllSizes()" class="text-xs text-blue-500 underline">الكل</button></div>
+                            <div class="flex justify-between mb-2"><span class="font-bold text-sm">مقاسات <span id="active-color-name" class="text-[#4b5f28]"></span></span><button onclick="window.selectAllSizes()" class="text-xs text-blue-500 underline">الكل</button></div>
                             <div id="sizes-grid" class="grid grid-cols-6 gap-2"></div>
                         </div>
                         <div id="stock-summary" class="mt-2 text-xs text-gray-500 flex flex-wrap gap-2"></div>
@@ -82,12 +83,12 @@
                 <div class="space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm">
                         <h3 class="font-bold mb-4">3. الصور</h3>
-                        <div class="border-2 border-dashed border-[#4b5f28] bg-green-50 p-6 rounded-xl text-center cursor-pointer" onclick="document.getElementById('img-file').click()">
-                            <input type="file" id="img-file" hidden multiple onchange="handleImg(this)"><span class="text-[#4b5f28] font-bold">رفع صور</span>
+                        <div class="border-2 border-dashed border-[#4b5f28] bg-green-50 p-6 rounded-xl text-center cursor-pointer hover:bg-green-100" onclick="document.getElementById('img-file').click()">
+                            <input type="file" id="img-file" hidden multiple onchange="window.handleImg(this)"><span class="text-[#4b5f28] font-bold">اضغط لرفع صور</span>
                         </div>
                         <div id="preview-area" class="grid grid-cols-3 gap-2 mt-4"></div>
                     </div>
-                    <button onclick="uploadProduct()" id="upload-btn" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition">نشر المنتج 🚀</button>
+                    <button onclick="window.uploadProduct()" id="upload-btn" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition">نشر المنتج 🚀</button>
                 </div>
             </div>
             <div id="products-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -95,15 +96,13 @@
 
         <div id="sec-banners" class="hidden">
             <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 flex items-center gap-4">
-                <div class="border-2 border-dashed border-blue-400 bg-blue-50 p-4 rounded-xl cursor-pointer flex-1 text-center" onclick="document.getElementById('banner-file').click()">
-                    <input type="file" id="banner-file" hidden onchange="uploadBanner(this)"><span class="text-blue-600 font-bold">➕ إضافة عرض جديد (Slider)</span>
+                <div class="border-2 border-dashed border-blue-400 bg-blue-50 p-4 rounded-xl cursor-pointer flex-1 text-center hover:bg-blue-100" onclick="document.getElementById('banner-file').click()">
+                    <input type="file" id="banner-file" hidden onchange="window.uploadBanner(this)"><span class="text-blue-600 font-bold">➕ إضافة عرض جديد (Slider)</span>
                 </div>
             </div>
             <div id="banners-list" class="space-y-3"></div>
         </div>
     </div>
-
-    <div id="toast-container" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -116,13 +115,23 @@
         let tempImages = [], stockData = {}, activeColor = null;
         const RANGES = { 'رجالي': {min: 41, max: 49}, 'حريمي': {min: 37, max: 41}, 'أطفالي': {min: 17, max: 32} };
 
-        // AUTH
-        window.checkLogin = () => {
-            if(document.getElementById('admin-pass').value === 'MA') {
+        // --- 1. إصلاح زر الدخول (ربطه بالنافذة) ---
+        window.checkLogin = function() {
+            const passInput = document.getElementById('admin-pass');
+            // تنظيف المسافات عشان لو كتبتها بالغلط
+            const val = passInput.value.trim(); 
+            
+            console.log("Checking password..."); // للتأكد ان الزر شغال
+
+            if(val === 'MA') {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
                 loadData();
-            } else alert('كلمة المرور خطأ');
+            } else {
+                alert('❌ كلمة المرور خاطئة! (تأكد أنها MA كبيرة)');
+                passInput.value = '';
+                passInput.focus();
+            }
         };
 
         window.switchTab = (t) => {
@@ -130,35 +139,40 @@
             document.getElementById('sec-'+t).classList.remove('hidden'); document.getElementById('tab-'+t).classList.add('active');
         };
 
-        // DATA LOADING
+        // --- 2. جلب البيانات ---
         function loadData() {
             // Orders
             onSnapshot(query(collection(db, "orders"), orderBy("timestamp", "desc")), (snap) => {
                 document.getElementById('stat-orders').innerText = snap.size;
                 document.getElementById('orders-badge').innerText = snap.size + ' طلب';
-                document.getElementById('orders-list').innerHTML = snap.docs.map(d => {
+                
+                const list = document.getElementById('orders-list');
+                if(snap.empty) { list.innerHTML = '<p class="py-10">لا يوجد طلبات</p>'; return; }
+
+                list.innerHTML = snap.docs.map(d => {
                     const o = d.data();
                     const statusText = { 'new': 'قيد المراجعة', 'processing': 'جاري التجهيز', 'shipped': 'خرج للتوصيل', 'completed': 'تم الاستلام', 'cancelled': 'ملغي' };
                     const st = o.status || 'new';
-                    return `<div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    
+                    return `<div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-right">
                         <div class="flex justify-between border-b pb-2 mb-2">
                             <div><span class="font-bold">#${d.id.slice(0,6).toUpperCase()}</span> <span class="text-xs text-gray-500">${new Date(o.timestamp).toLocaleString('ar-EG')}</span></div>
-                            <span class="bg-gray-100 px-2 rounded text-xs font-bold text-[#4b5f28]">${statusText[st]}</span>
+                            <span class="bg-gray-100 px-2 py-1 rounded text-xs font-bold text-[#4b5f28]">${statusText[st]}</span>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div><p class="font-bold text-gray-500">العميل:</p><p>${o.customerName}</p><p class="font-bold text-blue-600">${o.customerPhone}</p><p>${o.customerAddress}</p></div>
+                            <div><p class="font-bold text-gray-500">العميل:</p><p>${o.customerName}</p><p class="font-bold text-blue-600 cursor-pointer" onclick="window.open('tel:${o.customerPhone}')">${o.customerPhone}</p><p>${o.customerAddress}</p></div>
                             <div class="bg-gray-50 p-2 rounded"><p class="font-bold text-gray-500">المنتجات:</p>${o.items.map(i=>`<div>${i.productName} (${i.color}/${i.size}) x${i.qty}</div>`).join('')}<div class="border-t mt-1 font-bold flex justify-between"><span>الإجمالي</span><span>${o.total} ج.م</span></div></div>
                         </div>
                         <div class="mt-3 flex gap-2 items-center bg-gray-50 p-2 rounded">
-                            <label class="text-xs font-bold">تحديث الحالة:</label>
-                            <select onchange="updateStatus('${d.id}', this.value)" class="p-1 rounded text-sm flex-1 border">
+                            <label class="text-xs font-bold">الحالة:</label>
+                            <select onchange="window.updateStatus('${d.id}', this.value)" class="p-1 rounded text-sm flex-1 border outline-none bg-white cursor-pointer">
                                 <option value="new" ${st=='new'?'selected':''}>⏳ مراجعة</option>
                                 <option value="processing" ${st=='processing'?'selected':''}>⚙️ تجهيز</option>
                                 <option value="shipped" ${st=='shipped'?'selected':''}>🚚 توصيل</option>
-                                <option value="completed" ${st=='completed'?'selected':''}>✅ تسليم</option>
+                                <option value="completed" ${st=='completed'?'selected':''}>✅ استلام</option>
                                 <option value="cancelled" ${st=='cancelled'?'selected':''}>❌ إلغاء</option>
                             </select>
-                            <a href="https://wa.me/20${o.customerPhone.replace(/^0/,'')}?text=مرحباً ${o.customerName.split(' ')[0]}، بخصوص طلبك.." target="_blank" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold">واتساب</a>
+                            <a href="https://wa.me/20${o.customerPhone.replace(/^0/,'')}?text=مرحباً ${o.customerName.split(' ')[0]}، بخصوص طلبك رقم ${d.id.slice(0,4)}.." target="_blank" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-600">واتساب</a>
                         </div>
                     </div>`;
                 }).join('');
@@ -169,41 +183,56 @@
                 document.getElementById('stat-products').innerText = snap.size;
                 document.getElementById('products-list').innerHTML = snap.docs.map(d => {
                     const p = d.data();
-                    return `<div class="bg-white p-3 rounded-xl border flex items-center gap-3"><img src="${p.images[0]}" class="w-12 h-12 rounded object-cover"><div class="flex-1"><h4 class="font-bold text-sm">${p.name}</h4><p class="text-xs text-gray-500">${p.price} ج.م</p></div><button onclick="delDoc('products','${d.id}')" class="text-red-500 text-xs font-bold border border-red-200 px-2 py-1 rounded">حذف</button></div>`;
+                    return `<div class="bg-white p-3 rounded-xl border flex items-center gap-3"><img src="${p.images[0]}" class="w-12 h-12 rounded object-cover"><div class="flex-1"><h4 class="font-bold text-sm">${p.name}</h4><p class="text-xs text-gray-500">${p.price} ج.م</p></div><button onclick="window.delDoc('products','${d.id}')" class="text-red-500 text-xs font-bold border border-red-200 px-2 py-1 rounded hover:bg-red-50">حذف</button></div>`;
                 }).join('');
             });
 
             // Banners
             onSnapshot(query(collection(db, "banners"), orderBy("timestamp", "desc")), (snap) => {
                 document.getElementById('stat-banners').innerText = snap.size;
-                document.getElementById('banners-list').innerHTML = snap.docs.map(d => `<div class="relative h-24 rounded-lg overflow-hidden border"><img src="${d.data().image}" class="w-full h-full object-cover"><button onclick="delDoc('banners','${d.id}')" class="absolute top-1 left-1 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">✕</button></div>`).join('');
+                document.getElementById('banners-list').innerHTML = snap.docs.map(d => `<div class="relative h-24 rounded-lg overflow-hidden border group"><img src="${d.data().image}" class="w-full h-full object-cover"><button onclick="window.delDoc('banners','${d.id}')" class="absolute top-1 left-1 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow opacity-90 hover:opacity-100">✕</button></div>`).join('');
             });
         }
 
-        // ACTIONS
+        // --- 3. الوظائف العامة (مربوطة بـ window) ---
         window.updateStatus = async (id, st) => { await updateDoc(doc(db, "orders", id), {status: st}); };
-        window.delDoc = async (c, id) => { if(confirm('حذف؟')) await deleteDoc(doc(db, c, id)); };
+        window.delDoc = async (c, id) => { if(confirm('متأكد من الحذف؟')) await deleteDoc(doc(db, c, id)); };
 
-        // IMAGES
-        const compress = (f) => new Promise(res => { const r = new FileReader(); r.readAsDataURL(f); r.onload = e => { const i = new Image(); i.src=e.target.result; i.onload=()=>{ const c=document.createElement('canvas'); const s=800/i.width; c.width=800; c.height=i.height*s; c.getContext('2d').drawImage(i,0,0,c.width,c.height); res(c.toDataURL('image/jpeg',0.6)); } } });
-        window.handleImg = async (inp) => { document.getElementById('preview-area').innerHTML='<p class="text-xs text-center col-span-3">جاري الضغط...</p>'; tempImages=[]; for(const f of inp.files){ const c=await compress(f); tempImages.push(c); } document.getElementById('preview-area').innerHTML=tempImages.map(s=>`<img src="${s}" class="w-full h-16 rounded object-cover border">`).join(''); };
-        
-        // PRODUCTS LOGIC
-        window.activateColor = (n) => { activeColor=n; document.getElementById('size-section').classList.remove('hidden'); document.getElementById('active-color-name').innerText=n; document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); if(!stockData[n]) stockData[n]=[]; renderGrid(); };
-        window.addCustomColor = () => { const n=document.getElementById('custom-color').value; if(n){ activateColor(n); document.getElementById('custom-color').value=''; } };
-        window.renderGrid = () => { const r=RANGES[document.getElementById('prod-cat').value]; const g=document.getElementById('sizes-grid'); g.innerHTML=''; for(let i=r.min; i<=r.max; i++) { g.innerHTML+=`<label class="cursor-pointer select-none"><input type="checkbox" class="size-checkbox hidden" value="${i}" ${stockData[activeColor].includes(i)?'checked':''} onchange="toggleSize(${i})"><div class="w-full aspect-square flex items-center justify-center rounded-lg bg-gray-100 border font-bold text-gray-500">${i}</div></label>`; } };
-        window.updateSizeGrid = () => { if(activeColor) renderGrid(); };
-        window.toggleSize = (s) => { const a=stockData[activeColor]; if(a.includes(s)) a.splice(a.indexOf(s),1); else a.push(s); if(!a.length) delete stockData[activeColor]; document.getElementById('stock-summary').innerHTML=Object.entries(stockData).map(([k,v])=>`<span class="bg-gray-100 px-2 rounded border"><b>${k}:</b> ${v.join(',')}</span>`).join(''); };
-        window.selectAllSizes = () => document.querySelectorAll('.size-checkbox').forEach(c => { if(!c.checked) { c.checked=true; c.onchange(); } });
+        // ضغط الصور
+        const compress = (f) => new Promise(res => {
+            const r = new FileReader(); r.readAsDataURL(f);
+            r.onload = e => { const i = new Image(); i.src=e.target.result; i.onload=()=>{ const c=document.createElement('canvas'); const s=800/i.width; c.width=800; c.height=i.height*s; c.getContext('2d').drawImage(i,0,0,c.width,c.height); res(c.toDataURL('image/jpeg',0.6)); } }
+        });
 
-        window.uploadProduct = async () => {
-            const name=document.getElementById('prod-name').value, price=document.getElementById('prod-price').value, cat=document.getElementById('prod-cat').value;
-            if(!name || !price || !tempImages.length || !Object.keys(stockData).length) return alert('البيانات ناقصة!');
-            const btn=document.getElementById('upload-btn'); btn.disabled=true; btn.innerText='جاري الرفع...';
-            try { await addDoc(collection(db, "products"), { name, price:Number(price), category:cat, images:tempImages, colors:Object.entries(stockData).map(([k,v])=>({name:k, sizes:v})), timestamp:Date.now() }); alert('تم ✅'); location.reload(); } catch(e){ alert('خطأ'); btn.disabled=false; }
+        window.handleImg = async (inp) => {
+            document.getElementById('preview-area').innerHTML='<p class="text-xs text-center col-span-3 text-green-600">جاري المعالجة...</p>'; 
+            tempImages=[]; 
+            for(const f of inp.files){ const c=await compress(f); tempImages.push(c); } 
+            document.getElementById('preview-area').innerHTML=tempImages.map(s=>`<img src="${s}" class="w-full h-16 rounded object-cover border">`).join(''); 
         };
 
-        window.uploadBanner = async (inp) => { if(inp.files[0]) { const i=await compress(inp.files[0]); await addDoc(collection(db, "banners"), {image:i, timestamp:Date.now()}); alert('تم رفع البنر'); } };
+        window.uploadBanner = async (inp) => {
+            if(!inp.files[0]) return;
+            const img = await compress(inp.files[0]);
+            await addDoc(collection(db, "banners"), {image: img, timestamp: Date.now()});
+            alert('تم رفع البنر ✅');
+        };
+
+        // إدارة المنتج
+        window.activateColor = (n) => { activeColor=n; document.getElementById('size-section').classList.remove('hidden'); document.getElementById('active-color-name').innerText=n; document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); if(!stockData[n]) stockData[n]=[]; window.renderGrid(); };
+        window.addCustomColor = () => { const n=document.getElementById('custom-color').value; if(n){ window.activateColor(n); document.getElementById('custom-color').value=''; } };
+        window.renderGrid = () => { const r=RANGES[document.getElementById('prod-cat').value]; const g=document.getElementById('sizes-grid'); g.innerHTML=''; for(let i=r.min; i<=r.max; i++) { g.innerHTML+=`<label class="cursor-pointer select-none"><input type="checkbox" class="size-checkbox hidden" value="${i}" ${stockData[activeColor].includes(i)?'checked':''} onchange="window.toggleSize(${i})"><div class="w-full aspect-square flex items-center justify-center rounded bg-gray-100 border text-gray-500 font-bold text-sm hover:bg-gray-200 transition">${i}</div></label>`; } };
+        window.updateSizeGrid = () => { if(activeColor) window.renderGrid(); };
+        window.toggleSize = (s) => { const a=stockData[activeColor]; if(a.includes(s)) a.splice(a.indexOf(s),1); else a.push(s); if(!a.length) delete stockData[activeColor]; window.renderSummary(); };
+        window.selectAllSizes = () => document.querySelectorAll('.size-checkbox').forEach(c => { if(!c.checked) { c.checked=true; c.onchange(); } });
+        window.renderSummary = () => { document.getElementById('stock-summary').innerHTML = Object.entries(stockData).map(([k,v]) => `<span class="bg-white border px-1 rounded"><b>${k}:</b> ${v.join(',')}</span>`).join(' '); };
+
+        window.uploadProduct = async () => {
+            const name=document.getElementById('prod-name').value, price=document.getElementById('prod-price').value, cat=document.getElementById('prod-cat').value, btn=document.getElementById('upload-btn');
+            if(!name || !price || !tempImages.length || !Object.keys(stockData).length) return alert('البيانات ناقصة!');
+            btn.disabled=true; btn.innerText='جاري الرفع...';
+            try { await addDoc(collection(db, "products"), { name, price:Number(price), category:cat, images:tempImages, colors:Object.entries(stockData).map(([k,v])=>({name:k, sizes:v})), timestamp:Date.now() }); alert('تم ✅'); location.reload(); } catch(e){ alert('خطأ: '+e.message); btn.disabled=false; btn.innerText='نشر المنتج 🚀'; }
+        };
     </script>
 </body>
 </html>
