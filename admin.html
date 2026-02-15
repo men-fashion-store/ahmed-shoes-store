@@ -120,7 +120,7 @@
                     <input type="file" id="img-file" multiple hidden onchange="handleImgSelect(this)">
                     <p class="text-3xl mb-2">📸</p>
                     <p class="text-sm font-bold text-[#4b5f28]">اضغط لرفع الصور</p>
-                    <p class="text-[10px] text-gray-500">يفضل صور مربعة أو طولية</p>
+                    <p class="text-[10px] text-gray-500">سيتم ضغط الصور تلقائياً لتسريع الرفع</p>
                 </div>
                 <div id="preview-area" class="grid grid-cols-3 gap-2 mt-4"></div>
             </div>
@@ -135,65 +135,88 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Firebase Setup
-        const app = initializeApp({
+        // 1. إعدادات Firebase
+        const firebaseConfig = {
             apiKey: "AIzaSyASO-AN5XaSGn4SaCZ8VlHr6zsFCIxPCzs",
             authDomain: "ahmed-shoes.firebaseapp.com",
             projectId: "ahmed-shoes",
             storageBucket: "ahmed-shoes.firebasestorage.app",
             messagingSenderId: "172928088473",
             appId: "1:172928088473:web:100f543fd097a8d5c33b08",
-        });
+        };
+
+        const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         // State
         window.tempImages = [];
-        window.stockData = {}; // { 'أسود': [41, 42], 'أبيض': [40] }
+        window.stockData = {}; 
         window.activeColor = null;
 
-        // Configuration (Ranges)
         const RANGES = {
             'رجالي': {min: 41, max: 49},
             'حريمي': {min: 37, max: 41},
             'أطفالي': {min: 17, max: 32}
         };
 
-        // --- Logic: 1. Images ---
-        window.handleImgSelect = (input) => {
-            const files = [...input.files];
-            document.getElementById('preview-area').innerHTML = '';
-            window.tempImages = [];
-            
-            files.forEach(file => {
+        // --- دالة ضغط الصور (لتسريع الرفع وحل مشكلة التعليق) ---
+        const compressImage = (file) => {
+            return new Promise((resolve) => {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    // Resize/Compress Logic could go here, keeping it simple
-                    window.tempImages.push(e.target.result);
-                    document.getElementById('preview-area').innerHTML += 
-                        `<div class="relative group">
-                            <img src="${e.target.result}" class="w-full h-20 object-cover rounded-lg border">
-                         </div>`;
-                };
                 reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800; // أقصى عرض 800 بيكسل
+                        const scaleSize = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scaleSize;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // إرجاع الصورة مضغوطة بجودة 60%
+                        resolve(canvas.toDataURL('image/jpeg', 0.6));
+                    };
+                };
             });
         };
 
-        // --- Logic: 2. Colors & Sizes ---
-        
-        // When a color circle is clicked
+        // --- معالجة الصور ---
+        window.handleImgSelect = async (input) => {
+            const files = [...input.files];
+            document.getElementById('preview-area').innerHTML = '<p class="text-xs text-green-600 col-span-3 text-center">جاري المعالجة والضغط...</p>';
+            window.tempImages = [];
+            
+            for (const file of files) {
+                try {
+                    const compressedBase64 = await compressImage(file);
+                    window.tempImages.push(compressedBase64);
+                    
+                    const div = document.createElement('div');
+                    div.className = "relative group";
+                    div.innerHTML = `<img src="${compressedBase64}" class="w-full h-20 object-cover rounded-lg border shadow-sm">`;
+                    document.getElementById('preview-area').appendChild(div);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+            // إزالة رسالة الانتظار
+            if(document.querySelector('#preview-area p')) document.querySelector('#preview-area p').remove();
+        };
+
+        // --- منطق الألوان والمقاسات ---
         window.activateColor = (colorName, hex) => {
             window.activeColor = colorName;
-            
-            // UI Update
             document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-            // Try to find the button we clicked (approximation)
             event.target.classList.add('active'); 
             
             document.getElementById('no-color-msg').classList.add('hidden');
             document.getElementById('size-section').classList.remove('hidden');
             document.getElementById('active-color-name').innerText = colorName;
             
-            // Init stock array for this color if not exists
             if(!window.stockData[colorName]) window.stockData[colorName] = [];
             
             renderSizeGrid();
@@ -202,7 +225,6 @@
         window.addCustomColor = () => {
             const name = document.getElementById('custom-color-name').value.trim();
             if(!name) return;
-            // Create a temporary button visually
             const btn = document.createElement('button');
             btn.className = "color-btn w-10 h-10 rounded-full bg-gray-200 border border-gray-400 font-bold text-[10px] flex items-center justify-center shadow-md";
             btn.innerText = name.substring(0,2);
@@ -212,7 +234,6 @@
             window.activateColor(name, '#ccc');
         };
 
-        // Render the squares
         window.renderSizeGrid = () => {
             const cat = document.getElementById('prod-cat').value;
             const range = RANGES[cat];
@@ -223,7 +244,6 @@
 
             for(let i = range.min; i <= range.max; i++) {
                 const isChecked = currentSelected.includes(i) ? 'checked' : '';
-                
                 grid.innerHTML += `
                     <label class="cursor-pointer select-none">
                         <input type="checkbox" class="size-checkbox hidden" value="${i}" ${isChecked} onchange="toggleSize(${i})">
@@ -235,82 +255,54 @@
             }
         };
 
-        // When category changes, reset or update grid
-        window.updateSizeGrid = () => {
-            if(window.activeColor) renderSizeGrid();
-        };
+        window.updateSizeGrid = () => { if(window.activeColor) renderSizeGrid(); };
 
-        // Toggle a single size
         window.toggleSize = (size) => {
             if(!window.activeColor) return;
             const arr = window.stockData[window.activeColor];
             
             if(arr.includes(size)) {
-                // Remove
-                const idx = arr.indexOf(size);
-                arr.splice(idx, 1);
+                arr.splice(arr.indexOf(size), 1);
             } else {
-                // Add
                 arr.push(size);
                 arr.sort((a,b) => a-b);
             }
-            
-            // Clean up empty colors
             if(arr.length === 0) delete window.stockData[window.activeColor];
-            
             updateSummary();
         };
         
         window.selectAllSizes = () => {
-             const inputs = document.querySelectorAll('.size-checkbox');
-             inputs.forEach(input => {
-                 if(!input.checked) {
-                     input.checked = true;
-                     input.onchange(); // Trigger the logic
-                 }
+             document.querySelectorAll('.size-checkbox').forEach(input => {
+                 if(!input.checked) { input.checked = true; input.onchange(); }
              });
         }
 
-        // Show summary at bottom
         function updateSummary() {
             const div = document.getElementById('stock-summary');
             const entries = Object.entries(window.stockData);
-            
-            if(entries.length === 0) {
-                div.innerHTML = 'لا يوجد بيانات مدخلة بعد..';
-                return;
-            }
-            
+            if(entries.length === 0) { div.innerHTML = 'لا يوجد بيانات مدخلة بعد..'; return; }
             div.innerHTML = entries.map(([color, sizes]) => {
                 if(sizes.length === 0) return '';
-                return `<span class="bg-white border px-2 py-1 rounded-lg">
-                    <b class="text-[#4b5f28]">${color}:</b> ${sizes.join(', ')}
-                </span>`;
+                return `<span class="bg-white border px-2 py-1 rounded-lg"><b class="text-[#4b5f28]">${color}:</b> ${sizes.join(', ')}</span>`;
             }).join('');
         }
 
-        // --- Logic: 3. Upload ---
+        // --- دالة الرفع ---
         window.uploadProduct = async () => {
             const name = document.getElementById('prod-name').value;
             const price = document.getElementById('prod-price').value;
             const cat = document.getElementById('prod-cat').value;
             const btn = document.getElementById('upload-btn');
             
-            // Validation
-            if(!name || !price) return alert('ناقص الاسم أو السعر!');
-            if(window.tempImages.length === 0) return alert('لازم صورة واحدة عالأقل!');
-            const hasStock = Object.keys(window.stockData).length > 0;
-            if(!hasStock) return alert('لازم تختار لون ومقاس واحد عالأقل!');
+            if(!name || !price) return alert('⚠️ يرجى كتابة اسم المنتج والسعر');
+            if(window.tempImages.length === 0) return alert('⚠️ يرجى اختيار صورة واحدة على الأقل');
+            if(Object.keys(window.stockData).length === 0) return alert('⚠️ يرجى اختيار لون ومقاس واحد على الأقل');
 
-            // Transform stockData to array format for Frontend compatibility
-            // Frontend expects: colors: [{name: 'Red', sizes: [41, 42]}]
-            const colorsArray = Object.entries(window.stockData).map(([k, v]) => ({
-                name: k,
-                sizes: v
-            }));
+            const colorsArray = Object.entries(window.stockData).map(([k, v]) => ({ name: k, sizes: v }));
 
             btn.disabled = true;
-            btn.innerHTML = '<div class="loader w-6 h-6 rounded-full border-2 border-white"></div> جاري الرفع...';
+            const oldText = btn.innerHTML;
+            btn.innerHTML = '<span class="loader w-5 h-5 rounded-full border-2 border-white inline-block"></span> جاري الرفع...';
 
             try {
                 await addDoc(collection(db, "products"), {
@@ -323,11 +315,18 @@
                 });
                 
                 alert('تمت الإضافة بنجاح! ✅');
-                location.reload(); // Reset form
+                location.reload(); 
             } catch (e) {
-                alert('حدث خطأ: ' + e.message);
+                console.error(e);
+                if (e.message.includes("permission")) {
+                    alert('⛔ خطأ في الصلاحيات! تأكد من تفعيل "Test Mode" في قواعد Firebase.');
+                } else if (e.message.includes("quota") || e.message.includes("size")) {
+                    alert('⛔ الصور كبيرة جداً، حاول تقليل عدد الصور.');
+                } else {
+                    alert('حدث خطأ: ' + e.message);
+                }
                 btn.disabled = false;
-                btn.innerText = 'نشر المنتج 🚀';
+                btn.innerHTML = oldText;
             }
         };
     </script>
