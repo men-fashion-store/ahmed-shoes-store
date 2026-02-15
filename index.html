@@ -11,16 +11,10 @@
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; -webkit-tap-highlight-color: transparent; }
     .scroll-hide::-webkit-scrollbar { display: none; }
     .heart-btn.active svg { fill: #ef4444; stroke: #ef4444; }
-    /* حالات الطلب */
-    .st-new { background: #fef3c7; color: #92400e; }
-    .st-processing { background: #dbeafe; color: #1e40af; }
-    .st-shipped { background: #f3e8ff; color: #6b21a8; }
-    .st-completed { background: #dcfce7; color: #166534; }
-    .st-cancelled { background: #fee2e2; color: #991b1b; }
+    .st-new { background: #fef3c7; color: #92400e; } .st-processing { background: #dbeafe; color: #1e40af; } .st-shipped { background: #f3e8ff; color: #6b21a8; } .st-completed { background: #dcfce7; color: #166534; }
   </style>
  </head>
  <body class="min-h-screen bg-gray-50 pb-24">
-   
    <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999]"></div>
 
    <button onclick="openCart()" class="fixed bottom-20 left-4 z-40 w-14 h-14 bg-[#4b5f28] text-white rounded-full shadow-xl flex items-center justify-center animate-float border-2 border-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg><span id="cart-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-bold flex items-center justify-center border border-white hidden">0</span></button>
@@ -35,17 +29,25 @@
    <div id="view-home" class="view-section max-w-md mx-auto">
      <div class="bg-white p-4 pb-2 shadow-sm rounded-b-3xl mb-4">
         <div class="flex justify-between items-center mb-4">
-            <div><p class="text-xs text-gray-400 font-bold">أهلاً بك 👋</p><h1 class="text-xl font-black text-gray-800" id="header-username">زائر</h1></div>
+            <div><p class="text-xs text-gray-400 font-bold">مرحباً 👋</p><h1 class="text-xl font-black text-gray-800" id="header-username">زائر</h1></div>
             <img id="header-avatar" src="احمد الشيخ (3).png" class="w-10 h-10 rounded-full border shadow-sm object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
         </div>
         <div id="banners-slider" class="flex overflow-x-auto gap-3 snap-x scroll-hide pb-2 h-40"><div class="w-full flex-shrink-0 snap-center bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 text-xs">جاري تحميل العروض...</div></div>
      </div>
 
-     <div class="px-4 mb-2"><h3 class="font-bold text-gray-800">الأقسام</h3></div>
-     <div class="flex gap-3 overflow-x-auto px-4 pb-4 scroll-hide">
-         <button onclick="showCategory('رجالي')" class="flex-shrink-0 bg-white p-3 rounded-xl shadow-sm border min-w-[100px] flex flex-col items-center"><span class="text-2xl mb-1">👞</span><span class="text-sm font-bold">رجالي</span></button>
-         <button onclick="showCategory('حريمي')" class="flex-shrink-0 bg-white p-3 rounded-xl shadow-sm border min-w-[100px] flex flex-col items-center"><span class="text-2xl mb-1">👠</span><span class="text-sm font-bold">حريمي</span></button>
-         <button onclick="showCategory('أطفالي')" class="flex-shrink-0 bg-white p-3 rounded-xl shadow-sm border min-w-[100px] flex flex-col items-center"><span class="text-2xl mb-1">👟</span><span class="text-sm font-bold">أطفالي</span></button>
+     <div class="px-4 space-y-4 mb-6">
+       <div onclick="showCategory('رجالي')" class="relative h-40 rounded-2xl overflow-hidden cursor-pointer shadow-lg group">
+           <img src="men.jpg" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x150?text=Men'">
+           <div class="absolute inset-0 bg-black/30 flex items-center justify-center"><h3 class="text-white text-3xl font-black border-b-2 border-white/50 pb-1">رجالي</h3></div>
+       </div>
+       <div onclick="showCategory('حريمي')" class="relative h-40 rounded-2xl overflow-hidden cursor-pointer shadow-lg group">
+           <img src="women.jpg" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x150?text=Women'">
+           <div class="absolute inset-0 bg-black/30 flex items-center justify-center"><h3 class="text-white text-3xl font-black border-b-2 border-white/50 pb-1">حريمي</h3></div>
+       </div>
+       <div onclick="showCategory('أطفالي')" class="relative h-40 rounded-2xl overflow-hidden cursor-pointer shadow-lg group">
+           <img src="kids.jpg" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x150?text=Kids'">
+           <div class="absolute inset-0 bg-black/30 flex items-center justify-center"><h3 class="text-white text-3xl font-black border-b-2 border-white/50 pb-1">أطفالي</h3></div>
+       </div>
      </div>
 
      <div class="px-4 mb-2 flex justify-between items-end"><h3 class="font-bold text-gray-800" id="grid-title">أحدث الموديلات</h3></div>
@@ -55,7 +57,7 @@
    <div id="view-wishlist" class="view-section hidden max-w-md mx-auto pt-4 px-4">
        <h2 class="text-xl font-black text-[#4b5f28] mb-4">❤️ المفضلة</h2>
        <div id="wishlist-grid" class="grid grid-cols-2 gap-3"></div>
-       <div id="wishlist-empty" class="hidden text-center py-20 text-gray-400">لم تحفظ شيئاً بعد</div>
+       <div id="wishlist-empty" class="hidden text-center py-20 text-gray-400">لا يوجد مفضلة</div>
    </div>
 
    <div id="view-orders" class="view-section hidden max-w-md mx-auto pt-4 px-4">
@@ -68,7 +70,7 @@
        <button onclick="document.getElementById('product-modal').classList.add('hidden')" class="absolute top-4 left-4 z-10 w-8 h-8 bg-white/80 rounded-full font-bold shadow-sm">✕</button>
        <div class="h-64 bg-gray-100 p-4"><img id="m-img" class="w-full h-full object-contain mix-blend-multiply"></div>
        <div class="p-6 space-y-4 bg-white flex-1 overflow-y-auto">
-         <div class="flex justify-between"><h2 id="m-name" class="text-xl font-bold"></h2><span id="m-price" class="text-xl font-black text-[#4b5f28]"></span></div>
+         <div class="flex justify-between"><h2 id="m-name" class="text-xl font-bold"></h2><div class="text-right"><span id="m-price" class="text-xl font-black text-[#4b5f28]"></span><br><span id="m-old-price" class="text-sm text-gray-400 line-through hidden"></span></div></div>
          <div id="m-colors-wrap"><p class="text-xs text-gray-400 mb-2">اللون</p><div id="m-colors" class="flex flex-wrap gap-2"></div></div>
          <div id="m-sizes-wrap"><p class="text-xs text-gray-400 mb-2">المقاس</p><div id="m-sizes" class="flex flex-wrap gap-2"></div></div>
          <button onclick="addToCart()" class="w-full py-3.5 bg-[#4b5f28] text-white font-bold rounded-xl shadow-lg mt-2">إضافة للسلة 🛒</button>
@@ -125,19 +127,14 @@
     const db = getFirestore(app);
 
     window.currentUser = JSON.parse(localStorage.getItem('userData')) || null;
-    window.products = [];
-    window.wishlist = [];
+    window.products = []; window.wishlist = [];
 
     // --- INIT ---
     async function init() {
         if(window.currentUser) {
             document.getElementById('header-username').innerText = window.currentUser.name;
             if(window.currentUser.avatar) document.getElementById('header-avatar').src = window.currentUser.avatar;
-            // Load Wishlist from DB (Real Backend)
-            try {
-                const uSnap = await getDoc(doc(db, "users", window.currentUser.phone));
-                if(uSnap.exists() && uSnap.data().wishlist) window.wishlist = uSnap.data().wishlist;
-            } catch(e){}
+            try { const uSnap = await getDoc(doc(db, "users", window.currentUser.phone)); if(uSnap.exists() && uSnap.data().wishlist) window.wishlist = uSnap.data().wishlist; } catch(e){}
         }
         
         // Products
@@ -155,7 +152,7 @@
     }
     init();
 
-    // --- NAV ---
+    // --- NAVIGATION ---
     window.switchView = (v) => {
         document.querySelectorAll('.view-section').forEach(e => e.classList.add('hidden'));
         document.getElementById('view-'+v).classList.remove('hidden');
@@ -163,27 +160,32 @@
         document.getElementById('nav-'+v)?.classList.add('text-[#4b5f28]');
         if(v==='home') renderGrid(window.products);
     };
-    window.showCategory = (cat) => { document.getElementById('grid-title').innerText=cat; renderGrid(window.products.filter(p=>p.category===cat)); };
+    window.showCategory = (cat) => {
+        document.getElementById('grid-title').innerText = cat;
+        renderGrid(window.products.filter(p=>p.category===cat));
+        window.scrollTo({top: document.getElementById('grid-title').offsetTop - 200, behavior: 'smooth'});
+    };
 
-    // --- RENDER ---
+    // --- GRID RENDER ---
     function renderGrid(items) {
         document.getElementById('products-grid').innerHTML = items.map(p => {
             const isLiked = window.wishlist.includes(p.id);
+            const saleHtml = (p.oldPrice && p.oldPrice > p.price) ? `<span class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md z-10">SALE</span>` : '';
             return `<div class="bg-white rounded-xl shadow-sm border overflow-hidden relative group">
+                ${saleHtml}
                 <button onclick="toggleWish('${p.id}', this)" class="absolute top-2 right-2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center z-10 shadow-sm heart-btn ${isLiked?'active':''}"><svg class="w-5 h-5 transition stroke-gray-400 ${isLiked?'fill-red-500 stroke-red-500':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
                 <div onclick="openProd('${p.id}')" class="h-40 bg-gray-50"><img src="${p.images[0]}" class="w-full h-full object-cover mix-blend-multiply"></div>
-                <div onclick="openProd('${p.id}')" class="p-3"><h4 class="font-bold text-sm truncate">${p.name}</h4><p class="font-black text-[#4b5f28]">${p.price} ج.م</p></div>
+                <div onclick="openProd('${p.id}')" class="p-3"><h4 class="font-bold text-sm truncate">${p.name}</h4><div class="flex items-center gap-2"><p class="font-black text-[#4b5f28]">${p.price} ج.م</p>${saleHtml?'<p class="text-xs text-gray-400 line-through">'+p.oldPrice+'</p>':''}</div></div>
             </div>`;
         }).join('');
     }
 
-    // --- WISHLIST (BACKEND) ---
+    // --- WISHLIST & ACTIONS ---
     window.toggleWish = async (id, btn) => {
         event.stopPropagation();
-        if(!window.currentUser) return toast('سجل دخول عشان تحفظ المفضلة', 'error');
-        if(window.wishlist.includes(id)) window.wishlist = window.wishlist.filter(x=>x!==id);
-        else window.wishlist.push(id);
-        btn.classList.toggle('active'); const svg = btn.querySelector('svg'); svg.classList.toggle('fill-red-500'); svg.classList.toggle('stroke-red-500');
+        if(!window.currentUser) return toast('سجل دخول لحفظ المفضلة', 'error');
+        if(window.wishlist.includes(id)) window.wishlist = window.wishlist.filter(x=>x!==id); else window.wishlist.push(id);
+        btn.classList.toggle('active'); btn.querySelector('svg').classList.toggle('fill-red-500'); btn.querySelector('svg').classList.toggle('stroke-red-500');
         await updateDoc(doc(db, "users", window.currentUser.phone), { wishlist: window.wishlist });
     };
     window.openWishlist = () => {
@@ -191,75 +193,50 @@
         document.getElementById('wishlist-grid').innerHTML = items.length ? items.map(p => `<div class="bg-white rounded-xl p-3 border flex gap-3 items-center"><img src="${p.images[0]}" class="w-16 h-16 rounded object-cover"><div class="flex-1"><h4 class="font-bold text-sm">${p.name}</h4><p class="font-black text-[#4b5f28]">${p.price}</p></div><button onclick="openProd('${p.id}')" class="bg-[#4b5f28] text-white px-3 py-1 rounded text-xs">شراء</button></div>`).join('') : '<p class="col-span-2 text-center text-gray-400">مفيش مفضلة</p>';
     };
 
-    // --- AUTH ---
+    // --- AUTH, PROFILE, ORDERS (Simplified for brevity but fully functional) ---
     window.checkLoginAndAction = (act) => { if(!window.currentUser) { window.pendingAction=act; document.getElementById('login-modal').classList.remove('hidden'); } else { switchView(act); if(act==='orders') loadOrders(); if(act==='wishlist') openWishlist(); } };
     window.handleLogin = async (e) => {
-        e.preventDefault(); const ph=document.getElementById('l-phone').value.trim(); const btn=document.getElementById('l-btn'), newF=document.getElementById('new-user-fields');
-        btn.disabled=true; btn.innerText='...';
+        e.preventDefault(); const ph=document.getElementById('l-phone').value.trim(), btn=document.getElementById('l-btn'), newF=document.getElementById('new-user-fields'); btn.disabled=true;
         try {
             const ref = doc(db, "users", ph); const snap = await getDoc(ref);
             if(snap.exists()) finishLogin(snap.data());
             else {
                 if(newF.classList.contains('hidden')) { newF.classList.remove('hidden'); btn.innerText='حفظ'; btn.disabled=false; }
-                else {
-                    const u = { name:document.getElementById('l-name').value, address:document.getElementById('l-address').value, phone:ph, wishlist: [] };
-                    await setDoc(ref, u); finishLogin(u);
-                }
+                else { const u={name:document.getElementById('l-name').value, address:document.getElementById('l-address').value, phone:ph, wishlist:[]}; await setDoc(ref, u); finishLogin(u); }
             }
         } catch(e) { alert('خطأ'); btn.disabled=false; }
     };
-    function finishLogin(u) {
-        localStorage.setItem('userData', JSON.stringify(u)); window.currentUser=u; window.wishlist = u.wishlist || [];
-        document.getElementById('header-username').innerText = u.name; if(u.avatar) document.getElementById('header-avatar').src=u.avatar;
-        document.getElementById('login-modal').classList.add('hidden');
-        if(window.pendingAction) { switchView(window.pendingAction); if(window.pendingAction==='orders') loadOrders(); if(window.pendingAction==='wishlist') openWishlist(); }
-    }
-
-    // --- PROFILE ---
+    function finishLogin(u) { localStorage.setItem('userData', JSON.stringify(u)); window.currentUser=u; window.wishlist=u.wishlist||[]; document.getElementById('header-username').innerText=u.name; if(u.avatar)document.getElementById('header-avatar').src=u.avatar; document.getElementById('login-modal').classList.add('hidden'); if(window.pendingAction){ switchView(window.pendingAction); if(window.pendingAction==='orders')loadOrders(); if(window.pendingAction==='wishlist')openWishlist(); } }
+    
     window.openProfileEdit = () => { if(!window.currentUser) return checkLoginAndAction('home'); document.getElementById('profile-modal').classList.remove('hidden'); document.getElementById('edit-name').value=window.currentUser.name; document.getElementById('edit-address').value=window.currentUser.address; };
-    window.saveProfile = async () => {
-        const n=document.getElementById('edit-name').value, a=document.getElementById('edit-address').value, img=document.getElementById('edit-avatar-url').value;
-        const up = { name:n, address:a }; if(img) up.avatar=img;
-        await updateDoc(doc(db, "users", window.currentUser.phone), up);
-        window.currentUser = {...window.currentUser, ...up}; localStorage.setItem('userData', JSON.stringify(window.currentUser));
-        document.getElementById('header-username').innerText=n; if(img) document.getElementById('header-avatar').src=img;
-        document.getElementById('profile-modal').classList.add('hidden'); alert('تم الحفظ');
-    };
+    window.saveProfile = async () => { const n=document.getElementById('edit-name').value, a=document.getElementById('edit-address').value, i=document.getElementById('edit-avatar-url').value; const up={name:n, address:a}; if(i)up.avatar=i; await updateDoc(doc(db,"users",window.currentUser.phone),up); window.currentUser={...window.currentUser,...up}; localStorage.setItem('userData',JSON.stringify(window.currentUser)); document.getElementById('header-username').innerText=n; if(i)document.getElementById('header-avatar').src=i; document.getElementById('profile-modal').classList.add('hidden'); alert('تم'); };
     window.logout = () => { localStorage.removeItem('userData'); location.reload(); };
 
-    // --- ORDERS ---
     async function loadOrders() {
-        document.getElementById('orders-list').innerHTML = '<p class="text-center py-10">⏳</p>';
-        const q = query(collection(db, "orders"), where("customerPhone", "==", window.currentUser.phone), orderBy("timestamp", "desc"));
-        const snap = await getDocs(q);
-        if(snap.empty) { document.getElementById('orders-list').innerHTML = '<p class="text-center py-10 text-gray-400">لا يوجد طلبات</p>'; return; }
-        const statusText = { 'new': 'قيد المراجعة', 'processing': 'جاري التجهيز', 'shipped': 'في الطريق إليك', 'completed': 'تم الاستلام', 'cancelled': 'ملغي' };
-        const statusClass = { 'new': 'st-new', 'processing': 'st-processing', 'shipped': 'st-shipped', 'completed': 'st-completed', 'cancelled': 'st-cancelled' };
-        document.getElementById('orders-list').innerHTML = snap.docs.map(d => {
-            const o = d.data(); const st = o.status || 'new';
-            return `<div class="bg-white p-4 rounded-xl border shadow-sm"><div class="flex justify-between mb-2"><span class="font-bold">#${d.id.slice(0,5).toUpperCase()}</span><span class="status-badge ${statusClass[st]}">${statusText[st]}</span></div><div class="text-sm text-gray-600 mb-2">${o.items.map(i=>i.productName).join(' + ')}</div><div class="flex justify-between border-t pt-2 font-bold"><span>${o.total} ج.م</span><span class="text-xs text-gray-400 font-normal">${new Date(o.timestamp).toLocaleDateString('ar-EG')}</span></div></div>`;
-        }).join('');
+        document.getElementById('orders-list').innerHTML='<p class="text-center py-10">⏳</p>';
+        const q=query(collection(db,"orders"),where("customerPhone","==",window.currentUser.phone),orderBy("timestamp","desc")); const snap=await getDocs(q);
+        if(snap.empty){ document.getElementById('orders-list').innerHTML='<p class="text-center text-gray-400">لا يوجد</p>'; return; }
+        const stText={'new':'قيد المراجعة','processing':'جاري التجهيز','shipped':'في الطريق','completed':'تم الاستلام','cancelled':'ملغي'};
+        const stCls={'new':'st-new','processing':'st-processing','shipped':'st-shipped','completed':'st-completed','cancelled':'st-cancelled'};
+        document.getElementById('orders-list').innerHTML=snap.docs.map(d=>{ const o=d.data(), st=o.status||'new'; return `<div class="bg-white p-4 rounded-xl border shadow-sm"><div class="flex justify-between mb-2"><span class="font-bold">#${d.id.slice(0,5)}</span><span class="status-badge ${stCls[st]}">${stText[st]}</span></div><div class="text-sm text-gray-600 mb-2">${o.items.map(i=>i.productName).join(' + ')}</div><div class="flex justify-between border-t pt-2 font-bold"><span>${o.total} ج.م</span><span class="text-xs text-gray-400 font-normal">${new Date(o.timestamp).toLocaleDateString('ar-EG')}</span></div></div>`; }).join('');
     }
 
-    // --- PRODUCT & CART ---
+    // --- PROD MODAL ---
     window.openProd = (id) => {
         const p = window.products.find(x=>x.id===id); window.currentProd=p; window.selColorVar=null; window.selSizeVar=null;
         document.getElementById('product-modal').classList.remove('hidden'); document.getElementById('m-img').src=p.images[0]; document.getElementById('m-name').innerText=p.name; document.getElementById('m-price').innerText=p.price+' ج.م';
+        if(p.oldPrice && p.oldPrice > p.price) { document.getElementById('m-old-price').innerText=p.oldPrice+' ج.م'; document.getElementById('m-old-price').classList.remove('hidden'); } else document.getElementById('m-old-price').classList.add('hidden');
         document.getElementById('m-colors').innerHTML = p.colors.map(c=>`<button onclick="selColor('${c.name}',this)" class="px-3 py-1 border rounded">${c.name}</button>`).join('');
         document.getElementById('m-sizes').innerHTML = '<span class="text-xs text-gray-400">اختر اللون</span>';
     };
     window.selColor = (n,btn) => { window.selColorVar=n; document.querySelectorAll('#m-colors button').forEach(b=>b.classList.remove('bg-[#4b5f28]','text-white')); btn.classList.add('bg-[#4b5f28]','text-white'); const sizes = window.currentProd.colors.find(c=>c.name===n).sizes; document.getElementById('m-sizes').innerHTML = sizes.map(s=>`<button onclick="selSize('${s}',this)" class="w-8 h-8 bg-gray-100 rounded hover:bg-[#4b5f28] hover:text-white">${s}</button>`).join(''); };
     window.selSize = (s,btn) => { window.selSizeVar=s; document.querySelectorAll('#m-sizes button').forEach(b=>b.classList.remove('bg-[#4b5f28]','text-white')); btn.classList.add('bg-[#4b5f28]','text-white'); };
-    window.closeModal = () => document.getElementById('product-modal').classList.add('hidden');
-
+    
     window.checkout = async () => {
         if(!window.cart?.length) return alert('سلة فاضية');
         if(!window.currentUser) return checkLoginAndAction('home');
-        const btn = document.querySelector('#cart-modal button:last-child'); btn.disabled=true;
-        try {
-            await addDoc(collection(db, "orders"), { items: window.cart, total: window.cart.reduce((s,i)=>s+(i.price*i.qty),0), customerName: window.currentUser.name, customerPhone: window.currentUser.phone, customerAddress: window.currentUser.address, timestamp: Date.now(), status: 'new' });
-            window.cart=[]; saveCart(); renderCart(); updateCartBadge(); closeCart(); alert('تم الطلب ✅ تابع حالته من قسم طلباتي');
-        } catch(e) { alert('خطأ'); } btn.disabled=false;
+        const btn=document.querySelector('#cart-modal button:last-child'); btn.disabled=true;
+        try { await addDoc(collection(db,"orders"),{items:window.cart, total:window.cart.reduce((s,i)=>s+(i.price*i.qty),0), customerName:window.currentUser.name, customerPhone:window.currentUser.phone, customerAddress:window.currentUser.address, timestamp:Date.now(), status:'new'}); window.cart=[]; saveCart(); renderCart(); updateCartBadge(); closeCart(); alert('تم الطلب ✅'); } catch(e){alert('خطأ');} btn.disabled=false;
     };
     window.toast=(m,t)=>{const e=document.createElement('div');e.className=`bg-${t=='error'?'red':'green'}-600 text-white px-6 py-3 rounded-full font-bold shadow-xl mb-2 animate-bounce`;e.innerText=m;document.getElementById('toast-container').appendChild(e);setTimeout(()=>e.remove(),3000)};
    </script>
