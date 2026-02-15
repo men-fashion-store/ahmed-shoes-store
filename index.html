@@ -6,26 +6,21 @@
   <title>أحمد الشيخ - للأحذية</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
-  <script>tailwind.config = { theme: { extend: { colors: { brand: '#4b5f28' }, animation: { 'float': 'float 3s ease-in-out infinite' }, keyframes: { float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } } } } } }</script>
+  <script>tailwind.config = { theme: { extend: { colors: { brand: '#4b5f28' }, animation: { 'float': 'float 3s ease-in-out infinite', 'pop': 'pop 0.3s ease-out forwards' }, keyframes: { float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } }, pop: { '0%': { transform: 'scale(0.95)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } } } } } }</script>
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; -webkit-tap-highlight-color: transparent; }
     .scroll-hide::-webkit-scrollbar { display: none; }
     .heart-btn.active svg { fill: #ef4444; stroke: #ef4444; }
-    /* Sale Badge Animation */
-    @keyframes pulse-red { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-    .sale-tag { position: absolute; top: 10px; right: 10px; background: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); animation: pulse-red 2s infinite; }
-    /* Status Colors */
-    .st-new { background: #fef3c7; color: #92400e; } .st-processing { background: #dbeafe; color: #1e40af; } .st-shipped { background: #f3e8ff; color: #6b21a8; } .st-completed { background: #dcfce7; color: #166534; } .st-cancelled { background: #fee2e2; color: #991b1b; }
+    .sale-tag { position: absolute; top: 10px; right: 10px; background: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    /* Animation Class */
+    .section-enter { animation: pop 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
   </style>
  </head>
  <body class="min-h-screen bg-gray-50 pb-24">
    
    <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999]"></div>
 
-   <button onclick="openCart()" class="fixed bottom-20 left-4 z-40 w-14 h-14 bg-[#4b5f28] text-white rounded-full shadow-xl flex items-center justify-center animate-float border-2 border-white">
-     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-     <span id="cart-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-bold flex items-center justify-center border border-white hidden">0</span>
-   </button>
+   <button onclick="openCart()" class="fixed bottom-20 left-4 z-40 w-14 h-14 bg-[#4b5f28] text-white rounded-full shadow-xl flex items-center justify-center animate-float border-2 border-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg><span id="cart-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-bold flex items-center justify-center border border-white hidden">0</span></button>
 
    <div class="fixed bottom-0 w-full bg-white border-t flex justify-around py-3 z-30 text-gray-400 text-xs font-bold shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
        <button onclick="switchView('home')" class="flex flex-col items-center gap-1 text-[#4b5f28] nav-btn" id="nav-home"><span class="text-xl">🏠</span>الرئيسية</button>
@@ -34,7 +29,7 @@
        <button onclick="openProfileEdit()" class="flex flex-col items-center gap-1 hover:text-[#4b5f28] nav-btn" id="nav-profile"><span class="text-xl">👤</span>حسابي</button>
    </div>
 
-   <div id="view-home" class="view-section max-w-md mx-auto">
+   <div id="view-home" class="view-section max-w-md mx-auto section-enter">
      <div class="bg-white p-4 pb-2 shadow-sm rounded-b-3xl mb-4">
         <div class="flex justify-between items-center mb-4">
             <div><p class="text-xs text-gray-400 font-bold">مرحباً 👋</p><h1 class="text-xl font-black text-gray-800" id="header-username">زائر</h1></div>
@@ -60,21 +55,21 @@
        </div>
      </div>
 
-     <div id="grid-header" class="px-4 mb-2 flex justify-between items-end hidden">
+     <div id="grid-header" class="px-4 mb-2 flex justify-between items-end hidden section-enter">
          <h3 class="font-bold text-gray-800 text-xl border-b-4 border-[#4b5f28]" id="grid-title"></h3>
          <button onclick="hideGrid()" class="text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded">إغلاق ✕</button>
      </div>
      
-     <div id="products-grid" class="grid grid-cols-2 gap-3 px-4 pb-8 min-h-[50px]"></div>
+     <div id="products-grid" class="grid grid-cols-2 gap-3 px-4 pb-8 min-h-[50px] section-enter"></div>
    </div>
 
-   <div id="view-wishlist" class="view-section hidden max-w-md mx-auto pt-4 px-4">
+   <div id="view-wishlist" class="view-section hidden max-w-md mx-auto pt-4 px-4 section-enter">
        <h2 class="text-xl font-black text-[#4b5f28] mb-4 border-b pb-2">❤️ المفضلة</h2>
        <div id="wishlist-grid" class="grid grid-cols-2 gap-3"></div>
        <div id="wishlist-empty" class="hidden text-center py-20 text-gray-400">لم تحفظ شيئاً بعد</div>
    </div>
 
-   <div id="view-orders" class="view-section hidden max-w-md mx-auto pt-4 px-4">
+   <div id="view-orders" class="view-section hidden max-w-md mx-auto pt-4 px-4 section-enter">
        <h2 class="text-xl font-black text-[#4b5f28] mb-4 border-b pb-2">📦 طلباتي</h2>
        <div id="orders-list" class="space-y-3"></div>
    </div>
@@ -84,7 +79,7 @@
        <button onclick="closeModal()" class="absolute top-4 left-4 z-10 w-8 h-8 bg-white/80 rounded-full font-bold shadow-sm">✕</button>
        <div class="h-64 bg-gray-100 p-4 relative">
            <img id="m-img" class="w-full h-full object-contain mix-blend-multiply">
-           <span id="m-sale-badge" class="sale-tag hidden">SALE</span>
+           <span id="m-sale-badge" class="absolute top-4 right-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded hidden">SALE</span>
        </div>
        <div class="p-6 space-y-4 bg-white flex-1 overflow-y-auto">
          <div class="flex justify-between"><h2 id="m-name" class="text-xl font-bold"></h2><div class="text-right"><span id="m-price" class="text-xl font-black text-[#4b5f28]"></span><br><span id="m-old-price" class="text-sm text-gray-400 line-through hidden"></span></div></div>
@@ -129,31 +124,8 @@
    <div id="cart-modal" class="hidden fixed inset-0 z-50 bg-black/50 flex justify-end">
      <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl" style="animation: slideLeft 0.3s">
         <div class="p-4 border-b flex justify-between items-center bg-gray-50"><h2 class="font-bold text-lg">🛒 السلة</h2><button onclick="closeCart()" class="text-gray-500 font-bold text-xl">✕</button></div>
-        
         <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
-        
-        <div class="p-4 border-t bg-gray-50">
-            <div class="mb-4 bg-white p-3 rounded-xl border shadow-sm">
-                <p class="text-xs font-bold text-gray-500 mb-2">بيانات التوصيل (قابلة للتعديل)</p>
-                <div class="space-y-2">
-                    <input id="cart-name" class="w-full p-2 border rounded text-sm font-bold focus:border-[#4b5f28] outline-none" placeholder="الاسم">
-                    <input id="cart-phone" class="w-full p-2 border rounded text-sm font-bold focus:border-[#4b5f28] outline-none" placeholder="الهاتف">
-                    <input id="cart-address" class="w-full p-2 border rounded text-sm font-bold focus:border-[#4b5f28] outline-none" placeholder="العنوان بالتفصيل">
-                </div>
-            </div>
-
-            <div class="flex justify-between font-bold text-lg mb-4"><span>الإجمالي:</span><span id="cart-total" class="text-[#4b5f28]">0 ج.م</span></div>
-            <button onclick="confirmOrder()" class="w-full py-4 bg-[#4b5f28] text-white font-bold rounded-xl shadow-lg">تأكيد الطلب ✅</button>
-        </div>
-     </div>
-   </div>
-
-   <div id="order-success-modal" class="hidden fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
-     <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center">
-       <div class="text-6xl mb-4">✅</div>
-       <h3 class="text-xl font-bold text-gray-800">تم الطلب بنجاح!</h3>
-       <p class="text-sm text-gray-500 mt-2">رقم الطلب: <span id="order-number-display" class="font-mono font-black text-[#4b5f28]"></span></p>
-       <button onclick="document.getElementById('order-success-modal').classList.add('hidden')" class="w-full py-3 mt-4 rounded-xl bg-[#4b5f28] text-white font-bold">حسناً</button>
+        <div class="p-4 border-t"><div class="flex justify-between font-bold text-lg mb-4"><span>الإجمالي:</span><span id="cart-total" class="text-[#4b5f28]">0 ج.م</span></div><button onclick="checkout()" class="w-full py-4 bg-[#4b5f28] text-white font-bold rounded-xl shadow-lg">تأكيد الطلب ✅</button></div>
      </div>
    </div>
 
@@ -169,7 +141,6 @@
     window.currentUser = JSON.parse(localStorage.getItem('userData')) || null;
     window.products = []; window.wishlist = [];
 
-    // INIT
     async function init() {
         if(window.currentUser) {
             document.getElementById('header-username').innerText = window.currentUser.name;
@@ -177,20 +148,23 @@
             try { const uSnap = await getDoc(doc(db, "users", window.currentUser.phone)); if(uSnap.exists() && uSnap.data().wishlist) window.wishlist = uSnap.data().wishlist; } catch(e){}
         }
         
+        // Load Products
         const qP = query(collection(db, "products"), orderBy("timestamp", "desc"));
         const snapP = await getDocs(qP);
         window.products = snapP.docs.map(d => ({id: d.id, ...d.data()}));
 
+        // Load Banners
         const qB = query(collection(db, "banners"), orderBy("timestamp", "desc"));
         const snapB = await getDocs(qB);
         if(!snapB.empty) {
             document.getElementById('banners-container').classList.remove('hidden');
             document.getElementById('banners-slider').innerHTML = snapB.docs.map(d => `<img src="${d.data().image}" class="h-full w-auto rounded-xl object-cover snap-center shadow-sm">`).join('');
+        } else {
+            document.getElementById('banners-container').classList.add('hidden'); // إخفاء لو مفيش عروض
         }
     }
     init();
 
-    // NAVIGATION
     window.switchView = (v) => {
         document.querySelectorAll('.view-section').forEach(e => e.classList.add('hidden'));
         document.getElementById('view-'+v).classList.remove('hidden');
@@ -201,9 +175,17 @@
 
     window.showCategory = (cat) => {
         document.getElementById('grid-title').innerText = cat;
-        document.getElementById('grid-header').classList.remove('hidden');
+        const header = document.getElementById('grid-header');
+        header.classList.remove('hidden');
+        
+        // Animation trigger
+        const grid = document.getElementById('products-grid');
+        grid.classList.remove('section-enter');
+        void grid.offsetWidth; // Trigger reflow
+        grid.classList.add('section-enter');
+        
         renderGrid(window.products.filter(p=>p.category===cat));
-        setTimeout(() => document.getElementById('grid-header').scrollIntoView({behavior: 'smooth'}), 100);
+        setTimeout(() => header.scrollIntoView({behavior: 'smooth'}), 100);
     };
 
     window.hideGrid = () => {
@@ -227,12 +209,12 @@
         }).join('');
     }
 
-    // PRODUCT MODAL
+    // --- PRODUCT MODAL ---
     window.openProd = (id) => {
         const p = window.products.find(x=>x.id===id); window.currentProd=p; window.selColorVar=null; window.selSizeVar=null;
         const modalContent = document.getElementById('modal-content');
         document.getElementById('product-modal').classList.remove('hidden');
-        setTimeout(() => modalContent.classList.remove('translate-y-full'), 10);
+        setTimeout(() => modalContent.classList.remove('translate-y-full'), 10); // Slide up animation
 
         document.getElementById('m-img').src=p.images[0];
         document.getElementById('m-name').innerText=p.name;
@@ -256,7 +238,7 @@
         setTimeout(() => document.getElementById('product-modal').classList.add('hidden'), 300);
     }
 
-    // WISHLIST & AUTH
+    // --- WISHLIST & AUTH (Standard Logic) ---
     window.toggleWish = async (id, btn) => {
         event.stopPropagation();
         if(!window.currentUser) return toast('سجل دخول الأول', 'error');
@@ -266,10 +248,7 @@
     };
     window.openWishlist = () => {
         const items = window.products.filter(p => window.wishlist.includes(p.id));
-        document.getElementById('wishlist-grid').innerHTML = items.length ? items.map(p => {
-            const hasSale = p.oldPrice && p.oldPrice > p.price;
-            return `<div class="bg-white rounded-xl p-3 border flex gap-3 items-center relative"><button onclick="toggleWish('${p.id}', this.parentElement)" class="absolute top-2 left-2 text-red-500 text-xs font-bold bg-red-50 px-2 py-1 rounded">✕</button><img src="${p.images[0]}" class="w-16 h-16 rounded object-cover"><div class="flex-1"><h4 class="font-bold text-sm">${p.name}</h4><div class="flex items-center gap-2"><p class="font-black text-[#4b5f28]">${p.price}</p>${hasSale?`<span class="text-xs text-red-500 line-through">${p.oldPrice}</span>`:''}</div></div><button onclick="openProd('${p.id}')" class="bg-[#4b5f28] text-white px-3 py-1 rounded text-xs">شراء</button></div>`;
-        }).join('') : '<p class="col-span-2 text-center text-gray-400 py-10">مفيش مفضلة</p>';
+        document.getElementById('wishlist-grid').innerHTML = items.length ? items.map(p => `<div class="bg-white rounded-xl p-3 border flex gap-3 items-center relative"><button onclick="toggleWish('${p.id}', this.parentElement)" class="absolute top-2 left-2 text-red-500 text-xs font-bold bg-red-50 px-2 py-1 rounded">✕</button><img src="${p.images[0]}" class="w-16 h-16 rounded object-cover"><div class="flex-1"><h4 class="font-bold text-sm">${p.name}</h4><p class="font-black text-[#4b5f28]">${p.price}</p></div><button onclick="openProd('${p.id}')" class="bg-[#4b5f28] text-white px-3 py-1 rounded text-xs">شراء</button></div>`).join('') : '<p class="col-span-2 text-center text-gray-400 py-10">مفيش مفضلة</p>';
     };
 
     window.checkLoginAndAction = (act) => { if(!window.currentUser) { window.pendingAction=act; document.getElementById('login-modal').classList.remove('hidden'); } else { switchView(act); if(act==='orders') loadOrders(); if(act==='wishlist') openWishlist(); } };
@@ -286,50 +265,21 @@
     async function loadOrders() {
         document.getElementById('orders-list').innerHTML='<p class="text-center py-10">⏳</p>';
         const q=query(collection(db,"orders"),where("customerPhone","==",window.currentUser.phone),orderBy("timestamp","desc")); const snap=await getDocs(q);
-        if(snap.empty){ document.getElementById('orders-list').innerHTML='<p class="text-center text-gray-400 py-10">لا يوجد طلبات سابقة</p>'; return; }
+        if(snap.empty){ document.getElementById('orders-list').innerHTML='<p class="text-center text-gray-400 py-10">لا يوجد طلبات</p>'; return; }
         const stText={'new':'قيد المراجعة','processing':'جاري التجهيز','shipped':'في الطريق','completed':'تم الاستلام','cancelled':'ملغي'};
-        const stCls={'new':'st-new','processing':'st-processing','shipped':'st-shipped','completed':'st-completed','cancelled':'st-cancelled'};
-        document.getElementById('orders-list').innerHTML=snap.docs.map(d=>{ const o=d.data(), st=o.status||'new'; return `<div class="bg-white p-4 rounded-xl border shadow-sm"><div class="flex justify-between mb-2"><span class="font-bold">#${d.id.slice(0,5)}</span><span class="status-badge ${stCls[st]}">${stText[st]}</span></div><div class="text-sm text-gray-600 mb-2">${o.items.map(i=>i.productName).join(' + ')}</div><div class="flex justify-between border-t pt-2 font-bold"><span>${o.total} ج.م</span><span class="text-xs text-gray-400 font-normal">${new Date(o.timestamp).toLocaleDateString('ar-EG')}</span></div></div>`; }).join('');
+        document.getElementById('orders-list').innerHTML=snap.docs.map(d=>{ const o=d.data(), st=o.status||'new'; return `<div class="bg-white p-4 rounded-xl border shadow-sm"><div class="flex justify-between mb-2"><span class="font-bold">#${d.id.slice(0,5)}</span><span class="text-xs bg-gray-100 px-2 rounded font-bold text-[#4b5f28]">${stText[st]}</span></div><div class="text-sm text-gray-600 mb-2">${o.items.map(i=>i.productName).join(' + ')}</div><div class="flex justify-between border-t pt-2 font-bold"><span>${o.total} ج.م</span><span class="text-xs text-gray-400 font-normal">${new Date(o.timestamp).toLocaleDateString('ar-EG')}</span></div></div>`; }).join('');
     }
 
-    // --- CHECKOUT ---
+    // --- CART HELPERS ---
     window.selColor = (n,btn) => { window.selColorVar=n; document.querySelectorAll('#m-colors button').forEach(b=>b.classList.remove('bg-[#4b5f28]','text-white')); btn.classList.add('bg-[#4b5f28]','text-white'); const sizes = window.currentProd.colors.find(c=>c.name===n).sizes; document.getElementById('m-sizes').innerHTML = sizes.map(s=>`<button onclick="selSize('${s}',this)" class="w-8 h-8 bg-gray-100 rounded hover:bg-[#4b5f28] hover:text-white">${s}</button>`).join(''); };
     window.selSize = (s,btn) => { window.selSizeVar=s; document.querySelectorAll('#m-sizes button').forEach(b=>b.classList.remove('bg-[#4b5f28]','text-white')); btn.classList.add('bg-[#4b5f28]','text-white'); };
     
-    // تأكيد الطلب بالبيانات المعدلة
-    window.confirmOrder = async () => {
+    window.checkout = async () => {
         if(!window.cart?.length) return alert('سلة فاضية');
-        if(!window.currentUser) { closeCart(); return checkLoginAndAction('home'); }
-        
-        const name = document.getElementById('cart-name').value;
-        const phone = document.getElementById('cart-phone').value;
-        const address = document.getElementById('cart-address').value;
-        
-        if(!name || !phone || !address) return alert('يرجى التأكد من بيانات الشحن');
-
-        const btn=document.querySelector('#cart-modal button:last-child'); btn.disabled=true; btn.innerText='جاري الارسال...';
-        try { 
-            const docRef = await addDoc(collection(db,"orders"),{
-                items:window.cart, 
-                total:window.cart.reduce((s,i)=>s+(i.price*i.qty),0), 
-                customerName: name, 
-                customerPhone: phone, 
-                customerAddress: address, 
-                timestamp:Date.now(), 
-                status:'new'
-            }); 
-            // رسالة النجاح والواتساب
-            document.getElementById('order-number-display').innerText = '#' + docRef.id.slice(0,6).toUpperCase();
-            document.getElementById('order-success-modal').classList.remove('hidden');
-            
-            const msg = `🛒 *طلب جديد*\n👤 ${name}\n📞 ${phone}\n📍 ${address}\n\n` + window.cart.map(i=>`- ${i.productName} (${i.color}/${i.size})`).join('\n') + `\n💰 الإجمالي: ${window.cart.reduce((s,i)=>s+(i.price*i.qty),0)}`;
-            window.open(`https://wa.me/201020468021?text=${encodeURIComponent(msg)}`, '_blank');
-
-            window.cart=[]; saveCart(); renderCart(); updateCartBadge(); closeCart(); 
-        } catch(e){alert('خطأ');} 
-        btn.disabled=false; btn.innerText='تأكيد الطلب ✅';
+        if(!window.currentUser) return checkLoginAndAction('home');
+        const btn=document.querySelector('#cart-modal button:last-child'); btn.disabled=true;
+        try { await addDoc(collection(db,"orders"),{items:window.cart, total:window.cart.reduce((s,i)=>s+(i.price*i.qty),0), customerName:window.currentUser.name, customerPhone:window.currentUser.phone, customerAddress:window.currentUser.address, timestamp:Date.now(), status:'new'}); window.cart=[]; saveCart(); renderCart(); updateCartBadge(); closeCart(); alert('تم الطلب ✅ تابع حالته من قسم طلباتي'); } catch(e){alert('خطأ');} btn.disabled=false;
     };
-    
     window.toast=(m,t)=>{const e=document.createElement('div');e.className=`bg-${t=='error'?'red':'green'}-600 text-white px-6 py-3 rounded-full font-bold shadow-xl mb-2 animate-bounce`;e.innerText=m;document.getElementById('toast-container').appendChild(e);setTimeout(()=>e.remove(),3000)};
    </script>
  </body>
