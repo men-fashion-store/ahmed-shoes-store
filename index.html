@@ -13,6 +13,8 @@
     .heart-btn.active svg { fill: #ef4444; stroke: #ef4444; }
     .sale-tag { position: absolute; top: 10px; right: 10px; background: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); animation: pulse 2s infinite; }
     .st-new { background: #fef3c7; color: #92400e; } .st-processing { background: #dbeafe; color: #1e40af; } .st-shipped { background: #f3e8ff; color: #6b21a8; } .st-completed { background: #dcfce7; color: #166534; }
+    /* Avatar Upload Style */
+    .avatar-upload-box:hover .overlay { opacity: 1; }
   </style>
  </head>
  <body class="min-h-screen bg-gray-50 pb-24">
@@ -35,7 +37,7 @@
      <div class="bg-white p-4 pb-2 shadow-sm rounded-b-3xl mb-4">
         <div class="flex justify-between items-center mb-4">
             <div><p class="text-xs text-gray-400 font-bold">مرحباً 👋</p><h1 class="text-xl font-black text-gray-800" id="header-username">زائر</h1></div>
-            <img id="header-avatar" src="احمد الشيخ (3).png" class="w-10 h-10 rounded-full border shadow-sm object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+            <img onclick="openProfileEdit()" id="header-avatar" src="احمد الشيخ (3).png" class="w-10 h-10 rounded-full border shadow-sm object-cover cursor-pointer" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
         </div>
         <div id="banners-container" class="hidden"><div id="banners-slider" class="flex overflow-x-auto gap-3 snap-x scroll-hide pb-2 h-40"></div></div>
      </div>
@@ -81,13 +83,22 @@
 
    <div id="profile-modal" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
        <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl">
-           <h3 class="font-bold text-lg mb-4 text-center">تعديل بياناتي</h3>
+           <h3 class="font-bold text-lg mb-4 text-center text-gray-800">تعديل بياناتي</h3>
+           
+           <div class="flex justify-center mb-6">
+               <div class="relative w-24 h-24 avatar-upload-box cursor-pointer group" onclick="document.getElementById('avatar-file').click()">
+                   <img id="edit-avatar-preview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="w-full h-full rounded-full border-2 border-dashed border-[#4b5f28] p-1 object-cover">
+                   <div class="overlay absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 transition-opacity duration-300">
+                       <span class="text-white text-xs font-bold">تغيير 📷</span>
+                   </div>
+                   <input type="file" id="avatar-file" hidden accept="image/*" onchange="handleAvatarUpload(this)">
+               </div>
+           </div>
+
            <div class="space-y-3">
-               <div class="flex justify-center mb-4"><img id="edit-avatar-preview" src="" class="w-20 h-20 rounded-full border bg-gray-100 object-cover"></div>
-               <input type="text" id="edit-avatar-url" placeholder="رابط الصورة (اختياري)" class="w-full p-2 border rounded text-xs text-center" onchange="document.getElementById('edit-avatar-preview').src=this.value">
                <input id="edit-name" class="w-full p-3 border rounded-xl text-sm" placeholder="الاسم">
                <input id="edit-address" class="w-full p-3 border rounded-xl text-sm" placeholder="العنوان">
-               <button onclick="saveProfile()" class="w-full py-3 bg-[#4b5f28] text-white font-bold rounded-xl">حفظ</button>
+               <button onclick="saveProfile()" id="save-profile-btn" class="w-full py-3 bg-[#4b5f28] text-white font-bold rounded-xl">حفظ التغييرات</button>
                <button onclick="logout()" class="w-full py-2 text-red-500 font-bold text-sm">خروج</button>
                <button onclick="document.getElementById('profile-modal').classList.add('hidden')" class="w-full py-2 text-gray-400 text-sm">إلغاء</button>
            </div>
@@ -100,7 +111,7 @@
         <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
         <div class="p-4 border-t bg-gray-50">
             <div class="mb-4 bg-white p-3 rounded-xl border shadow-sm">
-                <p class="text-xs font-bold text-gray-500 mb-2">بيانات التوصيل (قابلة للتعديل)</p>
+                <p class="text-xs font-bold text-gray-500 mb-2">بيانات التوصيل</p>
                 <div class="space-y-2">
                     <input id="cart-name" class="w-full p-2 border rounded text-sm font-bold focus:border-[#4b5f28] outline-none" placeholder="الاسم">
                     <input id="cart-phone" class="w-full p-2 border rounded text-sm font-bold focus:border-[#4b5f28] outline-none" placeholder="الهاتف">
@@ -132,7 +143,7 @@
     const db = getFirestore(app);
 
     window.currentUser = JSON.parse(localStorage.getItem('userData')) || null;
-    window.products = []; window.wishlist = [];
+    window.products = []; window.wishlist = []; window.newAvatarBase64 = null;
 
     async function init() {
         if(window.currentUser) {
@@ -140,9 +151,11 @@
             if(window.currentUser.avatar) document.getElementById('header-avatar').src = window.currentUser.avatar;
             try { const uSnap = await getDoc(doc(db, "users", window.currentUser.phone)); if(uSnap.exists() && uSnap.data().wishlist) window.wishlist = uSnap.data().wishlist; } catch(e){}
         }
+        
         const qP = query(collection(db, "products"), orderBy("timestamp", "desc"));
         const snapP = await getDocs(qP);
         window.products = snapP.docs.map(d => ({id: d.id, ...d.data()}));
+
         const qB = query(collection(db, "banners"), orderBy("timestamp", "desc"));
         const snapB = await getDocs(qB);
         if(!snapB.empty) { document.getElementById('banners-container').classList.remove('hidden'); document.getElementById('banners-slider').innerHTML = snapB.docs.map(d => `<img src="${d.data().image}" class="h-full w-auto rounded-xl object-cover snap-center shadow-sm">`).join(''); } else { document.getElementById('banners-container').classList.add('hidden'); }
@@ -192,21 +205,33 @@
     window.handleLogin = async (e) => { e.preventDefault(); const ph=document.getElementById('l-phone').value.trim(), btn=document.getElementById('l-btn'), newF=document.getElementById('new-user-fields'); btn.disabled=true; try { const ref = doc(db, "users", ph); const snap = await getDoc(ref); if(snap.exists()) finishLogin(snap.data()); else { if(newF.classList.contains('hidden')) { newF.classList.remove('hidden'); btn.innerText='حفظ'; btn.disabled=false; } else { const u={name:document.getElementById('l-name').value, address:document.getElementById('l-address').value, phone:ph, wishlist:[]}; await setDoc(ref, u); finishLogin(u); } } } catch(e) { alert('خطأ'); btn.disabled=false; } };
     function finishLogin(u) { localStorage.setItem('userData', JSON.stringify(u)); window.currentUser=u; window.wishlist=u.wishlist||[]; document.getElementById('header-username').innerText=u.name; if(u.avatar)document.getElementById('header-avatar').src=u.avatar; document.getElementById('login-modal').classList.add('hidden'); if(window.pendingAction){ switchView(window.pendingAction); if(window.pendingAction==='orders')loadOrders(); if(window.pendingAction==='wishlist')openWishlist(); } }
     
-    window.openProfileEdit = () => { if(!window.currentUser) return checkLoginAndAction('home'); document.getElementById('profile-modal').classList.remove('hidden'); document.getElementById('edit-name').value=window.currentUser.name; document.getElementById('edit-address').value=window.currentUser.address; };
-    window.saveProfile = async () => { const n=document.getElementById('edit-name').value, a=document.getElementById('edit-address').value, i=document.getElementById('edit-avatar-url').value; const up={name:n, address:a}; if(i)up.avatar=i; await updateDoc(doc(db,"users",window.currentUser.phone),up); window.currentUser={...window.currentUser,...up}; localStorage.setItem('userData',JSON.stringify(window.currentUser)); document.getElementById('header-username').innerText=n; if(i)document.getElementById('header-avatar').src=i; document.getElementById('profile-modal').classList.add('hidden'); alert('تم'); };
+    // --- PROFILE IMAGE UPLOAD ---
+    const compress = (f) => new Promise(res => { const r = new FileReader(); r.readAsDataURL(f); r.onload=e=>{ const i=new Image(); i.src=e.target.result; i.onload=()=>{ const c=document.createElement('canvas'); const s=300/i.width; c.width=300; c.height=i.height*s; c.getContext('2d').drawImage(i,0,0,c.width,c.height); res(c.toDataURL('image/jpeg',0.7)); } } });
+    window.handleAvatarUpload = async (inp) => { if(inp.files[0]) { const b64 = await compress(inp.files[0]); document.getElementById('edit-avatar-preview').src = b64; window.newAvatarBase64 = b64; } };
+
+    window.openProfileEdit = () => { if(!window.currentUser) return checkLoginAndAction('home'); document.getElementById('profile-modal').classList.remove('hidden'); document.getElementById('edit-name').value=window.currentUser.name; document.getElementById('edit-address').value=window.currentUser.address; if(window.currentUser.avatar) document.getElementById('edit-avatar-preview').src=window.currentUser.avatar; };
+    window.saveProfile = async () => { 
+        const n=document.getElementById('edit-name').value, a=document.getElementById('edit-address').value;
+        const btn = document.getElementById('save-profile-btn'); btn.innerText="جاري الحفظ..."; btn.disabled=true;
+        const up={name:n, address:a}; 
+        if(window.newAvatarBase64) up.avatar = window.newAvatarBase64;
+        
+        await updateDoc(doc(db,"users",window.currentUser.phone),up); 
+        window.currentUser={...window.currentUser,...up}; localStorage.setItem('userData',JSON.stringify(window.currentUser)); 
+        document.getElementById('header-username').innerText=n; 
+        if(up.avatar) document.getElementById('header-avatar').src=up.avatar; 
+        document.getElementById('profile-modal').classList.add('hidden'); 
+        btn.innerText="حفظ التغييرات"; btn.disabled=false;
+        toast('تم الحفظ ✅'); 
+    };
     window.logout = () => { localStorage.removeItem('userData'); location.reload(); };
 
-    // --- FIX FOR ORDERS NOT SHOWING ---
     async function loadOrders() {
         document.getElementById('orders-list').innerHTML='<p class="text-center py-10">⏳</p>';
-        // تم إزالة الترتيب من الاستعلام لتجنب مشاكل الفهرسة في فايربيز
         const q=query(collection(db,"orders"),where("customerPhone","==",window.currentUser.phone)); 
         const snap=await getDocs(q);
         if(snap.empty){ document.getElementById('orders-list').innerHTML='<p class="text-center text-gray-400 py-10">لا يوجد طلبات سابقة</p>'; return; }
-        
-        // ترتيب الطلبات يدوياً في المتصفح
         const orders = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => b.timestamp - a.timestamp);
-        
         const stText={'new':'قيد المراجعة','processing':'جاري التجهيز','shipped':'في الطريق','completed':'تم الاستلام','cancelled':'ملغي'};
         const stCls={'new':'st-new','processing':'st-processing','shipped':'st-shipped','completed':'st-completed','cancelled':'st-cancelled'};
         document.getElementById('orders-list').innerHTML=orders.map(o=>{ const st=o.status||'new'; return `<div class="bg-white p-4 rounded-xl border shadow-sm"><div class="flex justify-between mb-2"><span class="font-bold">#${o.id.slice(0,5)}</span><span class="status-badge ${stCls[st]}">${stText[st]}</span></div><div class="text-sm text-gray-600 mb-2">${o.items.map(i=>i.productName).join(' + ')}</div><div class="flex justify-between border-t pt-2 font-bold"><span>${o.total} ج.م</span><span class="text-xs text-gray-400 font-normal">${new Date(o.timestamp).toLocaleDateString('ar-EG')}</span></div></div>`; }).join('');
