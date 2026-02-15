@@ -2,52 +2,131 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة القيادة | أحمد الشيخ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم الذكية | أحمد الشيخ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Cairo', sans-serif; background: #f0f2f5; }</style>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; background: #f3f4f6; }
+        
+        /* Custom Checkbox Style for Sizes */
+        .size-checkbox:checked + div {
+            background-color: #4b5f28;
+            color: white;
+            border-color: #4b5f28;
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(75, 95, 40, 0.3);
+        }
+        
+        /* Color Button Selection */
+        .color-btn.active {
+            ring: 4px solid #c5a059;
+            transform: scale(1.1);
+        }
+
+        /* Loader */
+        .loader { border-top-color: #4b5f28; -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    
-    <div class="max-w-4xl mx-auto p-6">
-        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm">
-            <h1 class="text-2xl font-bold text-[#4b5f28]">لوحة التحكم</h1>
-            <a href="index.html" class="text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200">عرض المتجر ↗</a>
-        </header>
+<body class="p-6 max-w-5xl mx-auto">
 
-        <div class="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-gray-100">
-            <h2 class="font-bold text-lg mb-4 text-gray-700">➕ إضافة موديل جديد</h2>
+    <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-2xl shadow-sm">
+        <h1 class="text-2xl font-black text-[#4b5f28]">لوحة التحكم ⚙️</h1>
+        <div class="flex gap-2">
+            <a href="index.html" target="_blank" class="px-4 py-2 bg-gray-100 rounded-xl font-bold text-sm hover:bg-gray-200">معاينة المتجر 👁️</a>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2 space-y-6">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <input id="prod-name" placeholder="اسم المنتج" class="p-3 bg-gray-50 rounded-lg border focus:border-[#4b5f28] outline-none">
-                <input id="prod-price" type="number" placeholder="السعر" class="p-3 bg-gray-50 rounded-lg border focus:border-[#4b5f28] outline-none">
-            </div>
-            
-            <div class="mb-4">
-                <select id="prod-cat" class="w-full p-3 bg-gray-50 rounded-lg border outline-none">
-                    <option value="رجالي">رجالي</option>
-                    <option value="حريمي">حريمي</option>
-                    <option value="أطفالي">أطفالي</option>
-                </select>
-            </div>
-
-            <div class="border-2 border-dashed border-gray-300 p-6 rounded-xl text-center cursor-pointer hover:border-[#4b5f28] transition mb-4" onclick="document.getElementById('img-file').click()">
-                <input type="file" id="img-file" multiple hidden onchange="handleImgSelect(this)">
-                <p class="text-gray-500">اضغط لرفع صور المنتج 📸</p>
-            </div>
-            <div id="preview-area" class="flex gap-2 mb-4 overflow-x-auto"></div>
-
-            <div class="bg-gray-50 p-4 rounded-xl mb-4">
-                <p class="font-bold text-sm mb-2">🎨 تكوين الألوان والمقاسات</p>
-                <div class="flex gap-2 mb-2">
-                    <input id="color-name" placeholder="اللون (مثلاً: أسود)" class="p-2 border rounded text-sm flex-1">
-                    <button onclick="startColor()" class="bg-gray-800 text-white px-3 rounded text-sm">إضافة</button>
+            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                <h3 class="font-bold text-gray-800 mb-4 border-b pb-2">1. تفاصيل المنتج</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-500">اسم الموديل</label>
+                        <input id="prod-name" class="w-full bg-gray-50 border p-3 rounded-xl font-bold focus:border-[#4b5f28] outline-none" placeholder="مثال: نايك اير جوردن">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500">السعر</label>
+                        <input id="prod-price" type="number" class="w-full bg-gray-50 border p-3 rounded-xl font-bold focus:border-[#4b5f28] outline-none" placeholder="00">
+                    </div>
                 </div>
-                <div id="colors-setup-list" class="space-y-2"></div>
+                <div class="mt-4">
+                    <label class="text-xs font-bold text-gray-500">القسم (يحدد المقاسات تلقائياً)</label>
+                    <select id="prod-cat" onchange="updateSizeGrid()" class="w-full bg-green-50 border border-green-200 text-[#4b5f28] p-3 rounded-xl font-bold focus:outline-none cursor-pointer">
+                        <option value="رجالي">رجالي (41 - 49)</option>
+                        <option value="حريمي">حريمي (37 - 41)</option>
+                        <option value="أطفالي">أطفالي (17 - 32)</option>
+                    </select>
+                </div>
             </div>
 
-            <button onclick="uploadProduct()" id="upload-btn" class="w-full bg-[#4b5f28] text-white py-3 rounded-xl font-bold hover:bg-[#3a4a1f] transition shadow-lg">
-                نشر المنتج على الموقع 🚀
+            <div class="bg-white p-6 rounded-2xl shadow-sm border-2 border-[#4b5f28]/10">
+                <h3 class="font-bold text-gray-800 mb-4 border-b pb-2 flex justify-between">
+                    <span>2. الألوان والمقاسات</span>
+                    <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">اضغط اللون ثم اختر مقاساته</span>
+                </h3>
+
+                <div class="mb-6">
+                    <p class="text-xs font-bold text-gray-400 mb-2">أولاً: اختر لون لتعديل مقاساته</p>
+                    <div class="flex flex-wrap gap-3" id="color-palette">
+                        <button onclick="activateColor('أسود', '#000000')" class="color-btn w-10 h-10 rounded-full bg-black shadow-md transition hover:scale-105" title="أسود"></button>
+                        <button onclick="activateColor('أبيض', '#ffffff')" class="color-btn w-10 h-10 rounded-full bg-white border border-gray-300 shadow-md transition hover:scale-105" title="أبيض"></button>
+                        <button onclick="activateColor('كحلي', '#1e3a8a')" class="color-btn w-10 h-10 rounded-full bg-blue-900 shadow-md transition hover:scale-105" title="كحلي"></button>
+                        <button onclick="activateColor('بني', '#78350f')" class="color-btn w-10 h-10 rounded-full bg-amber-900 shadow-md transition hover:scale-105" title="بني"></button>
+                        <button onclick="activateColor('بيج', '#f5f5dc')" class="color-btn w-10 h-10 rounded-full bg-[#f5f5dc] border border-gray-300 shadow-md transition hover:scale-105" title="بيج"></button>
+                        <button onclick="activateColor('رمادي', '#6b7280')" class="color-btn w-10 h-10 rounded-full bg-gray-500 shadow-md transition hover:scale-105" title="رمادي"></button>
+                        <button onclick="activateColor('هافان', '#d97706')" class="color-btn w-10 h-10 rounded-full bg-amber-600 shadow-md transition hover:scale-105" title="هافان"></button>
+                        
+                        <div class="flex items-center gap-1 mr-2 border-r pr-2">
+                            <input id="custom-color-name" placeholder="لون آخر.." class="w-20 text-xs p-2 border rounded-lg bg-gray-50">
+                            <button onclick="addCustomColor()" class="bg-[#4b5f28] text-white w-8 h-8 rounded-lg text-lg font-bold">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="size-section" class="hidden">
+                    <div class="flex justify-between items-center mb-3">
+                        <p class="font-bold text-gray-800">
+                            مقاسات اللون: <span id="active-color-name" class="text-[#4b5f28] text-lg">...</span>
+                        </p>
+                        <button onclick="selectAllSizes()" class="text-xs text-blue-500 underline">تحديد الكل</button>
+                    </div>
+                    
+                    <div id="sizes-grid" class="grid grid-cols-6 gap-2">
+                        </div>
+                </div>
+                
+                <div id="no-color-msg" class="text-center py-8 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                    <p class="text-gray-400">👈 اضغط على أي لون فوق عشان تفتح المقاسات</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <h4 class="font-bold text-gray-700 mb-2 text-sm">ملخص المخزون (هيظهر للعميل كدا):</h4>
+                <div id="stock-summary" class="flex flex-wrap gap-2 text-sm text-gray-500">
+                    لا يوجد بيانات مدخلة بعد..
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                <h3 class="font-bold text-gray-800 mb-4 border-b pb-2">3. صور المنتج</h3>
+                <div class="border-2 border-dashed border-[#4b5f28] bg-green-50 rounded-xl p-6 text-center cursor-pointer hover:bg-green-100 transition" onclick="document.getElementById('img-file').click()">
+                    <input type="file" id="img-file" multiple hidden onchange="handleImgSelect(this)">
+                    <p class="text-3xl mb-2">📸</p>
+                    <p class="text-sm font-bold text-[#4b5f28]">اضغط لرفع الصور</p>
+                    <p class="text-[10px] text-gray-500">يفضل صور مربعة أو طولية</p>
+                </div>
+                <div id="preview-area" class="grid grid-cols-3 gap-2 mt-4"></div>
+            </div>
+
+            <button onclick="uploadProduct()" id="upload-btn" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold text-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition flex justify-center items-center gap-2">
+                <span>نشر المنتج 🚀</span>
             </button>
         </div>
     </div>
@@ -56,6 +135,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // Firebase Setup
         const app = initializeApp({
             apiKey: "AIzaSyASO-AN5XaSGn4SaCZ8VlHr6zsFCIxPCzs",
             authDomain: "ahmed-shoes.firebaseapp.com",
@@ -66,80 +146,188 @@
         });
         const db = getFirestore(app);
 
-        let tempImages = [];
-        let productConfig = []; // [{name: 'Black', sizes: [41,42]}]
+        // State
+        window.tempImages = [];
+        window.stockData = {}; // { 'أسود': [41, 42], 'أبيض': [40] }
+        window.activeColor = null;
 
+        // Configuration (Ranges)
+        const RANGES = {
+            'رجالي': {min: 41, max: 49},
+            'حريمي': {min: 37, max: 41},
+            'أطفالي': {min: 17, max: 32}
+        };
+
+        // --- Logic: 1. Images ---
         window.handleImgSelect = (input) => {
             const files = [...input.files];
             document.getElementById('preview-area').innerHTML = '';
-            tempImages = [];
+            window.tempImages = [];
             
             files.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    tempImages.push(e.target.result); // Base64 for simplicity
+                    // Resize/Compress Logic could go here, keeping it simple
+                    window.tempImages.push(e.target.result);
                     document.getElementById('preview-area').innerHTML += 
-                        `<img src="${e.target.result}" class="w-16 h-16 object-cover rounded shadow-sm border">`;
+                        `<div class="relative group">
+                            <img src="${e.target.result}" class="w-full h-20 object-cover rounded-lg border">
+                         </div>`;
                 };
                 reader.readAsDataURL(file);
             });
         };
 
-        window.startColor = () => {
-            const name = document.getElementById('color-name').value;
-            if(!name) return;
-            productConfig.push({ name, sizes: [] });
-            document.getElementById('color-name').value = '';
-            renderConfig();
+        // --- Logic: 2. Colors & Sizes ---
+        
+        // When a color circle is clicked
+        window.activateColor = (colorName, hex) => {
+            window.activeColor = colorName;
+            
+            // UI Update
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+            // Try to find the button we clicked (approximation)
+            event.target.classList.add('active'); 
+            
+            document.getElementById('no-color-msg').classList.add('hidden');
+            document.getElementById('size-section').classList.remove('hidden');
+            document.getElementById('active-color-name').innerText = colorName;
+            
+            // Init stock array for this color if not exists
+            if(!window.stockData[colorName]) window.stockData[colorName] = [];
+            
+            renderSizeGrid();
         };
 
-        window.addSizeToColor = (idx) => {
-            const size = prompt("أدخل المقاس:");
-            if(size) {
-                productConfig[idx].sizes.push(size);
-                productConfig[idx].sizes.sort((a,b)=>a-b);
-                renderConfig();
+        window.addCustomColor = () => {
+            const name = document.getElementById('custom-color-name').value.trim();
+            if(!name) return;
+            // Create a temporary button visually
+            const btn = document.createElement('button');
+            btn.className = "color-btn w-10 h-10 rounded-full bg-gray-200 border border-gray-400 font-bold text-[10px] flex items-center justify-center shadow-md";
+            btn.innerText = name.substring(0,2);
+            btn.onclick = (e) => window.activateColor(name, '#ccc');
+            document.getElementById('color-palette').insertBefore(btn, document.getElementById('color-palette').lastElementChild);
+            document.getElementById('custom-color-name').value = '';
+            window.activateColor(name, '#ccc');
+        };
+
+        // Render the squares
+        window.renderSizeGrid = () => {
+            const cat = document.getElementById('prod-cat').value;
+            const range = RANGES[cat];
+            const grid = document.getElementById('sizes-grid');
+            grid.innerHTML = '';
+            
+            const currentSelected = window.stockData[window.activeColor] || [];
+
+            for(let i = range.min; i <= range.max; i++) {
+                const isChecked = currentSelected.includes(i) ? 'checked' : '';
+                
+                grid.innerHTML += `
+                    <label class="cursor-pointer select-none">
+                        <input type="checkbox" class="size-checkbox hidden" value="${i}" ${isChecked} onchange="toggleSize(${i})">
+                        <div class="w-full aspect-square flex items-center justify-center rounded-xl bg-gray-100 border-2 border-transparent font-bold text-gray-500 transition-all hover:bg-gray-200">
+                            ${i}
+                        </div>
+                    </label>
+                `;
             }
         };
 
-        function renderConfig() {
-            document.getElementById('colors-setup-list').innerHTML = productConfig.map((c, idx) => `
-                <div class="flex items-center justify-between bg-white p-2 rounded border">
-                    <span class="font-bold text-gray-700">${c.name}</span>
-                    <div class="flex flex-wrap gap-1 mx-2">
-                        ${c.sizes.map(s => `<span class="bg-gray-100 px-2 rounded text-xs">${s}</span>`).join('')}
-                        <button onclick="addSizeToColor(${idx})" class="text-[#4b5f28] text-xs font-bold border border-[#4b5f28] px-1 rounded">+</button>
-                    </div>
-                    <button onclick="productConfig.splice(${idx},1); renderConfig()" class="text-red-500 font-bold">✕</button>
-                </div>
-            `).join('');
-        }
-        window.addSizeToColor = window.addSizeToColor; // Expose to global
+        // When category changes, reset or update grid
+        window.updateSizeGrid = () => {
+            if(window.activeColor) renderSizeGrid();
+        };
 
+        // Toggle a single size
+        window.toggleSize = (size) => {
+            if(!window.activeColor) return;
+            const arr = window.stockData[window.activeColor];
+            
+            if(arr.includes(size)) {
+                // Remove
+                const idx = arr.indexOf(size);
+                arr.splice(idx, 1);
+            } else {
+                // Add
+                arr.push(size);
+                arr.sort((a,b) => a-b);
+            }
+            
+            // Clean up empty colors
+            if(arr.length === 0) delete window.stockData[window.activeColor];
+            
+            updateSummary();
+        };
+        
+        window.selectAllSizes = () => {
+             const inputs = document.querySelectorAll('.size-checkbox');
+             inputs.forEach(input => {
+                 if(!input.checked) {
+                     input.checked = true;
+                     input.onchange(); // Trigger the logic
+                 }
+             });
+        }
+
+        // Show summary at bottom
+        function updateSummary() {
+            const div = document.getElementById('stock-summary');
+            const entries = Object.entries(window.stockData);
+            
+            if(entries.length === 0) {
+                div.innerHTML = 'لا يوجد بيانات مدخلة بعد..';
+                return;
+            }
+            
+            div.innerHTML = entries.map(([color, sizes]) => {
+                if(sizes.length === 0) return '';
+                return `<span class="bg-white border px-2 py-1 rounded-lg">
+                    <b class="text-[#4b5f28]">${color}:</b> ${sizes.join(', ')}
+                </span>`;
+            }).join('');
+        }
+
+        // --- Logic: 3. Upload ---
         window.uploadProduct = async () => {
             const name = document.getElementById('prod-name').value;
             const price = document.getElementById('prod-price').value;
             const cat = document.getElementById('prod-cat').value;
             const btn = document.getElementById('upload-btn');
+            
+            // Validation
+            if(!name || !price) return alert('ناقص الاسم أو السعر!');
+            if(window.tempImages.length === 0) return alert('لازم صورة واحدة عالأقل!');
+            const hasStock = Object.keys(window.stockData).length > 0;
+            if(!hasStock) return alert('لازم تختار لون ومقاس واحد عالأقل!');
 
-            if(!name || !price || tempImages.length === 0) return alert('أكمل البيانات والصور');
+            // Transform stockData to array format for Frontend compatibility
+            // Frontend expects: colors: [{name: 'Red', sizes: [41, 42]}]
+            const colorsArray = Object.entries(window.stockData).map(([k, v]) => ({
+                name: k,
+                sizes: v
+            }));
 
-            btn.innerText = 'جاري الرفع...';
             btn.disabled = true;
+            btn.innerHTML = '<div class="loader w-6 h-6 rounded-full border-2 border-white"></div> جاري الرفع...';
 
             try {
                 await addDoc(collection(db, "products"), {
-                    name, price, category: cat,
-                    images: tempImages, // يفضل رفعها Storage بس الـ Base64 شغال للمشاريع الصغيرة
-                    colors: productConfig,
+                    name, 
+                    price: Number(price), 
+                    category: cat,
+                    images: window.tempImages,
+                    colors: colorsArray,
                     timestamp: Date.now()
                 });
+                
                 alert('تمت الإضافة بنجاح! ✅');
-                location.reload();
+                location.reload(); // Reset form
             } catch (e) {
                 alert('حدث خطأ: ' + e.message);
-                btn.innerText = 'حاول مرة أخرى';
                 btn.disabled = false;
+                btn.innerText = 'نشر المنتج 🚀';
             }
         };
     </script>
