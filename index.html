@@ -6,21 +6,23 @@
   <title>أحمد الشيخ - للأحذية</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
-  <script>tailwind.config = { theme: { extend: { colors: { brand: '#4b5f28' }, animation: { 'float': 'float 3s ease-in-out infinite', 'pop': 'pop 0.3s ease-out forwards' }, keyframes: { float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } }, pop: { '0%': { transform: 'scale(0.95)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } } } } } }</script>
+  <script>tailwind.config = { theme: { extend: { colors: { brand: '#4b5f28' }, animation: { 'float': 'float 3s ease-in-out infinite' }, keyframes: { float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } } } } } }</script>
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; -webkit-tap-highlight-color: transparent; }
     .scroll-hide::-webkit-scrollbar { display: none; }
     .heart-btn.active svg { fill: #ef4444; stroke: #ef4444; }
-    .sale-tag { position: absolute; top: 10px; right: 10px; background: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    /* Animation Class */
-    .section-enter { animation: pop 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .sale-tag { position: absolute; top: 10px; right: 10px; background: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); animation: pulse 2s infinite; }
+    .st-new { background: #fef3c7; color: #92400e; } .st-processing { background: #dbeafe; color: #1e40af; } .st-shipped { background: #f3e8ff; color: #6b21a8; } .st-completed { background: #dcfce7; color: #166534; }
   </style>
  </head>
  <body class="min-h-screen bg-gray-50 pb-24">
    
    <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999]"></div>
 
-   <button onclick="openCart()" class="fixed bottom-20 left-4 z-40 w-14 h-14 bg-[#4b5f28] text-white rounded-full shadow-xl flex items-center justify-center animate-float border-2 border-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg><span id="cart-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-bold flex items-center justify-center border border-white hidden">0</span></button>
+   <button onclick="openCart()" class="fixed bottom-20 left-4 z-40 w-14 h-14 bg-[#4b5f28] text-white rounded-full shadow-xl flex items-center justify-center animate-float border-2 border-white">
+     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+     <span id="cart-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-bold flex items-center justify-center border border-white hidden">0</span>
+   </button>
 
    <div class="fixed bottom-0 w-full bg-white border-t flex justify-around py-3 z-30 text-gray-400 text-xs font-bold shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
        <button onclick="switchView('home')" class="flex flex-col items-center gap-1 text-[#4b5f28] nav-btn" id="nav-home"><span class="text-xl">🏠</span>الرئيسية</button>
@@ -29,58 +31,33 @@
        <button onclick="openProfileEdit()" class="flex flex-col items-center gap-1 hover:text-[#4b5f28] nav-btn" id="nav-profile"><span class="text-xl">👤</span>حسابي</button>
    </div>
 
-   <div id="view-home" class="view-section max-w-md mx-auto section-enter">
+   <div id="view-home" class="view-section max-w-md mx-auto">
      <div class="bg-white p-4 pb-2 shadow-sm rounded-b-3xl mb-4">
         <div class="flex justify-between items-center mb-4">
             <div><p class="text-xs text-gray-400 font-bold">مرحباً 👋</p><h1 class="text-xl font-black text-gray-800" id="header-username">زائر</h1></div>
             <img id="header-avatar" src="احمد الشيخ (3).png" class="w-10 h-10 rounded-full border shadow-sm object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
         </div>
-        <div id="banners-container" class="hidden">
-            <div id="banners-slider" class="flex overflow-x-auto gap-3 snap-x scroll-hide pb-2 h-40"></div>
-        </div>
+        <div id="banners-container" class="hidden"><div id="banners-slider" class="flex overflow-x-auto gap-3 snap-x scroll-hide pb-2 h-40"></div></div>
      </div>
 
      <div class="px-4 space-y-4 mb-6">
-       <div onclick="showCategory('رجالي')" class="relative h-40 rounded-2xl overflow-hidden cursor-pointer shadow-lg group transform transition active:scale-95">
-           <img src="men.jpg" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x150?text=Men'">
-           <div class="absolute inset-0 bg-black/30 flex items-center justify-center"><h3 class="text-white text-3xl font-black border-b-2 border-white/50 pb-1">رجالي</h3></div>
-       </div>
-       <div onclick="showCategory('حريمي')" class="relative h-40 rounded-2xl overflow-hidden cursor-pointer shadow-lg group transform transition active:scale-95">
-           <img src="women.jpg" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x150?text=Women'">
-           <div class="absolute inset-0 bg-black/30 flex items-center justify-center"><h3 class="text-white text-3xl font-black border-b-2 border-white/50 pb-1">حريمي</h3></div>
-       </div>
-       <div onclick="showCategory('أطفالي')" class="relative h-40 rounded-2xl overflow-hidden cursor-pointer shadow-lg group transform transition active:scale-95">
-           <img src="kids.jpg" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x150?text=Kids'">
-           <div class="absolute inset-0 bg-black/30 flex items-center justify-center"><h3 class="text-white text-3xl font-black border-b-2 border-white/50 pb-1">أطفالي</h3></div>
-       </div>
+       <div onclick="showCategory('رجالي')" class="relative h-40 rounded-2xl overflow-hidden cursor-pointer shadow-lg group transform transition active:scale-95"><img src="men.jpg" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x150?text=Men'"><div class="absolute inset-0 bg-black/30 flex items-center justify-center"><h3 class="text-white text-3xl font-black border-b-2 border-white/50 pb-1">رجالي</h3></div></div>
+       <div onclick="showCategory('حريمي')" class="relative h-40 rounded-2xl overflow-hidden cursor-pointer shadow-lg group transform transition active:scale-95"><img src="women.jpg" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x150?text=Women'"><div class="absolute inset-0 bg-black/30 flex items-center justify-center"><h3 class="text-white text-3xl font-black border-b-2 border-white/50 pb-1">حريمي</h3></div></div>
+       <div onclick="showCategory('أطفالي')" class="relative h-40 rounded-2xl overflow-hidden cursor-pointer shadow-lg group transform transition active:scale-95"><img src="kids.jpg" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x150?text=Kids'"><div class="absolute inset-0 bg-black/30 flex items-center justify-center"><h3 class="text-white text-3xl font-black border-b-2 border-white/50 pb-1">أطفالي</h3></div></div>
      </div>
 
-     <div id="grid-header" class="px-4 mb-2 flex justify-between items-end hidden section-enter">
-         <h3 class="font-bold text-gray-800 text-xl border-b-4 border-[#4b5f28]" id="grid-title"></h3>
-         <button onclick="hideGrid()" class="text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded">إغلاق ✕</button>
-     </div>
-     
-     <div id="products-grid" class="grid grid-cols-2 gap-3 px-4 pb-8 min-h-[50px] section-enter"></div>
+     <div id="grid-header" class="px-4 mb-2 flex justify-between items-end hidden"><h3 class="font-bold text-gray-800 text-xl border-b-4 border-[#4b5f28]" id="grid-title"></h3><button onclick="hideGrid()" class="text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded">إغلاق ✕</button></div>
+     <div id="products-grid" class="grid grid-cols-2 gap-3 px-4 pb-8 min-h-[50px]"></div>
    </div>
 
-   <div id="view-wishlist" class="view-section hidden max-w-md mx-auto pt-4 px-4 section-enter">
-       <h2 class="text-xl font-black text-[#4b5f28] mb-4 border-b pb-2">❤️ المفضلة</h2>
-       <div id="wishlist-grid" class="grid grid-cols-2 gap-3"></div>
-       <div id="wishlist-empty" class="hidden text-center py-20 text-gray-400">لم تحفظ شيئاً بعد</div>
-   </div>
+   <div id="view-wishlist" class="view-section hidden max-w-md mx-auto pt-4 px-4"><h2 class="text-xl font-black text-[#4b5f28] mb-4 border-b pb-2">❤️ المفضلة</h2><div id="wishlist-grid" class="grid grid-cols-2 gap-3"></div><div id="wishlist-empty" class="hidden text-center py-20 text-gray-400">لم تحفظ شيئاً بعد</div></div>
 
-   <div id="view-orders" class="view-section hidden max-w-md mx-auto pt-4 px-4 section-enter">
-       <h2 class="text-xl font-black text-[#4b5f28] mb-4 border-b pb-2">📦 طلباتي</h2>
-       <div id="orders-list" class="space-y-3"></div>
-   </div>
+   <div id="view-orders" class="view-section hidden max-w-md mx-auto pt-4 px-4"><h2 class="text-xl font-black text-[#4b5f28] mb-4 border-b pb-2">📦 طلباتي</h2><div id="orders-list" class="space-y-3"></div></div>
 
    <div id="product-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
      <div class="bg-white w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden max-h-[90vh] flex flex-col transform transition-transform duration-300 translate-y-full" id="modal-content">
        <button onclick="closeModal()" class="absolute top-4 left-4 z-10 w-8 h-8 bg-white/80 rounded-full font-bold shadow-sm">✕</button>
-       <div class="h-64 bg-gray-100 p-4 relative">
-           <img id="m-img" class="w-full h-full object-contain mix-blend-multiply">
-           <span id="m-sale-badge" class="absolute top-4 right-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded hidden">SALE</span>
-       </div>
+       <div class="h-64 bg-gray-100 p-4 relative"><img id="m-img" class="w-full h-full object-contain mix-blend-multiply"><span id="m-sale-badge" class="sale-tag hidden">SALE</span></div>
        <div class="p-6 space-y-4 bg-white flex-1 overflow-y-auto">
          <div class="flex justify-between"><h2 id="m-name" class="text-xl font-bold"></h2><div class="text-right"><span id="m-price" class="text-xl font-black text-[#4b5f28]"></span><br><span id="m-old-price" class="text-sm text-gray-400 line-through hidden"></span></div></div>
          <div id="m-colors-wrap"><p class="text-xs text-gray-400 mb-2">اللون</p><div id="m-colors" class="flex flex-wrap gap-2"></div></div>
@@ -96,11 +73,7 @@
            <h3 class="text-xl font-bold text-center mb-6">تسجيل الدخول</h3>
            <form onsubmit="handleLogin(event)" class="space-y-4">
                <input type="tel" id="l-phone" class="w-full p-3 border rounded-xl font-bold text-center text-lg focus:border-[#4b5f28]" placeholder="رقم الهاتف" required>
-               <div id="new-user-fields" class="hidden space-y-3">
-                   <p class="text-xs text-green-600 text-center">أول مرة! كمل بياناتك</p>
-                   <input id="l-name" class="w-full p-2 border rounded-lg text-sm" placeholder="الاسم">
-                   <input id="l-address" class="w-full p-2 border rounded-lg text-sm" placeholder="العنوان">
-               </div>
+               <div id="new-user-fields" class="hidden space-y-3"><p class="text-xs text-green-600 text-center">أول مرة! كمل بياناتك</p><input id="l-name" class="w-full p-2 border rounded-lg text-sm" placeholder="الاسم"><input id="l-address" class="w-full p-2 border rounded-lg text-sm" placeholder="العنوان"></div>
                <button type="submit" id="l-btn" class="w-full py-3 bg-[#4b5f28] text-white font-bold rounded-xl">متابعة</button>
            </form>
        </div>
@@ -125,7 +98,27 @@
      <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl" style="animation: slideLeft 0.3s">
         <div class="p-4 border-b flex justify-between items-center bg-gray-50"><h2 class="font-bold text-lg">🛒 السلة</h2><button onclick="closeCart()" class="text-gray-500 font-bold text-xl">✕</button></div>
         <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
-        <div class="p-4 border-t"><div class="flex justify-between font-bold text-lg mb-4"><span>الإجمالي:</span><span id="cart-total" class="text-[#4b5f28]">0 ج.م</span></div><button onclick="checkout()" class="w-full py-4 bg-[#4b5f28] text-white font-bold rounded-xl shadow-lg">تأكيد الطلب ✅</button></div>
+        <div class="p-4 border-t bg-gray-50">
+            <div class="mb-4 bg-white p-3 rounded-xl border shadow-sm">
+                <p class="text-xs font-bold text-gray-500 mb-2">بيانات التوصيل (قابلة للتعديل)</p>
+                <div class="space-y-2">
+                    <input id="cart-name" class="w-full p-2 border rounded text-sm font-bold focus:border-[#4b5f28] outline-none" placeholder="الاسم">
+                    <input id="cart-phone" class="w-full p-2 border rounded text-sm font-bold focus:border-[#4b5f28] outline-none" placeholder="الهاتف">
+                    <input id="cart-address" class="w-full p-2 border rounded text-sm font-bold focus:border-[#4b5f28] outline-none" placeholder="العنوان بالتفصيل">
+                </div>
+            </div>
+            <div class="flex justify-between font-bold text-lg mb-4"><span>الإجمالي:</span><span id="cart-total" class="text-[#4b5f28]">0 ج.م</span></div>
+            <button onclick="confirmOrder()" class="w-full py-4 bg-[#4b5f28] text-white font-bold rounded-xl shadow-lg">تأكيد الطلب ✅</button>
+        </div>
+     </div>
+   </div>
+
+   <div id="order-success-modal" class="hidden fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
+     <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center">
+       <div class="text-6xl mb-4">✅</div>
+       <h3 class="text-xl font-bold text-gray-800">تم الطلب بنجاح!</h3>
+       <p class="text-sm text-gray-500 mt-2">رقم الطلب: <span id="order-number-display" class="font-mono font-black text-[#4b5f28]"></span></p>
+       <button onclick="document.getElementById('order-success-modal').classList.add('hidden')" class="w-full py-3 mt-4 rounded-xl bg-[#4b5f28] text-white font-bold">حسناً</button>
      </div>
    </div>
 
@@ -147,21 +140,12 @@
             if(window.currentUser.avatar) document.getElementById('header-avatar').src = window.currentUser.avatar;
             try { const uSnap = await getDoc(doc(db, "users", window.currentUser.phone)); if(uSnap.exists() && uSnap.data().wishlist) window.wishlist = uSnap.data().wishlist; } catch(e){}
         }
-        
-        // Load Products
         const qP = query(collection(db, "products"), orderBy("timestamp", "desc"));
         const snapP = await getDocs(qP);
         window.products = snapP.docs.map(d => ({id: d.id, ...d.data()}));
-
-        // Load Banners
         const qB = query(collection(db, "banners"), orderBy("timestamp", "desc"));
         const snapB = await getDocs(qB);
-        if(!snapB.empty) {
-            document.getElementById('banners-container').classList.remove('hidden');
-            document.getElementById('banners-slider').innerHTML = snapB.docs.map(d => `<img src="${d.data().image}" class="h-full w-auto rounded-xl object-cover snap-center shadow-sm">`).join('');
-        } else {
-            document.getElementById('banners-container').classList.add('hidden'); // إخفاء لو مفيش عروض
-        }
+        if(!snapB.empty) { document.getElementById('banners-container').classList.remove('hidden'); document.getElementById('banners-slider').innerHTML = snapB.docs.map(d => `<img src="${d.data().image}" class="h-full w-auto rounded-xl object-cover snap-center shadow-sm">`).join(''); } else { document.getElementById('banners-container').classList.add('hidden'); }
     }
     init();
 
@@ -175,23 +159,12 @@
 
     window.showCategory = (cat) => {
         document.getElementById('grid-title').innerText = cat;
-        const header = document.getElementById('grid-header');
-        header.classList.remove('hidden');
-        
-        // Animation trigger
-        const grid = document.getElementById('products-grid');
-        grid.classList.remove('section-enter');
-        void grid.offsetWidth; // Trigger reflow
-        grid.classList.add('section-enter');
-        
+        document.getElementById('grid-header').classList.remove('hidden');
         renderGrid(window.products.filter(p=>p.category===cat));
-        setTimeout(() => header.scrollIntoView({behavior: 'smooth'}), 100);
+        setTimeout(() => document.getElementById('grid-header').scrollIntoView({behavior: 'smooth'}), 100);
     };
 
-    window.hideGrid = () => {
-        document.getElementById('grid-header').classList.add('hidden');
-        document.getElementById('products-grid').innerHTML = '';
-    };
+    window.hideGrid = () => { document.getElementById('grid-header').classList.add('hidden'); document.getElementById('products-grid').innerHTML = ''; };
 
     function renderGrid(items) {
         if(items.length === 0) { document.getElementById('products-grid').innerHTML = '<p class="col-span-2 text-center text-gray-400 py-10">لا توجد منتجات حالياً</p>'; return; }
@@ -199,87 +172,69 @@
             const isLiked = window.wishlist.includes(p.id);
             const saleHtml = (p.oldPrice && p.oldPrice > p.price) ? `<span class="sale-tag">SALE</span>` : '';
             const priceHtml = (p.oldPrice && p.oldPrice > p.price) ? `<div class="flex flex-col items-start"><span class="text-xs text-gray-400 line-through decoration-red-500">${p.oldPrice}</span><span class="font-black text-[#4b5f28]">${p.price} ج.م</span></div>` : `<p class="font-black text-[#4b5f28]">${p.price} ج.م</p>`;
-
-            return `<div class="bg-white rounded-xl shadow-sm border overflow-hidden relative group">
-                ${saleHtml}
-                <button onclick="toggleWish('${p.id}', this)" class="absolute top-2 right-2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center z-10 shadow-sm heart-btn ${isLiked?'active':''}"><svg class="w-5 h-5 transition stroke-gray-400 ${isLiked?'fill-red-500 stroke-red-500':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
-                <div onclick="openProd('${p.id}')" class="h-40 bg-gray-50"><img src="${p.images[0]}" class="w-full h-full object-cover mix-blend-multiply"></div>
-                <div onclick="openProd('${p.id}')" class="p-3"><h4 class="font-bold text-sm truncate">${p.name}</h4><div class="mt-1">${priceHtml}</div></div>
-            </div>`;
+            return `<div class="bg-white rounded-xl shadow-sm border overflow-hidden relative group">${saleHtml}<button onclick="toggleWish('${p.id}', this)" class="absolute top-2 right-2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center z-10 shadow-sm heart-btn ${isLiked?'active':''}"><svg class="w-5 h-5 transition stroke-gray-400 ${isLiked?'fill-red-500 stroke-red-500':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button><div onclick="openProd('${p.id}')" class="h-40 bg-gray-50"><img src="${p.images[0]}" class="w-full h-full object-cover mix-blend-multiply"></div><div onclick="openProd('${p.id}')" class="p-3"><h4 class="font-bold text-sm truncate">${p.name}</h4><div class="mt-1">${priceHtml}</div></div></div>`;
         }).join('');
     }
 
-    // --- PRODUCT MODAL ---
     window.openProd = (id) => {
         const p = window.products.find(x=>x.id===id); window.currentProd=p; window.selColorVar=null; window.selSizeVar=null;
-        const modalContent = document.getElementById('modal-content');
-        document.getElementById('product-modal').classList.remove('hidden');
-        setTimeout(() => modalContent.classList.remove('translate-y-full'), 10); // Slide up animation
-
-        document.getElementById('m-img').src=p.images[0];
-        document.getElementById('m-name').innerText=p.name;
-        document.getElementById('m-price').innerText=p.price+' ج.م';
-        
-        if(p.oldPrice && p.oldPrice > p.price) { 
-            document.getElementById('m-old-price').innerText=p.oldPrice+' ج.م'; document.getElementById('m-old-price').classList.remove('hidden'); 
-            document.getElementById('m-sale-badge').classList.remove('hidden');
-        } else { 
-            document.getElementById('m-old-price').classList.add('hidden');
-            document.getElementById('m-sale-badge').classList.add('hidden');
-        }
-
-        document.getElementById('m-colors').innerHTML = p.colors.map(c=>`<button onclick="selColor('${c.name}',this)" class="px-3 py-1 border rounded">${c.name}</button>`).join('');
-        document.getElementById('m-sizes').innerHTML = '<span class="text-xs text-gray-400">اختر اللون</span>';
+        const modalContent = document.getElementById('modal-content'); document.getElementById('product-modal').classList.remove('hidden'); setTimeout(() => modalContent.classList.remove('translate-y-full'), 10);
+        document.getElementById('m-img').src=p.images[0]; document.getElementById('m-name').innerText=p.name; document.getElementById('m-price').innerText=p.price+' ج.م';
+        if(p.oldPrice && p.oldPrice > p.price) { document.getElementById('m-old-price').innerText=p.oldPrice+' ج.م'; document.getElementById('m-old-price').classList.remove('hidden'); document.getElementById('m-sale-badge').classList.remove('hidden'); } else { document.getElementById('m-old-price').classList.add('hidden'); document.getElementById('m-sale-badge').classList.add('hidden'); }
+        document.getElementById('m-colors').innerHTML = p.colors.map(c=>`<button onclick="selColor('${c.name}',this)" class="px-3 py-1 border rounded">${c.name}</button>`).join(''); document.getElementById('m-sizes').innerHTML = '<span class="text-xs text-gray-400">اختر اللون</span>';
     };
+    window.closeModal = () => { const modalContent = document.getElementById('modal-content'); modalContent.classList.add('translate-y-full'); setTimeout(() => document.getElementById('product-modal').classList.add('hidden'), 300); }
 
-    window.closeModal = () => {
-        const modalContent = document.getElementById('modal-content');
-        modalContent.classList.add('translate-y-full');
-        setTimeout(() => document.getElementById('product-modal').classList.add('hidden'), 300);
-    }
-
-    // --- WISHLIST & AUTH (Standard Logic) ---
-    window.toggleWish = async (id, btn) => {
-        event.stopPropagation();
-        if(!window.currentUser) return toast('سجل دخول الأول', 'error');
-        if(window.wishlist.includes(id)) window.wishlist = window.wishlist.filter(x=>x!==id); else window.wishlist.push(id);
-        btn.classList.toggle('active'); btn.querySelector('svg').classList.toggle('fill-red-500'); btn.querySelector('svg').classList.toggle('stroke-red-500');
-        await updateDoc(doc(db, "users", window.currentUser.phone), { wishlist: window.wishlist });
-    };
-    window.openWishlist = () => {
-        const items = window.products.filter(p => window.wishlist.includes(p.id));
-        document.getElementById('wishlist-grid').innerHTML = items.length ? items.map(p => `<div class="bg-white rounded-xl p-3 border flex gap-3 items-center relative"><button onclick="toggleWish('${p.id}', this.parentElement)" class="absolute top-2 left-2 text-red-500 text-xs font-bold bg-red-50 px-2 py-1 rounded">✕</button><img src="${p.images[0]}" class="w-16 h-16 rounded object-cover"><div class="flex-1"><h4 class="font-bold text-sm">${p.name}</h4><p class="font-black text-[#4b5f28]">${p.price}</p></div><button onclick="openProd('${p.id}')" class="bg-[#4b5f28] text-white px-3 py-1 rounded text-xs">شراء</button></div>`).join('') : '<p class="col-span-2 text-center text-gray-400 py-10">مفيش مفضلة</p>';
-    };
+    window.toggleWish = async (id, btn) => { event.stopPropagation(); if(!window.currentUser) return toast('سجل دخول الأول', 'error'); if(window.wishlist.includes(id)) window.wishlist = window.wishlist.filter(x=>x!==id); else window.wishlist.push(id); btn.classList.toggle('active'); btn.querySelector('svg').classList.toggle('fill-red-500'); btn.querySelector('svg').classList.toggle('stroke-red-500'); await updateDoc(doc(db, "users", window.currentUser.phone), { wishlist: window.wishlist }); };
+    window.openWishlist = () => { const items = window.products.filter(p => window.wishlist.includes(p.id)); document.getElementById('wishlist-grid').innerHTML = items.length ? items.map(p => `<div class="bg-white rounded-xl p-3 border flex gap-3 items-center relative"><button onclick="toggleWish('${p.id}', this.parentElement)" class="absolute top-2 left-2 text-red-500 text-xs font-bold bg-red-50 px-2 py-1 rounded">✕</button><img src="${p.images[0]}" class="w-16 h-16 rounded object-cover"><div class="flex-1"><h4 class="font-bold text-sm">${p.name}</h4><p class="font-black text-[#4b5f28]">${p.price}</p></div><button onclick="openProd('${p.id}')" class="bg-[#4b5f28] text-white px-3 py-1 rounded text-xs">شراء</button></div>`).join('') : '<p class="col-span-2 text-center text-gray-400 py-10">مفيش مفضلة</p>'; };
 
     window.checkLoginAndAction = (act) => { if(!window.currentUser) { window.pendingAction=act; document.getElementById('login-modal').classList.remove('hidden'); } else { switchView(act); if(act==='orders') loadOrders(); if(act==='wishlist') openWishlist(); } };
-    window.handleLogin = async (e) => {
-        e.preventDefault(); const ph=document.getElementById('l-phone').value.trim(), btn=document.getElementById('l-btn'), newF=document.getElementById('new-user-fields'); btn.disabled=true;
-        try { const ref = doc(db, "users", ph); const snap = await getDoc(ref); if(snap.exists()) finishLogin(snap.data()); else { if(newF.classList.contains('hidden')) { newF.classList.remove('hidden'); btn.innerText='حفظ'; btn.disabled=false; } else { const u={name:document.getElementById('l-name').value, address:document.getElementById('l-address').value, phone:ph, wishlist:[]}; await setDoc(ref, u); finishLogin(u); } } } catch(e) { alert('خطأ'); btn.disabled=false; }
-    };
+    window.handleLogin = async (e) => { e.preventDefault(); const ph=document.getElementById('l-phone').value.trim(), btn=document.getElementById('l-btn'), newF=document.getElementById('new-user-fields'); btn.disabled=true; try { const ref = doc(db, "users", ph); const snap = await getDoc(ref); if(snap.exists()) finishLogin(snap.data()); else { if(newF.classList.contains('hidden')) { newF.classList.remove('hidden'); btn.innerText='حفظ'; btn.disabled=false; } else { const u={name:document.getElementById('l-name').value, address:document.getElementById('l-address').value, phone:ph, wishlist:[]}; await setDoc(ref, u); finishLogin(u); } } } catch(e) { alert('خطأ'); btn.disabled=false; } };
     function finishLogin(u) { localStorage.setItem('userData', JSON.stringify(u)); window.currentUser=u; window.wishlist=u.wishlist||[]; document.getElementById('header-username').innerText=u.name; if(u.avatar)document.getElementById('header-avatar').src=u.avatar; document.getElementById('login-modal').classList.add('hidden'); if(window.pendingAction){ switchView(window.pendingAction); if(window.pendingAction==='orders')loadOrders(); if(window.pendingAction==='wishlist')openWishlist(); } }
     
     window.openProfileEdit = () => { if(!window.currentUser) return checkLoginAndAction('home'); document.getElementById('profile-modal').classList.remove('hidden'); document.getElementById('edit-name').value=window.currentUser.name; document.getElementById('edit-address').value=window.currentUser.address; };
     window.saveProfile = async () => { const n=document.getElementById('edit-name').value, a=document.getElementById('edit-address').value, i=document.getElementById('edit-avatar-url').value; const up={name:n, address:a}; if(i)up.avatar=i; await updateDoc(doc(db,"users",window.currentUser.phone),up); window.currentUser={...window.currentUser,...up}; localStorage.setItem('userData',JSON.stringify(window.currentUser)); document.getElementById('header-username').innerText=n; if(i)document.getElementById('header-avatar').src=i; document.getElementById('profile-modal').classList.add('hidden'); alert('تم'); };
     window.logout = () => { localStorage.removeItem('userData'); location.reload(); };
 
+    // --- FIX FOR ORDERS NOT SHOWING ---
     async function loadOrders() {
         document.getElementById('orders-list').innerHTML='<p class="text-center py-10">⏳</p>';
-        const q=query(collection(db,"orders"),where("customerPhone","==",window.currentUser.phone),orderBy("timestamp","desc")); const snap=await getDocs(q);
-        if(snap.empty){ document.getElementById('orders-list').innerHTML='<p class="text-center text-gray-400 py-10">لا يوجد طلبات</p>'; return; }
+        // تم إزالة الترتيب من الاستعلام لتجنب مشاكل الفهرسة في فايربيز
+        const q=query(collection(db,"orders"),where("customerPhone","==",window.currentUser.phone)); 
+        const snap=await getDocs(q);
+        if(snap.empty){ document.getElementById('orders-list').innerHTML='<p class="text-center text-gray-400 py-10">لا يوجد طلبات سابقة</p>'; return; }
+        
+        // ترتيب الطلبات يدوياً في المتصفح
+        const orders = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => b.timestamp - a.timestamp);
+        
         const stText={'new':'قيد المراجعة','processing':'جاري التجهيز','shipped':'في الطريق','completed':'تم الاستلام','cancelled':'ملغي'};
-        document.getElementById('orders-list').innerHTML=snap.docs.map(d=>{ const o=d.data(), st=o.status||'new'; return `<div class="bg-white p-4 rounded-xl border shadow-sm"><div class="flex justify-between mb-2"><span class="font-bold">#${d.id.slice(0,5)}</span><span class="text-xs bg-gray-100 px-2 rounded font-bold text-[#4b5f28]">${stText[st]}</span></div><div class="text-sm text-gray-600 mb-2">${o.items.map(i=>i.productName).join(' + ')}</div><div class="flex justify-between border-t pt-2 font-bold"><span>${o.total} ج.م</span><span class="text-xs text-gray-400 font-normal">${new Date(o.timestamp).toLocaleDateString('ar-EG')}</span></div></div>`; }).join('');
+        const stCls={'new':'st-new','processing':'st-processing','shipped':'st-shipped','completed':'st-completed','cancelled':'st-cancelled'};
+        document.getElementById('orders-list').innerHTML=orders.map(o=>{ const st=o.status||'new'; return `<div class="bg-white p-4 rounded-xl border shadow-sm"><div class="flex justify-between mb-2"><span class="font-bold">#${o.id.slice(0,5)}</span><span class="status-badge ${stCls[st]}">${stText[st]}</span></div><div class="text-sm text-gray-600 mb-2">${o.items.map(i=>i.productName).join(' + ')}</div><div class="flex justify-between border-t pt-2 font-bold"><span>${o.total} ج.م</span><span class="text-xs text-gray-400 font-normal">${new Date(o.timestamp).toLocaleDateString('ar-EG')}</span></div></div>`; }).join('');
     }
 
-    // --- CART HELPERS ---
     window.selColor = (n,btn) => { window.selColorVar=n; document.querySelectorAll('#m-colors button').forEach(b=>b.classList.remove('bg-[#4b5f28]','text-white')); btn.classList.add('bg-[#4b5f28]','text-white'); const sizes = window.currentProd.colors.find(c=>c.name===n).sizes; document.getElementById('m-sizes').innerHTML = sizes.map(s=>`<button onclick="selSize('${s}',this)" class="w-8 h-8 bg-gray-100 rounded hover:bg-[#4b5f28] hover:text-white">${s}</button>`).join(''); };
     window.selSize = (s,btn) => { window.selSizeVar=s; document.querySelectorAll('#m-sizes button').forEach(b=>b.classList.remove('bg-[#4b5f28]','text-white')); btn.classList.add('bg-[#4b5f28]','text-white'); };
     
-    window.checkout = async () => {
+    window.confirmOrder = async () => {
         if(!window.cart?.length) return alert('سلة فاضية');
-        if(!window.currentUser) return checkLoginAndAction('home');
-        const btn=document.querySelector('#cart-modal button:last-child'); btn.disabled=true;
-        try { await addDoc(collection(db,"orders"),{items:window.cart, total:window.cart.reduce((s,i)=>s+(i.price*i.qty),0), customerName:window.currentUser.name, customerPhone:window.currentUser.phone, customerAddress:window.currentUser.address, timestamp:Date.now(), status:'new'}); window.cart=[]; saveCart(); renderCart(); updateCartBadge(); closeCart(); alert('تم الطلب ✅ تابع حالته من قسم طلباتي'); } catch(e){alert('خطأ');} btn.disabled=false;
+        if(!window.currentUser) { closeCart(); return checkLoginAndAction('home'); }
+        const name = document.getElementById('cart-name').value;
+        const phone = document.getElementById('cart-phone').value;
+        const address = document.getElementById('cart-address').value;
+        if(!name || !phone || !address) return toast('أكمل البيانات', 'error');
+
+        const btn=document.querySelector('#cart-modal button:last-child'); btn.disabled=true; btn.innerText='جاري الارسال...';
+        try { 
+            const docRef = await addDoc(collection(db,"orders"),{ items:window.cart, total:window.cart.reduce((s,i)=>s+(i.price*i.qty),0), customerName: name, customerPhone: phone, customerAddress: address, timestamp:Date.now(), status:'new' }); 
+            const orderId = docRef.id.slice(-6).toUpperCase();
+            document.getElementById('order-number-display').innerText = '#' + orderId;
+            document.getElementById('order-success-modal').classList.remove('hidden');
+            window.open(`https://wa.me/201020468021?text=طلب جديد رقم ${orderId}`, '_blank');
+            window.cart=[]; saveCart(); renderCart(); updateCartBadge(); closeCart(); 
+        } catch(e){alert('خطأ');} 
+        btn.disabled=false; btn.innerText='تأكيد الطلب ✅';
     };
+    
     window.toast=(m,t)=>{const e=document.createElement('div');e.className=`bg-${t=='error'?'red':'green'}-600 text-white px-6 py-3 rounded-full font-bold shadow-xl mb-2 animate-bounce`;e.innerText=m;document.getElementById('toast-container').appendChild(e);setTimeout(()=>e.remove(),3000)};
    </script>
  </body>
