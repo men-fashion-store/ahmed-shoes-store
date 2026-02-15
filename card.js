@@ -1,210 +1,164 @@
-/* ================= CART CORE (FINAL) ================= */
-window.cart = [];
-try {
-    const raw = JSON.parse(localStorage.getItem('cart') || '[]');
-    window.cart = Array.isArray(raw) ? raw : [];
-} catch(e) { window.cart = []; }
+/* ================= CART CORE ================= */
+window.cart = JSON.parse(localStorage.getItem('myCart')) || [];
+window.currentProd = null;
+window.selColorVar = null;
+window.selSizeVar = null;
 
-function saveCart() {
-    try {
-        localStorage.setItem('cart', JSON.stringify(window.cart));
-    } catch(e) {}
-}
-
-function updateCartBadge() {
-    const badge = document.getElementById('cart-badge');
-    if(!badge) return;
-    const count = window.cart.reduce((s, i) => s + (parseInt(i.qty) || 1), 0);
-    badge.textContent = count;
-    if(count === 0) {
-        badge.classList.add('hidden');
-        badge.classList.remove('flex');
-    } else {
-        badge.classList.remove('hidden');
-        badge.classList.add('flex');
-    }
-}
-
-/* =============== ADD TO CART ================= */
+/* =============== ADD TO CART (مع دمج الكميات) =============== */
 window.addToCart = function() {
-    if(!window.currentSize) {
-        showToast('اختر المقاس أولاً', 'error');
+    if(!window.selColorVar || !window.selSizeVar) {
+        window.toast('من فضلك اختار اللون والمقاس', 'error');
         return;
     }
     
-    const color = window.currentColor || 'افتراضي';
-    const price = parseInt(window.currentProd.price) || 0;
     const productId = window.currentProd.id;
+    const color = window.selColorVar;
+    const size = window.selSizeVar;
     
-    // البحث عن منتج مطابق
-    const existingIdx = window.cart.findIndex(i => 
-        i.productId === productId && 
-        i.size === window.currentSize && 
-        i.color === color
+    // 1. نتأكد لو المنتج موجود أصلاً بنفس المواصفات
+    const existingItemIndex = window.cart.findIndex(item => 
+        item.id === productId && 
+        item.color === color && 
+        item.size === size
     );
-    
-    if(existingIdx > -1) {
-        window.cart[existingIdx].qty = (parseInt(window.cart[existingIdx].qty) || 0) + 1;
+
+    if (existingItemIndex > -1) {
+        // لو موجود، زود العدد بس
+        window.cart[existingItemIndex].qty += 1;
     } else {
-        window.cart.push({
-            productId: productId,
+        // لو جديد، ضيفه
+        const item = {
+            id: productId,
             productName: window.currentProd.name,
-            price: price,
+            price: parseInt(window.currentProd.price),
+            image: window.currentProd.images[0],
             color: color,
-            size: window.currentSize,
-            image: (window.currentProd.images || [])[0],
+            size: size,
             qty: 1
-        });
+        };
+        window.cart.push(item);
     }
-    
-    saveCart();
-    updateCartBadge();
-    renderCart();
-    showToast('تمت الإضافة للسلة ✓', 'success');
-    closeModal();
+
+    window.saveCart();
+    window.updateCartBadge();
+    window.renderCart(); // تحديث فوري للسلة لو مفتوحة
+    window.toast('تمت الإضافة للسلة ✅');
+    window.closeModal(); 
 };
 
-/* =============== RENDER CART ================= */
-function renderCart() {
-    const wrap = document.getElementById('cart-items');
-    const empty = document.getElementById('cart-empty');
-    
-    if(!wrap) return;
+/* =============== RENDER CART (الشكل الكبير والتحكم) =============== */
+window.renderCart = function() {
+    const container = document.getElementById('cart-items');
+    const totalEl = document.getElementById('cart-total');
     
     if(!window.cart.length) {
-        wrap.innerHTML = '';
-        if(empty) empty.classList.remove('hidden');
-        const totalEl = document.getElementById('cart-total-confirm');
+        container.innerHTML = `
+            <div class="text-center py-10 opacity-50">
+                <span class="text-6xl">🛒</span>
+                <p class="font-bold mt-2">السلة فاضية</p>
+            </div>`;
         if(totalEl) totalEl.innerText = '0 ج.م';
         return;
     }
-    
-    if(empty) empty.classList.add('hidden');
-    
+
     let total = 0;
-    
-    wrap.innerHTML = window.cart.map((item, idx) => {
-        const itemPrice = parseInt(item.price) || 0;
-        const itemQty = parseInt(item.qty) || 1;
-        const itemTotal = itemPrice * itemQty;
-        total += itemTotal;
+    container.innerHTML = window.cart.map((item, idx) => {
+        total += item.price * item.qty;
         
         return `
-            <div class="cart-item-big relative group rounded-xl mb-3 border border-gray-100 shadow-sm">
-                <img src="${item.image || 'https://via.placeholder.com/150'}" class="w-32 h-32 rounded-xl object-cover shadow-sm bg-gray-100 shrink-0" onerror="this.src='https://via.placeholder.com/150'">
+        <div class="flex gap-4 mb-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm relative group">
+            <div class="w-24 h-24 shrink-0 rounded-xl overflow-hidden bg-gray-50 border">
+                <img src="${item.image}" class="w-full h-full object-cover mix-blend-multiply">
+            </div>
+            
+            <div class="flex-1 flex flex-col justify-between">
+                <div>
+                    <h4 class="font-bold text-gray-800 text-sm leading-tight mb-1">${item.productName}</h4>
+                    <p class="text-xs text-gray-500 font-bold bg-gray-50 inline-block px-2 py-1 rounded">
+                        ${item.color} | مقاس ${item.size}
+                    </p>
+                </div>
                 
-                <div class="flex-1 min-w-0 flex flex-col justify-between py-1 h-full gap-2">
-                    <div>
-                        <p class="font-black text-xl text-gray-800 truncate leading-tight">${item.productName}</p>
-                        <p class="text-base text-gray-500 font-bold mt-1">
-                           ${item.color} | مقاس <span class="text-brand bg-brand/10 px-1 rounded">${item.size}</span>
-                        </p>
-                    </div>
+                <div class="flex items-center justify-between mt-2">
+                    <p class="font-black text-[#4b5f28] text-lg">${item.price * item.qty} ج.م</p>
                     
-                    <div class="flex items-center justify-between">
-                        <p class="text-brand font-black text-2xl">${itemTotal} <span class="text-sm text-gray-400">ج.م</span></p>
-                        
-                        <div class="flex items-center gap-3 bg-gray-50 rounded-full px-2 py-1 border border-gray-200">
-                            <button onclick="updateCartQty(${idx}, -1)" class="cart-qty-btn hover:bg-red-100 hover:text-red-500 hover:border-red-200">−</button>
-                            <span class="text-xl font-black w-6 text-center text-gray-700">${itemQty}</span>
-                            <button onclick="updateCartQty(${idx}, 1)" class="cart-qty-btn bg-brand text-white hover:bg-brand-accent hover:text-white border-transparent shadow-md">+</button>
-                        </div>
+                    <div class="flex items-center bg-gray-50 rounded-lg border border-gray-200 h-8">
+                        <button onclick="window.updateQty(${idx}, -1)" class="w-8 h-full flex items-center justify-center text-gray-500 hover:bg-gray-200 hover:text-red-500 font-bold transition rounded-r-lg">-</button>
+                        <span class="w-8 text-center text-sm font-bold text-gray-700">${item.qty}</span>
+                        <button onclick="window.updateQty(${idx}, 1)" class="w-8 h-full flex items-center justify-center text-white bg-[#4b5f28] hover:bg-[#3a4a1f] font-bold transition rounded-l-lg">+</button>
                     </div>
                 </div>
-
-                <button onclick="removeFromCart(${idx})" class="absolute top-2 left-2 text-gray-300 hover:text-red-500 p-2 bg-white/80 rounded-full hover:bg-red-50 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                </button>
             </div>
-        `;
+
+            <button onclick="window.delItem(${idx})" class="absolute top-2 left-2 text-gray-300 hover:text-red-500 p-1 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+        </div>`;
     }).join('');
     
-    const totalEl = document.getElementById('cart-total-confirm');
     if(totalEl) totalEl.innerText = total + ' ج.م';
 }
 
-/* =============== ACTIONS ================= */
-window.updateCartQty = function(idx, delta) {
-    if(!window.cart[idx]) return;
+/* =============== ACTIONS =============== */
+window.updateQty = function(idx, delta) {
+    const item = window.cart[idx];
+    item.qty += delta;
     
-    let newQty = (parseInt(window.cart[idx].qty) || 0) + delta;
-    
-    if(newQty < 1) {
-        window.cart.splice(idx, 1);
-    } else {
-        window.cart[idx].qty = newQty;
+    if (item.qty <= 0) {
+        // لو الكمية بقت صفر، نحذفه
+        if(confirm('حذف المنتج من السلة؟')) {
+            window.cart.splice(idx, 1);
+        } else {
+            item.qty = 1; // رجعه 1 لو العميل ألغى الحذف
+        }
     }
     
-    saveCart();
-    renderCart();
-    updateCartBadge();
-    showToast('تم تحديث الكمية', 'success');
+    window.saveCart();
+    window.renderCart();
+    window.updateCartBadge();
 };
 
-window.removeFromCart = function(idx) {
-    window.cart.splice(idx, 1);
-    saveCart();
-    renderCart();
-    updateCartBadge();
-    showToast('تم الحذف من السلة', 'success');
+window.delItem = function(i) {
+    if(confirm('حذف المنتج؟')) {
+        window.cart.splice(i, 1);
+        window.saveCart();
+        window.renderCart();
+        window.updateCartBadge();
+        window.toast('تم الحذف', 'success');
+    }
 };
 
-window.clearCart = function() {
-    if(!confirm('هل تريد مسح كل المنتجات من السلة؟')) return;
-    window.cart = [];
-    saveCart();
-    renderCart();
-    updateCartBadge();
-    showToast('تم تفريغ السلة', 'success');
-};
+window.saveCart = function() {
+    localStorage.setItem('myCart', JSON.stringify(window.cart));
+}
 
-/* =============== OPEN/CLOSE CART ================= */
+window.updateCartBadge = function() {
+    const b = document.getElementById('cart-badge');
+    // بنجمع الكميات مش بس عدد العناصر (عشان لو واخد 3 كوتشيات يبان 3)
+    const count = window.cart.reduce((total, item) => total + item.qty, 0);
+    
+    if(count > 0) {
+        b.innerText = count;
+        b.classList.remove('hidden');
+    } else {
+        b.classList.add('hidden');
+    }
+}
+
 window.openCart = function() {
-    renderCart();
-    updateCartBadge();
+    window.renderCart();
     document.getElementById('cart-modal').classList.remove('hidden');
-};
+    // Smart Fill للبيانات
+    if(window.currentUser) {
+        if(document.getElementById('cart-name')) document.getElementById('cart-name').value = window.currentUser.name || '';
+        if(document.getElementById('cart-phone')) document.getElementById('cart-phone').value = window.currentUser.phone || '';
+        if(document.getElementById('cart-address')) document.getElementById('cart-address').value = window.currentUser.address || '';
+    }
+}
 
 window.closeCart = function() {
     document.getElementById('cart-modal').classList.add('hidden');
-};
-
-/* =============== TOAST HELPER ================= */
-function showToast(msg, type='success') {
-    const c = document.getElementById('toast-container');
-    if(!c) return;
-    
-    const t = document.createElement('div');
-    t.className = `toast ${type}`;
-    t.textContent = msg;
-    c.appendChild(t);
-    
-    setTimeout(() => {
-        if(t.parentNode === c) c.removeChild(t);
-    }, 3000);
 }
 
-// دالة مساعدة لنسخ النص
-window.copyOrderNumber = function() {
-    const n = document.getElementById('order-number-display')?.textContent;
-    if(n && navigator.clipboard) {
-        navigator.clipboard.writeText(n).then(() => showToast('تم النسخ!'));
-    }
-};
-
-// إغلاق نافذة النجاح
-window.closeOrderSuccess = function() {
-    document.getElementById('order-success-modal')?.classList.add('hidden');
-};
-
-// تهيئة السلة عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', function() {
-    updateCartBadge();
-    renderCart();
-});
-
-// تعريض الدوال للاستخدام العام
-window.saveCart = saveCart;
-window.updateCartBadge = updateCartBadge;
-window.renderCart = renderCart;
-window.showToast = showToast;
+// تشغيل أولي
+window.updateCartBadge();
