@@ -1,169 +1,499 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أحمد الشيخ | بوابة الفخامة</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #4b5f28; --gold: #c5a059; }
-        body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; overflow-x: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .glass-dark { background: rgba(20, 20, 20, 0.9); backdrop-filter: blur(20px); }
-        .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .input-box { width: 100%; padding: 14px; border-radius: 12px; background: #f3f4f6; border: 2px solid transparent; outline: none; transition: 0.3s; font-weight: bold; }
-        .input-box:focus { background: #fff; border-color: var(--primary); box-shadow: 0 4px 20px rgba(75, 95, 40, 0.1); }
-        /* OTP Input styling */
-        .otp-digit { width: 50px; height: 50px; text-align: center; font-size: 24px; border-radius: 10px; border: 2px solid #ddd; outline: none; font-weight: bold; }
-        .otp-digit:focus { border-color: var(--primary); }
-    </style>
-</head>
-<body class="bg-gray-50">
+<!doctype html>
+<html lang="ar" dir="rtl" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4b5f28">
+  <title>أحمد الشيخ - للأحذية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { 
+        extend: { 
+          colors: { brand: { light: '#F3F4F6', DEFAULT: '#4b5f28', text: '#2d3748', accent: '#708238' } },
+          animation: { 'float': 'float 3s ease-in-out infinite' },
+          keyframes: { float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } } }
+        } 
+      } 
+    }
+  </script>
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #f0f2f5; -webkit-tap-highlight-color: transparent; }
+    .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); }
+    .btn-shine { position: relative; overflow: hidden; }
+    .btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: 0.5s; }
+    .btn-shine:hover::after { left: 100%; }
+    /* تنسيق كارت الطلب */
+    .order-card { border-right: 4px solid #4b5f28; background: white; margin-bottom: 10px; border-radius: 8px; padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+  </style>
+ </head>
+ <body class="min-h-screen bg-gray-50 pb-20">
+   
+   <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999]"></div>
 
-    <div id="auth-overlay" class="fixed inset-0 z-[9999] glass-dark flex flex-col items-center justify-center p-4 transition-all duration-500">
-        <div class="w-full max-w-md bg-white rounded-[2rem] shadow-2xl overflow-hidden slide-up relative">
-            
-            <div class="h-28 bg-[#4b5f28] flex items-center justify-center relative">
-                <img src="احمد الشيخ (3).png" class="h-20 w-20 rounded-full border-4 border-white shadow-lg relative z-10 bg-white object-contain">
-            </div>
+   <button onclick="openCart()" class="fixed bottom-6 left-6 z-40 w-16 h-16 bg-[#4b5f28] text-white rounded-full shadow-2xl flex items-center justify-center animate-float hover:scale-110 transition border-4 border-white">
+     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+     <span id="cart-badge" class="absolute -top-1 -right-1 w-6 h-6 bg-red-500 rounded-full text-xs font-bold flex items-center justify-center border-2 border-white hidden">0</span>
+   </button>
 
-            <div class="p-8">
-                <div class="flex bg-gray-100 p-1 rounded-xl mb-6">
-                    <button onclick="switchAuth('login')" id="btn-tab-login" class="flex-1 py-2 rounded-lg font-bold text-sm bg-white shadow text-[#4b5f28]">تسجيل دخول</button>
-                    <button onclick="switchAuth('signup')" id="btn-tab-signup" class="flex-1 py-2 rounded-lg font-bold text-sm text-gray-500">حساب جديد</button>
-                </div>
-
-                <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
-                    <div class="text-center mb-2">
-                        <h2 class="text-2xl font-black text-gray-800">أهلاً بك 👋</h2>
-                        <p class="text-xs text-gray-500">ادخل برقم هاتفك وكلمة المرور</p>
-                    </div>
-                    <input type="tel" id="l-phone" placeholder="رقم الهاتف" required class="input-box text-left" dir="ltr">
-                    <input type="password" id="l-pass" placeholder="كلمة المرور" required class="input-box">
-                    <button type="submit" class="w-full bg-[#4b5f28] text-white py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition transform active:scale-95">دخول 🔓</button>
-                </form>
-
-                <form id="signup-form" onsubmit="handleSignupInitiate(event)" class="space-y-3 hidden">
-                    <div class="text-center mb-2">
-                        <h2 class="text-2xl font-black text-gray-800">حساب جديد</h2>
-                        <p class="text-xs text-gray-500">سجل بياناتك مرة واحدة وارتاح</p>
-                    </div>
-                    <input type="text" id="s-name" placeholder="الاسم ثلاثي" required class="input-box">
-                    <input type="tel" id="s-phone" placeholder="رقم الموبايل (سيرسل كود تفعيل)" required class="input-box text-left" dir="ltr">
-                    <input type="text" id="s-address" placeholder="العنوان بالتفصيل" required class="input-box">
-                    <div class="relative">
-                        <input type="email" id="s-email" placeholder="البريد الإلكتروني (اختياري)" class="input-box">
-                    </div>
-                    <input type="password" id="s-pass" placeholder="كلمة المرور" required minlength="6" class="input-box">
-                    <button type="submit" class="w-full bg-[#4b5f28] text-white py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition transform active:scale-95">إرسال كود التفعيل 📱</button>
-                </form>
-
-                <div id="otp-screen" class="hidden text-center space-y-4 py-4 absolute inset-0 bg-white z-20 flex flex-col justify-center items-center px-8">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-3xl mb-2">📩</div>
-                    <h3 class="text-xl font-bold text-gray-800">تأكيد رقم الهاتف</h3>
-                    <p class="text-sm text-gray-500">تم إرسال رمز التحقق إلى <span id="otp-phone-display" class="font-bold text-[#4b5f28]"></span></p>
-                    
-                    <div class="flex gap-2 justify-center my-4" dir="ltr">
-                        <input type="text" id="otp-code-input" maxlength="4" class="w-32 text-center text-3xl tracking-widest border-b-4 border-[#4b5f28] outline-none font-black" placeholder="----">
-                    </div>
-                    
-                    <button onclick="verifyOTP()" class="w-full bg-[#4b5f28] text-white py-3 rounded-xl font-bold shadow-lg">تأكيد الرمز ✅</button>
-                    <button onclick="resendOTP()" class="text-xs text-gray-400 font-bold underline">إعادة إرسال الرمز</button>
-                    <button onclick="cancelOTP()" class="absolute top-4 right-4 text-gray-400 text-xl font-bold">✕</button>
-                </div>
-
-            </div>
+   <div id="home-view" class="max-w-md mx-auto min-h-screen flex flex-col relative">
+     
+     <div class="pt-10 pb-6 px-6 text-center relative overflow-hidden bg-white rounded-b-[2.5rem] shadow-sm mb-6">
+        <div class="w-32 h-32 mx-auto rounded-full p-1 border-4 border-[#4b5f28]/10 mb-3 relative">
+            <img src="احمد الشيخ (3).png" class="w-full h-full rounded-full object-contain bg-white shadow-sm" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+            <div id="login-status-dot" class="absolute bottom-2 right-2 w-4 h-4 bg-gray-300 border-2 border-white rounded-full"></div>
         </div>
-    </div>
-
-    <div id="main-app" class="filter blur-md pointer-events-none transition-all duration-700">
-        <nav class="fixed top-0 w-full z-50 glass h-20 shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
-                <div class="flex items-center gap-3 cursor-pointer" onclick="renderHome()">
-                    <img src="احمد الشيخ (3).png" class="h-12 w-12 rounded-full border-2 border-[#4b5f28]">
-                    <h1 class="font-black text-[#4b5f28] hidden md:block">أحمد الشيخ</h1>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="text-right hidden md:block">
-                        <p class="text-[10px] text-gray-400 font-bold">مرحباً</p>
-                        <p id="nav-user-name" class="text-sm font-black text-[#4b5f28]">...</p>
-                    </div>
-                    <div class="relative cursor-pointer" onclick="openCart()">
-                        <div class="p-2.5 rounded-full bg-white shadow-sm border border-gray-100 hover:scale-110 transition">
-                            <svg class="w-6 h-6 text-[#4b5f28]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        </div>
-                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full scale-0 transition-transform">0</span>
-                    </div>
-                    <button onclick="logout()" class="text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg hover:bg-red-100">خروج</button>
-                </div>
-            </div>
-        </nav>
-
-        <main class="pt-24 pb-20 min-h-screen px-4 max-w-7xl mx-auto">
-            <div id="home-view" class="max-w-md mx-auto space-y-6">
-                <div onclick="loadProducts('رجالي')" class="h-40 rounded-3xl relative overflow-hidden cursor-pointer group shadow-lg"><img src="men.jpg" class="absolute w-full h-full object-cover"><div class="absolute inset-0 bg-black/40 flex items-center justify-center"><h3 class="text-white text-3xl font-black">رجالي</h3></div></div>
-                <div onclick="loadProducts('حريمي')" class="h-40 rounded-3xl relative overflow-hidden cursor-pointer group shadow-lg"><img src="women.jpg" class="absolute w-full h-full object-cover"><div class="absolute inset-0 bg-black/40 flex items-center justify-center"><h3 class="text-white text-3xl font-black">حريمي</h3></div></div>
-                <div onclick="loadProducts('أطفالي')" class="h-40 rounded-3xl relative overflow-hidden cursor-pointer group shadow-lg"><img src="kids.jpg" class="absolute w-full h-full object-cover"><div class="absolute inset-0 bg-black/40 flex items-center justify-center"><h3 class="text-white text-3xl font-black">أطفالي</h3></div></div>
-            </div>
-            
-            <div id="products-view" class="hidden">
-                <button onclick="renderHome()" class="mb-4 text-gray-500 font-bold">→ رجوع</button>
-                <div id="grid-container" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-            </div>
-        </main>
-    </div>
-
-    <div id="product-modal" class="fixed inset-0 z-[100] hidden">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal()"></div>
-        <div class="absolute bottom-0 md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-full md:w-[450px] bg-white rounded-t-[2rem] md:rounded-[2rem] shadow-2xl overflow-hidden transition-transform duration-300 translate-y-full md:translate-y-0" id="modal-content">
-            <div class="relative h-64 bg-gray-50">
-                <button onclick="closeModal()" class="absolute top-4 left-4 z-10 w-8 h-8 bg-white rounded-full font-bold">✕</button>
-                <img id="modal-img" class="w-full h-full object-cover mix-blend-multiply p-6">
-            </div>
-            <div class="p-6 space-y-4">
-                <h3 id="modal-name" class="text-2xl font-black text-gray-800"></h3>
-                <p id="modal-price" class="text-xl font-bold text-[#4b5f28]"></p>
-                <div><p class="text-xs font-bold text-gray-400 mb-2">اللون</p><div id="modal-colors" class="flex gap-2"></div></div>
-                <div><p class="text-xs font-bold text-gray-400 mb-2">المقاس</p><div id="modal-sizes" class="flex gap-2"></div></div>
-                <button onclick="addToCartLogic()" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold shadow-lg mt-4">إضافة للسلة 🛒</button>
-            </div>
+        <h1 class="text-2xl font-black text-gray-800 mb-1" id="user-greeting">أهلاً بك 👋</h1>
+        <p class="text-gray-400 text-xs font-bold tracking-widest uppercase">Luxury Footwear</p>
+        
+        <div class="flex justify-center gap-3 mt-4">
+            <button onclick="checkLoginAndAction('orders')" class="px-4 py-2 bg-gray-50 text-[#4b5f28] rounded-full text-sm font-bold border border-gray-200 hover:bg-[#4b5f28] hover:text-white transition flex items-center gap-2">
+                📦 طلباتي
+            </button>
+            <button onclick="handleAuthClick()" id="auth-btn" class="px-4 py-2 bg-[#4b5f28] text-white rounded-full text-sm font-bold shadow-lg hover:bg-[#3a4a1f] transition">
+                تسجيل الدخول
+            </button>
         </div>
-    </div>
+     </div>
 
-    <div id="cart-modal" class="fixed inset-0 z-[110] hidden">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCart()"></div>
-        <div class="absolute right-0 top-0 h-full w-full md:w-[450px] bg-white shadow-2xl flex flex-col transition-transform duration-300 translate-x-full" id="cart-content">
-            <div class="p-5 border-b flex justify-between items-center bg-gray-50">
-                <h2 class="text-xl font-black text-gray-800">إتمام الطلب 🚀</h2>
-                <button onclick="closeCart()" class="w-8 h-8 rounded-full hover:bg-red-50 text-red-500">✕</button>
+     <div class="px-4 space-y-4 flex-1">
+       <button onclick="showCategory('رجالي')" class="w-full h-32 rounded-2xl relative overflow-hidden group shadow-md transition hover:-translate-y-1">
+         <img src="men.jpg" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-700" onerror="this.src='https://via.placeholder.com/400x150?text=Men'">
+         <div class="absolute inset-0 bg-black/40 flex items-center justify-center"><h3 class="text-white text-2xl font-black border-b-2 border-white pb-1">رجالي</h3></div>
+       </button>
+       <button onclick="showCategory('حريمي')" class="w-full h-32 rounded-2xl relative overflow-hidden group shadow-md transition hover:-translate-y-1">
+         <img src="women.jpg" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-700" onerror="this.src='https://via.placeholder.com/400x150?text=Women'">
+         <div class="absolute inset-0 bg-black/40 flex items-center justify-center"><h3 class="text-white text-2xl font-black border-b-2 border-white pb-1">حريمي</h3></div>
+       </button>
+       <button onclick="showCategory('أطفالي')" class="w-full h-32 rounded-2xl relative overflow-hidden group shadow-md transition hover:-translate-y-1">
+         <img src="kids.jpg" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-700" onerror="this.src='https://via.placeholder.com/400x150?text=Kids'">
+         <div class="absolute inset-0 bg-black/40 flex items-center justify-center"><h3 class="text-white text-2xl font-black border-b-2 border-white pb-1">أطفالي</h3></div>
+       </button>
+     </div>
+     
+     <div class="text-center py-6 text-gray-300 text-xs">A H M E D E L S H E K H</div>
+   </div>
+
+   <div id="products-view" class="hidden min-h-screen bg-white">
+     <div class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b px-4 py-3 flex items-center justify-between shadow-sm">
+        <button onclick="goHome()" class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full font-bold text-gray-600">←</button>
+        <h2 id="cat-title" class="font-bold text-lg text-[#4b5f28]"></h2>
+        <div class="w-8"></div>
+     </div>
+     <div id="grid" class="grid grid-cols-2 gap-3 p-3 pb-24"></div>
+     <div id="loader" class="text-center py-20 hidden"><span class="text-2xl animate-spin inline-block">⏳</span></div>
+   </div>
+
+   <div id="product-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+     <div class="bg-white w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden max-h-[90vh] flex flex-col relative animate-float" style="animation: slideUp 0.3s ease-out">
+       <button onclick="closeModal()" class="absolute top-4 left-4 z-10 w-8 h-8 bg-white/80 rounded-full font-bold shadow-sm">✕</button>
+       <div class="h-64 bg-gray-100 p-4"><img id="m-img" class="w-full h-full object-contain mix-blend-multiply"></div>
+       <div class="p-6 space-y-4 bg-white flex-1 overflow-y-auto">
+         <div class="flex justify-between items-start">
+            <h2 id="m-name" class="text-xl font-bold text-gray-800"></h2>
+            <span id="m-price" class="text-xl font-black text-[#4b5f28]"></span>
+         </div>
+         <div id="colors-area" class="hidden">
+             <p class="text-xs font-bold text-gray-400 mb-2">اللون</p>
+             <div id="m-colors" class="flex flex-wrap gap-2"></div>
+         </div>
+         <div>
+             <p class="text-xs font-bold text-gray-400 mb-2">المقاس</p>
+             <div id="m-sizes" class="flex flex-wrap gap-2"></div>
+         </div>
+         <button onclick="addToCart()" class="w-full py-3.5 bg-[#4b5f28] text-white font-bold rounded-xl shadow-lg btn-shine mt-2">إضافة للسلة 🛒</button>
+       </div>
+     </div>
+   </div>
+
+   <div id="login-modal" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+       <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl relative">
+           <button onclick="document.getElementById('login-modal').classList.add('hidden')" class="absolute top-3 left-3 text-gray-400 text-xl">✕</button>
+           
+           <div class="text-center mb-6">
+               <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">🔐</div>
+               <h3 class="text-xl font-bold text-gray-800">تسجيل دخول سريع</h3>
+               <p class="text-xs text-gray-500">ادخل رقم موبايلك وهنتعرف عليك</p>
+           </div>
+
+           <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+               <div>
+                   <label class="block text-xs font-bold text-gray-600 mb-1">رقم الهاتف</label>
+                   <input type="tel" id="login-phone" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-center text-lg outline-none focus:border-[#4b5f28]" placeholder="01xxxxxxxxx" required>
+               </div>
+               
+               <div id="new-user-fields" class="hidden space-y-4 border-t pt-4">
+                   <p class="text-xs text-green-600 font-bold text-center">أهلاً بك أول مرة! عرفنا بيك عشان الطلبات</p>
+                   <input type="text" id="login-name" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold outline-none" placeholder="الاسم الثلاثي">
+                   <input type="text" id="login-address" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold outline-none" placeholder="العنوان بالتفصيل">
+               </div>
+
+               <button type="submit" id="login-btn-submit" class="w-full py-3 bg-[#4b5f28] text-white font-bold rounded-xl shadow-lg">متابعة ➔</button>
+           </form>
+       </div>
+   </div>
+
+   <div id="orders-modal" class="hidden fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center">
+       <div class="bg-gray-50 w-full sm:max-w-md h-[80vh] sm:h-auto sm:max-h-[80vh] rounded-t-3xl sm:rounded-2xl flex flex-col shadow-2xl">
+           <div class="p-4 bg-white border-b flex justify-between items-center rounded-t-3xl sm:rounded-2xl">
+               <h3 class="font-bold text-lg text-[#4b5f28]">📦 طلباتي السابقة</h3>
+               <button onclick="document.getElementById('orders-modal').classList.add('hidden')" class="w-8 h-8 bg-gray-100 rounded-full text-gray-600 font-bold">✕</button>
+           </div>
+           <div id="orders-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+               <p class="text-center text-gray-400 py-10">جاري تحميل الطلبات...</p>
+           </div>
+       </div>
+   </div>
+
+   <div id="cart-modal" class="hidden fixed inset-0 z-50 bg-black/50 flex justify-end">
+     <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl" style="animation: slideLeft 0.3s">
+        <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+            <h2 class="font-bold text-lg">🛒 السلة</h2>
+            <button onclick="closeCart()" class="text-gray-500 font-bold text-xl">✕</button>
+        </div>
+        <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+        <div class="p-4 border-t bg-gray-50">
+            <div class="flex justify-between font-bold text-lg mb-4">
+                <span>الإجمالي:</span>
+                <span id="cart-total" class="text-[#4b5f28]">0 ج.م</span>
             </div>
-            
-            <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
-            
-            <div class="p-6 bg-white border-t shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-                <div class="flex justify-between font-bold text-lg mb-4">
-                    <span>الإجمالي:</span>
-                    <span id="cart-total" class="text-[#4b5f28]">0 ج.م</span>
-                </div>
+            <button onclick="checkout()" class="w-full py-4 bg-[#4b5f28] text-white font-bold rounded-xl shadow-lg">تأكيد الطلب ✅</button>
+        </div>
+     </div>
+   </div>
 
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-4 space-y-3">
-                    <p class="text-xs font-bold text-[#4b5f28] uppercase">بيانات التوصيل (جاهزة)</p>
-                    <input id="checkout-name" class="w-full bg-white border border-gray-200 p-2 rounded-lg text-sm font-bold text-gray-700" placeholder="الاسم">
-                    <input id="checkout-phone" class="w-full bg-white border border-gray-200 p-2 rounded-lg text-sm font-bold text-gray-700" placeholder="الهاتف">
-                    <textarea id="checkout-address" class="w-full bg-white border border-gray-200 p-2 rounded-lg text-sm font-bold text-gray-700 resize-none" rows="2" placeholder="العنوان"></textarea>
-                </div>
+   <script src="card.js"></script>
+   <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy, where, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyASO-AN5XaSGn4SaCZ8VlHr6zsFCIxPCzs",
+      authDomain: "ahmed-shoes.firebaseapp.com",
+      projectId: "ahmed-shoes",
+      storageBucket: "ahmed-shoes.firebasestorage.app",
+      messagingSenderId: "172928088473",
+      appId: "1:172928088473:web:100f543fd097a8d5c33b08",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // --- نظام المستخدم (Login System) ---
+    window.currentUser = JSON.parse(localStorage.getItem('userData')) || null;
+
+    function updateUIForUser() {
+        const btn = document.getElementById('auth-btn');
+        const greeting = document.getElementById('user-greeting');
+        const dot = document.getElementById('login-status-dot');
+
+        if(window.currentUser) {
+            btn.textContent = 'تسجيل خروج';
+            btn.classList.replace('bg-[#4b5f28]', 'bg-red-500');
+            btn.onclick = logout;
+            greeting.textContent = `أهلاً، ${window.currentUser.name.split(' ')[0]} 👋`;
+            dot.classList.replace('bg-gray-300', 'bg-green-500');
+        } else {
+            btn.textContent = 'تسجيل الدخول';
+            btn.classList.replace('bg-red-500', 'bg-[#4b5f28]');
+            btn.onclick = handleAuthClick;
+            greeting.textContent = 'أهلاً بك 👋';
+            dot.classList.replace('bg-green-500', 'bg-gray-300');
+        }
+    }
+    
+    window.handleAuthClick = function() {
+        document.getElementById('login-modal').classList.remove('hidden');
+        document.getElementById('login-phone').focus();
+    }
+
+    window.logout = function() {
+        if(confirm('هل تريد تسجيل الخروج؟')) {
+            localStorage.removeItem('userData');
+            window.currentUser = null;
+            updateUIForUser();
+            toast('تم تسجيل الخروج');
+        }
+    }
+
+    // --- منطق تسجيل الدخول السلس ---
+    window.handleLoginSubmit = async function(e) {
+        e.preventDefault();
+        const phone = document.getElementById('login-phone').value.trim();
+        const btn = document.getElementById('login-btn-submit');
+        const nameInput = document.getElementById('login-name');
+        const addrInput = document.getElementById('login-address');
+        const newFields = document.getElementById('new-user-fields');
+
+        if(!phone || phone.length < 11) return toast('رقم الهاتف غير صحيح', 'error');
+
+        btn.disabled = true;
+        btn.innerText = 'جاري التحقق...';
+
+        try {
+            // 1. البحث عن المستخدم
+            const userRef = doc(db, "users", phone);
+            const userSnap = await getDoc(userRef);
+
+            if(userSnap.exists()) {
+                // مستخدم موجود -> تسجيل دخول فوراً
+                const userData = userSnap.data();
+                loginSuccess(userData);
+            } else {
+                // مستخدم جديد -> هل أدخل الاسم؟
+                if(newFields.classList.contains('hidden')) {
+                    // أول مرة نضغط -> اظهر الحقول
+                    newFields.classList.remove('hidden');
+                    btn.innerText = 'إنشاء حساب ودخول';
+                    btn.disabled = false;
+                    toast('رقم جديد! كمل بياناتك');
+                } else {
+                    // تاني مرة نضغط -> حفظ البيانات
+                    const name = nameInput.value.trim();
+                    const address = addrInput.value.trim();
+                    if(!name || !address) {
+                        btn.disabled = false;
+                        return toast('اكتب الاسم والعنوان', 'error');
+                    }
+
+                    const newUser = { name, phone, address, joinedAt: Date.now() };
+                    await setDoc(userRef, newUser);
+                    loginSuccess(newUser);
+                }
+            }
+        } catch(e) {
+            console.error(e);
+            toast('حدث خطأ في الاتصال', 'error');
+            btn.disabled = false;
+            btn.innerText = 'متابعة ➔';
+        }
+    }
+
+    function loginSuccess(userData) {
+        localStorage.setItem('userData', JSON.stringify(userData));
+        window.currentUser = userData;
+        updateUIForUser();
+        document.getElementById('login-modal').classList.add('hidden');
+        // تنظيف الفورم
+        document.getElementById('login-phone').value = '';
+        document.getElementById('new-user-fields').classList.add('hidden');
+        document.getElementById('login-btn-submit').innerText = 'متابعة ➔';
+        document.getElementById('login-btn-submit').disabled = false;
+        
+        toast(`نورت يا ${userData.name.split(' ')[0]} ❤️`);
+        
+        // لو كان بيحاول يعمل حاجة (زي فتح الطلبات) نفتحها
+        if(window.pendingAction === 'orders') {
+            openMyOrders();
+            window.pendingAction = null;
+        }
+    }
+
+    // --- رف الطلبات (My Orders) ---
+    window.checkLoginAndAction = function(action) {
+        if(!window.currentUser) {
+            window.pendingAction = action;
+            toast('سجل دخولك الأول برقم الموبايل');
+            handleAuthClick();
+        } else {
+            if(action === 'orders') openMyOrders();
+        }
+    }
+
+    window.openMyOrders = async function() {
+        document.getElementById('orders-modal').classList.remove('hidden');
+        const list = document.getElementById('orders-list');
+        list.innerHTML = '<p class="text-center text-gray-400 py-10"><span class="inline-block animate-spin text-2xl">⏳</span> جاري البحث عن طلباتك...</p>';
+
+        try {
+            const q = query(collection(db, "orders"), where("customerPhone", "==", window.currentUser.phone), orderBy("timestamp", "desc"));
+            const snap = await getDocs(q);
+
+            if(snap.empty) {
+                list.innerHTML = `
+                    <div class="text-center py-10">
+                        <div class="text-5xl opacity-30 mb-2">📦</div>
+                        <p class="font-bold text-gray-500">لسه مفيش طلبات</p>
+                        <button onclick="document.getElementById('orders-modal').classList.add('hidden')" class="text-[#4b5f28] text-sm font-bold mt-2">اطلب دلوقتي</button>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = snap.docs.map(d => {
+                const o = d.data();
+                const date = new Date(o.timestamp).toLocaleDateString('ar-EG');
+                const itemsCount = o.items ? o.items.length : 1;
+                const title = o.items ? o.items.map(i=>i.productName).join(' + ') : o.productName;
                 
-                <button onclick="checkout()" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold shadow-xl hover:bg-[#3a4a1f] transition flex items-center justify-center gap-2">
-                    تأكيد الطلب نهائياً ✅
-                </button>
+                return `
+                <div class="order-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="font-black text-gray-800 text-sm">#${d.id.slice(0,6).toUpperCase()}</p>
+                            <p class="text-xs text-gray-500">${date}</p>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-1 rounded-full">قيد المراجعة</span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-700 truncate mb-1">${title}</p>
+                    <div class="flex justify-between items-center border-t pt-2 mt-2">
+                        <span class="text-xs text-gray-500">${itemsCount} منتجات</span>
+                        <span class="font-black text-[#4b5f28]">${o.total} ج.م</span>
+                    </div>
+                </div>`;
+            }).join('');
+
+        } catch(e) {
+            console.error(e);
+            list.innerHTML = '<p class="text-center text-red-500 py-4">حدث خطأ في تحميل الطلبات</p>';
+        }
+    }
+
+    // --- المنتجات والسلة ---
+    window.allProducts = [];
+    
+    // تحميل المنتجات
+    getDocs(query(collection(db, "products"), orderBy("timestamp", "desc"))).then(snap => {
+        window.allProducts = [];
+        snap.forEach(doc => window.allProducts.push({id: doc.id, ...doc.data()}));
+    });
+
+    window.showCategory = function(cat) {
+        document.getElementById('home-view').classList.add('hidden');
+        document.getElementById('products-view').classList.remove('hidden');
+        document.getElementById('cat-title').innerText = cat;
+        
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        const items = window.allProducts.filter(p => p.category === cat);
+        
+        if(!items.length) {
+            grid.innerHTML = '<p class="col-span-2 text-center text-gray-400 py-10">لا توجد منتجات حالياً</p>';
+            return;
+        }
+
+        grid.innerHTML = items.map(p => `
+            <div onclick="openProdModal('${p.id}')" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition">
+                <div class="h-40 bg-gray-50"><img src="${(p.images||[])[0]}" class="w-full h-full object-cover mix-blend-multiply"></div>
+                <div class="p-3">
+                    <h4 class="font-bold text-sm truncate text-gray-800">${p.name}</h4>
+                    <p class="font-black text-[#4b5f28] mt-1">${p.price} ج.م</p>
+                </div>
             </div>
-        </div>
-    </div>
+        `).join('');
+    }
 
-    <div id="toast-container" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"></div>
+    window.openProdModal = function(id) {
+        const p = window.allProducts.find(x => x.id === id);
+        window.currentProd = p;
+        window.selectedColor = null; window.selectedSize = null;
+        
+        document.getElementById('product-modal').classList.remove('hidden');
+        document.getElementById('m-img').src = (p.images||[])[0];
+        document.getElementById('m-name').innerText = p.name;
+        document.getElementById('m-price').innerText = p.price + ' ج.م';
+        
+        // الألوان
+        const cWrap = document.getElementById('colors-area');
+        const cDiv = document.getElementById('m-colors');
+        if(p.colors && p.colors.length > 0) {
+            cWrap.classList.remove('hidden');
+            cDiv.innerHTML = p.colors.map(c => 
+                `<button onclick="selColor('${c.name}', this)" class="px-3 py-1 border rounded-lg text-sm font-bold">${c.name}</button>`
+            ).join('');
+            document.getElementById('m-sizes').innerHTML = '<span class="text-gray-400 text-xs">اختر اللون..</span>';
+        } else {
+            cWrap.classList.add('hidden');
+            // لو مفيش ألوان، اعرض مقاسات الافتراضي لو موجودة
+            // للتبسيط هنعتمد هيكل الألوان دايما
+        }
+    }
 
-    <script type="module" src="main.js"></script>
-</body>
+    window.selColor = function(name, btn) {
+        window.selectedColor = name;
+        document.querySelectorAll('#m-colors button').forEach(b => b.classList.remove('bg-[#4b5f28]', 'text-white'));
+        btn.classList.add('bg-[#4b5f28]', 'text-white');
+        
+        const colorData = window.currentProd.colors.find(c => c.name === name);
+        document.getElementById('m-sizes').innerHTML = (colorData.sizes||[]).map(s => 
+            `<button onclick="selSize('${s}', this)" class="w-8 h-8 rounded bg-gray-100 text-xs font-bold hover:bg-[#4b5f28] hover:text-white transition">${s}</button>`
+        ).join('');
+    }
+
+    window.selSize = function(s, btn) {
+        window.selectedSize = s;
+        document.querySelectorAll('#m-sizes button').forEach(b => b.classList.remove('bg-[#4b5f28]', 'text-white'));
+        btn.classList.add('bg-[#4b5f28]', 'text-white');
+    }
+
+    window.checkout = async function() {
+        if(!window.cart || !window.cart.length) return toast('السلة فاضية', 'error');
+        
+        // التحقق من الدخول قبل الطلب
+        if(!window.currentUser) {
+            toast('من فضلك سجل دخولك الأول');
+            closeCart();
+            handleAuthClick();
+            return;
+        }
+
+        const btn = document.querySelector('#cart-modal button:last-child');
+        btn.disabled = true;
+        btn.innerText = 'جاري الإرسال...';
+
+        try {
+            const orderData = {
+                items: window.cart,
+                total: window.cart.reduce((s,i)=>s+(i.price*i.qty),0),
+                customerName: window.currentUser.name,
+                customerPhone: window.currentUser.phone,
+                customerAddress: window.currentUser.address,
+                timestamp: Date.now()
+            };
+
+            await addDoc(collection(db, "orders"), orderData);
+            
+            // رسالة واتساب
+            const msg = `🛒 *طلب جديد من الموقع*\n👤 العميل: ${window.currentUser.name}\n📞: ${window.currentUser.phone}\n📍: ${window.currentUser.address}\n\n` + 
+                        window.cart.map(i => `- ${i.productName} (${i.color}/${i.size})`).join('\n') + 
+                        `\n\n💰 الإجمالي: ${orderData.total} ج.م`;
+            
+            window.open(`https://wa.me/201020468021?text=${encodeURIComponent(msg)}`, '_blank');
+            
+            window.cart = [];
+            saveCart();
+            renderCart();
+            updateCartBadge();
+            closeCart();
+            toast('تم الطلب بنجاح ✅');
+
+        } catch(e) {
+            console.error(e);
+            toast('حدث خطأ', 'error');
+        }
+        btn.disabled = false;
+        btn.innerText = 'تأكيد الطلب ✅';
+    }
+
+    window.goHome = () => {
+        document.getElementById('products-view').classList.add('hidden');
+        document.getElementById('home-view').classList.remove('hidden');
+    }
+    
+    window.closeModal = () => document.getElementById('product-modal').classList.add('hidden');
+    
+    // تشغيل التحديثات عند التحميل
+    updateUIForUser();
+    
+    // Toast Function
+    function toast(msg, type='success') {
+        const t = document.createElement('div');
+        t.className = `bg-${type==='error'?'red':'green'}-600 text-white px-6 py-3 rounded-full font-bold shadow-xl mb-2 animate-bounce`;
+        t.innerText = msg;
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+    }
+    window.toast = toast;
+   </script>
+ </body>
 </html>
