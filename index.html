@@ -3,176 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أحمد الشيخ | للفخامة عنوان</title>
+    <title>أحمد الشيخ | بوابة الفخامة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4b5f28; --accent: #708238; --gold: #D4AF37; }
-        body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; color: #1f2937; overflow-x: hidden; }
+        :root { --primary: #4b5f28; --gold: #c5a059; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; overflow-x: hidden; }
         
-        /* Glassmorphism Classes */
-        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
-        .glass-dark { background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); color: white; }
+        /* Glass Effect */
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .glass-dark { background: rgba(20, 20, 20, 0.9); backdrop-filter: blur(20px); }
+
+        /* Animation */
+        .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        /* Animations */
-        .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; transform: translateY(20px); }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-        
-        .hover-lift { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .hover-lift:hover { transform: translateY(-5px) scale(1.02); }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-        
-        /* Loader */
-        .loader { border-top-color: var(--primary); -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
-        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Input Style */
+        .input-box { width: 100%; padding: 14px; border-radius: 12px; background: #f3f4f6; border: 2px solid transparent; outline: none; transition: 0.3s; font-weight: bold; }
+        .input-box:focus { background: #fff; border-color: var(--primary); box-shadow: 0 4px 20px rgba(75, 95, 40, 0.1); }
     </style>
 </head>
-<body class="bg-[#f3f4f6]">
+<body class="bg-gray-50">
 
-    <nav class="fixed top-0 w-full z-50 glass shadow-sm transition-all duration-300" id="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex items-center gap-3 cursor-pointer" onclick="renderHome()">
-                    <img src="احمد الشيخ (3).png" alt="Logo" class="h-12 w-12 rounded-full border-2 border-[#4b5f28] shadow-lg object-contain bg-white">
-                    <div>
-                        <h1 class="text-xl font-black text-[#4b5f28] tracking-wide">أحمد الشيخ</h1>
-                        <p class="text-[10px] text-gray-500 font-bold tracking-[0.2em] uppercase">Luxury Shoes</p>
-                    </div>
-                </div>
-                <div class="relative cursor-pointer hover:scale-110 transition" onclick="openCart()">
-                    <div class="p-2 rounded-full hover:bg-gray-100 transition">
-                        <svg class="w-7 h-7 text-[#4b5f28]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                    </div>
-                    <span id="cart-badge" class="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white transform scale-0 transition-transform duration-300">0</span>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <main id="app-root" class="pt-24 pb-20 min-h-screen">
-        <div id="home-view" class="max-w-md mx-auto px-4 space-y-8">
-            <div class="text-center py-6 fade-in-up" style="animation-delay: 0.1s;">
-                <h2 class="text-3xl font-black text-gray-800 mb-2">اختار ستايلك</h2>
-                <p class="text-gray-500 text-sm">أرقى الموديلات العصرية بجودة عالمية</p>
-            </div>
-
-            <div class="space-y-4">
-                <div onclick="loadProducts('رجالي')" class="fade-in-up hover-lift cursor-pointer relative h-40 rounded-3xl overflow-hidden shadow-xl group" style="animation-delay: 0.2s;">
-                    <img src="men.jpg" class="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=800&q=80'">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center px-8">
-                        <div>
-                            <h3 class="text-white text-2xl font-black mb-1">القسم الرجالي</h3>
-                            <span class="text-white/80 text-xs font-bold border border-white/30 px-3 py-1 rounded-full backdrop-blur-sm group-hover:bg-white group-hover:text-black transition">تصفح الآن ←</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div onclick="loadProducts('حريمي')" class="fade-in-up hover-lift cursor-pointer relative h-40 rounded-3xl overflow-hidden shadow-xl group" style="animation-delay: 0.3s;">
-                    <img src="women.jpg" class="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=800&q=80'">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center px-8">
-                        <div>
-                            <h3 class="text-white text-2xl font-black mb-1">القسم الحريمي</h3>
-                            <span class="text-white/80 text-xs font-bold border border-white/30 px-3 py-1 rounded-full backdrop-blur-sm group-hover:bg-white group-hover:text-black transition">تصفح الآن ←</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div onclick="loadProducts('أطفالي')" class="fade-in-up hover-lift cursor-pointer relative h-40 rounded-3xl overflow-hidden shadow-xl group" style="animation-delay: 0.4s;">
-                    <img src="kids.jpg" class="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='https://images.unsplash.com/photo-1514989940723-e8875ea6ab7d?auto=format&fit=crop&w=800&q=80'">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center px-8">
-                        <div>
-                            <h3 class="text-white text-2xl font-black mb-1">القسم الأطفالي</h3>
-                            <span class="text-white/80 text-xs font-bold border border-white/30 px-3 py-1 rounded-full backdrop-blur-sm group-hover:bg-white group-hover:text-black transition">تصفح الآن ←</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="products-view" class="hidden max-w-7xl mx-auto px-4">
-            <div class="flex items-center justify-between mb-6">
-                <button onclick="renderHome()" class="flex items-center gap-2 text-gray-500 hover:text-[#4b5f28] transition">
-                    <span class="text-2xl">→</span> <span class="font-bold">الرجوع</span>
-                </button>
-                <h2 id="page-title" class="text-2xl font-black text-[#4b5f28]"></h2>
-            </div>
+    <div id="auth-overlay" class="fixed inset-0 z-[9999] glass-dark flex flex-col items-center justify-center p-4 transition-all duration-500">
+        <div class="w-full max-w-md bg-white rounded-[2rem] shadow-2xl overflow-hidden slide-up relative">
             
-            <div id="loader" class="hidden flex justify-center py-20">
-                <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+            <div class="h-32 bg-[#4b5f28] flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                <img src="احمد الشيخ (3).png" class="h-20 w-20 rounded-full border-4 border-white shadow-lg relative z-10 bg-white object-contain">
             </div>
 
-            <div id="grid-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                </div>
-            
-             <div id="empty-state" class="hidden text-center py-20">
-                <p class="text-gray-400 font-bold text-lg">لا توجد منتجات متاحة حالياً</p>
-            </div>
-        </div>
-    </main>
-
-    <div id="product-modal" class="fixed inset-0 z-[60] hidden">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
-        <div class="absolute bottom-0 md:top-1/2 md:left-1/2 md:transform md:-translate-x-1/2 md:-translate-y-1/2 w-full md:w-[450px] bg-white rounded-t-[2rem] md:rounded-[2rem] shadow-2xl overflow-hidden transition-transform duration-300 translate-y-full md:translate-y-0" id="modal-content">
-            <div class="relative h-72 bg-gray-100">
-                <button onclick="closeModal()" class="absolute top-4 left-4 z-10 w-10 h-10 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-gray-800 font-bold shadow-md hover:scale-110 transition">✕</button>
-                <img id="modal-img" class="w-full h-full object-cover mix-blend-multiply p-4" src="">
-            </div>
-            <div class="p-6 md:p-8 space-y-4">
-                <div class="flex justify-between items-start">
-                    <h3 id="modal-name" class="text-2xl font-black text-gray-800 leading-tight"></h3>
-                    <p id="modal-price" class="text-xl font-bold text-[#4b5f28] whitespace-nowrap"></p>
-                </div>
-                
-                <div class="space-y-3">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">اختر اللون</p>
-                    <div id="modal-colors" class="flex gap-2 flex-wrap"></div>
-                </div>
-                
-                <div class="space-y-3">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">اختر المقاس</p>
-                    <div id="modal-sizes" class="flex gap-2 flex-wrap"></div>
+            <div class="p-8">
+                <div class="flex bg-gray-100 p-1 rounded-xl mb-6">
+                    <button onclick="switchAuth('login')" id="btn-tab-login" class="flex-1 py-2 rounded-lg font-bold text-sm transition-all bg-white shadow text-[#4b5f28]">تسجيل دخول</button>
+                    <button onclick="switchAuth('signup')" id="btn-tab-signup" class="flex-1 py-2 rounded-lg font-bold text-sm transition-all text-gray-500 hover:text-gray-700">حساب جديد</button>
                 </div>
 
-                <button onclick="addToCartLogic()" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-[#3a4a1f] active:scale-95 transition flex items-center justify-center gap-2 mt-4">
-                    <span>إضافة للسلة</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                </button>
+                <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div class="text-center mb-2">
+                        <h2 class="text-2xl font-black text-gray-800">أهلاً بك من جديد</h2>
+                        <p class="text-xs text-gray-500">سجل دخولك لمتابعة أحدث الكوليكشن</p>
+                    </div>
+                    <input type="email" id="l-email" placeholder="البريد الإلكتروني" required class="input-box">
+                    <input type="password" id="l-pass" placeholder="كلمة المرور" required class="input-box">
+                    <button type="submit" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition transform active:scale-95">دخول آمن 🔒</button>
+                    <p id="verify-warning" class="hidden text-center text-xs text-red-500 font-bold bg-red-50 p-2 rounded-lg">⚠️ يرجى تفعيل البريد الإلكتروني من الرسالة التي وصلتك</p>
+                </form>
+
+                <form id="signup-form" onsubmit="handleSignup(event)" class="space-y-3 hidden">
+                    <div class="text-center mb-2">
+                        <h2 class="text-2xl font-black text-gray-800">انضم للعائلة</h2>
+                        <p class="text-xs text-gray-500">بياناتك بنحفظها عشان راحتك في الطلب</p>
+                    </div>
+                    <input type="text" id="s-name" placeholder="الاسم ثلاثي" required class="input-box">
+                    <input type="tel" id="s-phone" placeholder="رقم الموبايل" required class="input-box">
+                    <input type="text" id="s-address" placeholder="عنوان التوصيل (بالتفصيل)" required class="input-box">
+                    <input type="email" id="s-email" placeholder="البريد الإلكتروني (لتأكيد الحساب)" required class="input-box">
+                    <input type="password" id="s-pass" placeholder="كلمة المرور" required minlength="6" class="input-box">
+                    <button type="submit" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition transform active:scale-95">إنشاء حساب وتأكيد ✉️</button>
+                </form>
+
+                <div id="verify-sent-msg" class="hidden text-center space-y-4 py-4">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-3xl">📧</div>
+                    <h3 class="text-xl font-bold text-gray-800">تم إرسال رابط التفعيل!</h3>
+                    <p class="text-sm text-gray-600">روح افتح إيميلك دلوقتي هتلاقي رسالة تفعيل، اضغط على الرابط وبعدين سجل دخول.</p>
+                    <button onclick="switchAuth('login')" class="text-[#4b5f28] font-bold underline">الرجوع لتسجيل الدخول</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="cart-modal" class="fixed inset-0 z-[70] hidden">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCart()"></div>
-        <div class="absolute right-0 top-0 h-full w-full md:w-[400px] bg-white shadow-2xl flex flex-col transition-transform duration-300 translate-x-full" id="cart-content">
-            <div class="p-6 border-b flex justify-between items-center bg-gray-50">
-                <h2 class="text-xl font-black text-gray-800">سلة المشتريات 🛒</h2>
-                <button onclick="closeCart()" class="text-gray-400 hover:text-red-500">✕</button>
-            </div>
-            <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-4">
+    <div id="main-app" class="filter blur-md pointer-events-none transition-all duration-700">
+        <nav class="fixed top-0 w-full z-50 glass h-20 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="renderHome()">
+                    <img src="احمد الشيخ (3).png" class="h-12 w-12 rounded-full border-2 border-[#4b5f28]">
+                    <h1 class="font-black text-[#4b5f28] hidden md:block">أحمد الشيخ</h1>
                 </div>
-            <div class="p-6 bg-gray-50 border-t space-y-4">
-                <div class="flex justify-between items-center text-lg font-bold">
+                <div class="flex items-center gap-4">
+                    <div class="text-right hidden md:block">
+                        <p class="text-[10px] text-gray-400 font-bold">مرحباً</p>
+                        <p id="nav-user-name" class="text-sm font-black text-[#4b5f28]">...</p>
+                    </div>
+                    <div class="relative cursor-pointer" onclick="openCart()">
+                        <div class="p-2.5 rounded-full bg-white shadow-sm border border-gray-100 hover:scale-110 transition">
+                            <svg class="w-6 h-6 text-[#4b5f28]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        </div>
+                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full scale-0 transition-transform">0</span>
+                    </div>
+                    <button onclick="logout()" class="text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg hover:bg-red-100">خروج</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="pt-24 pb-20 min-h-screen px-4 max-w-7xl mx-auto">
+            <div id="home-view" class="max-w-md mx-auto space-y-6">
+                <div onclick="loadProducts('رجالي')" class="h-40 rounded-3xl relative overflow-hidden cursor-pointer group shadow-lg"><img src="men.jpg" class="absolute w-full h-full object-cover"><div class="absolute inset-0 bg-black/40 flex items-center justify-center"><h3 class="text-white text-3xl font-black">رجالي</h3></div></div>
+                <div onclick="loadProducts('حريمي')" class="h-40 rounded-3xl relative overflow-hidden cursor-pointer group shadow-lg"><img src="women.jpg" class="absolute w-full h-full object-cover"><div class="absolute inset-0 bg-black/40 flex items-center justify-center"><h3 class="text-white text-3xl font-black">حريمي</h3></div></div>
+                <div onclick="loadProducts('أطفالي')" class="h-40 rounded-3xl relative overflow-hidden cursor-pointer group shadow-lg"><img src="kids.jpg" class="absolute w-full h-full object-cover"><div class="absolute inset-0 bg-black/40 flex items-center justify-center"><h3 class="text-white text-3xl font-black">أطفالي</h3></div></div>
+            </div>
+            
+            <div id="products-view" class="hidden">
+                <button onclick="renderHome()" class="mb-4 text-gray-500 font-bold">→ رجوع</button>
+                <div id="grid-container" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="product-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="absolute bottom-0 md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-full md:w-[450px] bg-white rounded-t-[2rem] md:rounded-[2rem] shadow-2xl overflow-hidden transition-transform duration-300 translate-y-full md:translate-y-0" id="modal-content">
+            <div class="relative h-64 bg-gray-50">
+                <button onclick="closeModal()" class="absolute top-4 left-4 z-10 w-8 h-8 bg-white rounded-full font-bold">✕</button>
+                <img id="modal-img" class="w-full h-full object-cover mix-blend-multiply p-6">
+            </div>
+            <div class="p-6 space-y-4">
+                <h3 id="modal-name" class="text-2xl font-black text-gray-800"></h3>
+                <p id="modal-price" class="text-xl font-bold text-[#4b5f28]"></p>
+                <div><p class="text-xs font-bold text-gray-400 mb-2">اللون</p><div id="modal-colors" class="flex gap-2"></div></div>
+                <div><p class="text-xs font-bold text-gray-400 mb-2">المقاس</p><div id="modal-sizes" class="flex gap-2"></div></div>
+                <button onclick="addToCartLogic()" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold shadow-lg mt-4">إضافة للسلة 🛒</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-modal" class="fixed inset-0 z-[110] hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCart()"></div>
+        <div class="absolute right-0 top-0 h-full w-full md:w-[450px] bg-white shadow-2xl flex flex-col transition-transform duration-300 translate-x-full" id="cart-content">
+            <div class="p-5 border-b flex justify-between items-center bg-gray-50">
+                <h2 class="text-xl font-black text-gray-800">إتمام الطلب 🚀</h2>
+                <button onclick="closeCart()" class="w-8 h-8 rounded-full hover:bg-red-50 text-red-500">✕</button>
+            </div>
+            
+            <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
+            
+            <div class="p-6 bg-white border-t shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+                <div class="flex justify-between font-bold text-lg mb-4">
                     <span>الإجمالي:</span>
                     <span id="cart-total" class="text-[#4b5f28]">0 ج.م</span>
                 </div>
-                
-                <div class="space-y-2">
-                    <input type="text" id="cust-name" placeholder="الاسم ثلاثي" class="w-full p-3 rounded-xl border border-gray-200 focus:border-[#4b5f28] outline-none text-sm">
-                    <input type="tel" id="cust-phone" placeholder="رقم الهاتف" class="w-full p-3 rounded-xl border border-gray-200 focus:border-[#4b5f28] outline-none text-sm">
-                    <input type="text" id="cust-address" placeholder="العنوان بالتفصيل" class="w-full p-3 rounded-xl border border-gray-200 focus:border-[#4b5f28] outline-none text-sm">
+
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-4 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <p class="text-xs font-bold text-[#4b5f28] uppercase">بيانات التوصيل (قابلة للتعديل)</p>
+                    </div>
+                    <input id="checkout-name" class="w-full bg-white border border-gray-200 p-2 rounded-lg text-sm font-bold text-gray-700 focus:border-[#4b5f28] outline-none" placeholder="الاسم">
+                    <input id="checkout-phone" class="w-full bg-white border border-gray-200 p-2 rounded-lg text-sm font-bold text-gray-700 focus:border-[#4b5f28] outline-none" placeholder="الهاتف">
+                    <textarea id="checkout-address" class="w-full bg-white border border-gray-200 p-2 rounded-lg text-sm font-bold text-gray-700 focus:border-[#4b5f28] outline-none resize-none" rows="2" placeholder="العنوان"></textarea>
                 </div>
                 
-                <button onclick="checkout()" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl transition hover:-translate-y-1">
-                    تأكيد الطلب (واتساب)
+                <button onclick="checkout()" class="w-full bg-[#4b5f28] text-white py-4 rounded-xl font-bold shadow-xl hover:bg-[#3a4a1f] transition flex items-center justify-center gap-2">
+                    <span>تأكيد الطلب نهائياً</span>
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.506-.669-.514-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="toast-container" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[100]"></div>
+    <div id="toast-container" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"></div>
 
     <script type="module" src="main.js"></script>
 </body>
