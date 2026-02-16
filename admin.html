@@ -1,27 +1,28 @@
-<!doctype html>
-<html lang="ar" dir="rtl" class="h-full">
- <head>
-  <meta charset="UTF-8">
-  <title>لوحة التحكم - تعديل المخزون</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Cairo', sans-serif; background-color: #f3f4f6; }
-    .tab { cursor: pointer; padding: 12px; border-bottom: 3px solid transparent; font-weight: bold; color: #888; transition: 0.3s; }
-    .tab.active { border-color: #4b5f28; color: #4b5f28; background: #e8f5e9; }
-    .size-checkbox:checked + div { background-color: #4b5f28; color: white; border-color: #4b5f28; transform: scale(1.05); }
-    .color-btn.active { ring: 4px solid #c5a059; transform: scale(1.1); }
-    .loader { border-top-color: #4b5f28; animation: spinner 1s linear infinite; }
-    @keyframes spinner { 100% { transform: rotate(360deg); } }
-  </style>
- </head>
- <body class="bg-gray-100 min-h-screen pb-20">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | أحمد الشيخ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; background: #f3f4f6; }
+        .tab { cursor: pointer; padding: 12px; border-bottom: 3px solid transparent; font-weight: bold; color: #888; transition: 0.3s; }
+        .tab.active { border-color: #4b5f28; color: #4b5f28; background: #e8f5e9; }
+        .size-checkbox:checked + div { background-color: #4b5f28; color: white; border-color: #4b5f28; transform: scale(1.05); }
+        .color-btn.active { ring: 4px solid #c5a059; transform: scale(1.1); }
+        .loader { border-top-color: #4b5f28; animation: spinner 1s linear infinite; }
+        @keyframes spinner { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-20">
 
     <div id="dashboard" class="max-w-6xl mx-auto p-4">
         <header class="flex flex-wrap justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm">
             <div>
                 <h1 class="text-2xl font-black text-[#4b5f28]">لوحة التحكم ⚙️</h1>
-                <p class="text-xs text-gray-500 font-bold">إدارة المنتجات والمخزون</p>
+                <p class="text-xs text-gray-500 font-bold">إدارة المنتجات والطلبات</p>
             </div>
             <div class="flex gap-2">
                 <a href="index.html" target="_blank" class="px-4 py-2 bg-gray-100 rounded-lg font-bold text-sm hover:bg-gray-200">المتجر 👁️</a>
@@ -32,33 +33,35 @@
         <div class="flex border-b border-gray-200 mb-6 bg-white rounded-t-xl overflow-hidden">
             <button onclick="window.switchTab('orders')" id="tab-orders" class="tab active flex-1">🛒 الطلبات</button>
             <button onclick="window.switchTab('archive')" id="tab-archive" class="tab flex-1">🗄️ الأرشيف</button>
-            <button onclick="window.switchTab('products')" id="tab-products" class="tab flex-1">📦 المنتجات (تعديل)</button>
+            <button onclick="window.switchTab('products')" id="tab-products" class="tab flex-1">📦 المنتجات</button>
             <button onclick="window.switchTab('banners')" id="tab-banners" class="tab flex-1">🖼️ العروض</button>
         </div>
 
         <div id="sec-orders">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-xl text-gray-800">إدارة الطلبات النشطة</h3>
+                <h3 class="font-bold text-xl text-gray-800">الطلبات النشطة</h3>
                 <span id="orders-badge" class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold">0 طلب</span>
             </div>
-            <div id="orders-list" class="space-y-4 text-center text-gray-500">جاري التحميل...</div>
+            <div id="orders-list" class="space-y-4">
+                <p class="text-center text-gray-500 py-10">جاري التحميل...</p>
+            </div>
         </div>
 
         <div id="sec-archive" class="hidden">
             <h3 class="font-bold text-xl text-gray-600 mb-4">سجل الطلبات المنتهية</h3>
-            <div id="archive-list" class="space-y-4 opacity-75 text-center text-gray-500">جاري التحميل...</div>
+            <div id="archive-list" class="space-y-4 opacity-75"></div>
         </div>
 
         <div id="sec-products" class="hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 <div class="lg:col-span-2 space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-gray-800 mb-4">إضافة منتج جديد</h3>
+                        <h3 class="font-bold text-gray-800 mb-4">1. بيانات المنتج</h3>
                         <div class="flex gap-4 mb-4">
                             <input id="prod-name" class="w-full p-3 border rounded-xl" placeholder="اسم الموديل">
                             <input id="prod-price" type="number" class="w-full p-3 border rounded-xl" placeholder="السعر">
                         </div>
-                        <input id="prod-old-price" type="number" class="w-full p-3 border rounded-xl bg-red-50 border-red-100 text-red-500 mb-4" placeholder="السعر القديم (اختياري للخصم)">
+                        <input id="prod-old-price" type="number" class="w-full p-3 border rounded-xl bg-red-50 border-red-100 text-red-500 mb-4" placeholder="السعر القديم (لعرض الخصم)">
                         <select id="prod-cat" onchange="window.updateSizeGrid()" class="w-full p-3 border rounded-xl bg-gray-50 cursor-pointer">
                             <option value="رجالي">رجالي (41-49)</option>
                             <option value="حريمي">حريمي (37-41)</option>
@@ -67,7 +70,7 @@
                     </div>
 
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-gray-800 mb-4">تحديد الألوان والمقاسات</h3>
+                        <h3 class="font-bold text-gray-800 mb-4">2. الألوان والمقاسات</h3>
                         <div class="flex flex-wrap gap-2 mb-4" id="color-palette">
                             <button onclick="window.activateColor('أسود')" class="color-btn w-8 h-8 rounded-full bg-black shadow-md"></button>
                             <button onclick="window.activateColor('أبيض')" class="color-btn w-8 h-8 rounded-full bg-white border border-gray-300 shadow-md"></button>
@@ -86,7 +89,7 @@
 
                 <div class="space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-gray-800 mb-4">الصور</h3>
+                        <h3 class="font-bold text-gray-800 mb-4">3. الصور</h3>
                         <div class="border-2 border-dashed border-[#4b5f28] bg-green-50 p-6 rounded-xl text-center cursor-pointer hover:bg-green-100" onclick="document.getElementById('img-file').click()">
                             <input type="file" id="img-file" hidden multiple onchange="window.handleImg(this)">
                             <span class="text-[#4b5f28] font-bold">اضغط لرفع صور</span>
@@ -111,7 +114,7 @@
         </div>
     </div>
 
-    <div id="edit-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+    <div id="edit-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
                 <h3 class="font-bold text-lg text-gray-800">تعديل المنتج</h3>
@@ -131,10 +134,8 @@
                 </div>
 
                 <div class="border-t pt-4">
-                    <p class="font-bold text-gray-700 mb-2">📦 المخزون (اضغط على المقاس لحذفه)</p>
-                    <div id="edit-colors-list" class="space-y-3">
-                        </div>
-                    <p class="text-[10px] text-gray-400 mt-2">* لإضافة مقاسات جديدة، يفضل حذف المنتج وإضافته من جديد أو استخدام لوحة قاعدة البيانات المتقدمة.</p>
+                    <p class="font-bold text-gray-700 mb-2">📦 المخزون (اضغط لحذف المقاس)</p>
+                    <div id="edit-colors-list" class="space-y-3"></div>
                 </div>
             </div>
 
@@ -153,11 +154,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // State
         window.tempImages = []; window.stockData = {}; window.activeColor = null; window.allOrders = []; window.archivedOrders = [];
         const RANGES = { 'رجالي': {min: 41, max: 49}, 'حريمي': {min: 37, max: 41}, 'أطفالي': {min: 17, max: 32} };
         
-        // Variables for Editing
+        // متغيرات التعديل
+        window.allProductsData = [];
         window.currentEditId = null;
         window.currentEditColors = [];
 
@@ -179,27 +180,26 @@
                 renderOrders(window.archivedOrders, 'archive-list', true);
             });
 
-            // Products (List for Editing)
+            // Products (عرض المنتجات كـ كروت Grid)
             onSnapshot(query(collection(db, "products"), orderBy("timestamp", "desc")), (snap) => {
-                document.getElementById('products-list').innerHTML = snap.docs.map(d => {
-                    const p = d.data();
+                window.allProductsData = snap.docs.map(d => ({id: d.id, ...d.data()})); // تخزين البيانات للتعديل
+                
+                document.getElementById('products-list').innerHTML = window.allProductsData.map(p => {
                     const stockSummary = p.colors ? p.colors.map(c => `${c.name}: ${c.sizes.length}`).join(' | ') : 'لا يوجد مخزون';
                     return `
-                    <div class="bg-white p-3 rounded-xl border flex items-center gap-3 relative group">
-                        <img src="${(p.images||[])[0]}" class="w-16 h-16 rounded object-cover">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-sm text-gray-800">${p.name}</h4>
-                            <p class="text-xs text-[#4b5f28] font-bold">${p.price} ج.م</p>
-                            <p class="text-[10px] text-gray-400 mt-1">${stockSummary}</p>
+                    <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3 relative group hover:border-[#4b5f28] transition">
+                        <img src="${(p.images||[])[0]}" class="w-20 h-20 rounded-lg object-cover bg-gray-100">
+                        <div class="flex-1 overflow-hidden">
+                            <h4 class="font-bold text-gray-800 truncate">${p.name}</h4>
+                            <p class="text-sm text-[#4b5f28] font-black">${p.price} ج.م</p>
+                            <p class="text-[10px] text-gray-400 mt-1 truncate">${stockSummary}</p>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="window.openEditModal('${d.id}', '${p.name}', '${p.price}')" class="bg-blue-50 text-blue-600 px-3 py-1 rounded text-xs font-bold hover:bg-blue-100">تعديل</button>
-                            <button onclick="window.delDoc('products','${d.id}')" class="bg-red-50 text-red-500 px-3 py-1 rounded text-xs font-bold hover:bg-red-100">حذف</button>
+                        <div class="flex flex-col gap-2">
+                            <button onclick="window.openEditModal('${p.id}')" class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-100 border border-blue-100">تعديل ✏️</button>
+                            <button onclick="window.delDoc('products','${p.id}')" class="bg-red-50 text-red-500 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-100 border border-red-100">حذف 🗑️</button>
                         </div>
                     </div>`;
                 }).join('');
-                // Store products for edit access
-                window.allProductsData = snap.docs.map(d => ({id: d.id, ...d.data()}));
             });
 
             // Banners
@@ -208,16 +208,16 @@
             });
         }
 
-        // --- EDIT LOGIC (التعديل) ---
-        window.openEditModal = (id, name, price) => {
-            const product = window.allProductsData.find(p => p.id === id);
-            if(!product) return;
+        // --- وظائف التعديل (EDIT) ---
+        window.openEditModal = (id) => {
+            const p = window.allProductsData.find(x => x.id === id);
+            if(!p) return;
 
             window.currentEditId = id;
-            window.currentEditColors = JSON.parse(JSON.stringify(product.colors || [])); // Deep copy
+            window.currentEditColors = JSON.parse(JSON.stringify(p.colors || [])); // Copy
 
-            document.getElementById('edit-prod-name').value = name;
-            document.getElementById('edit-prod-price').value = price;
+            document.getElementById('edit-prod-name').value = p.name;
+            document.getElementById('edit-prod-price').value = p.price;
             
             renderEditColors();
             document.getElementById('edit-modal').classList.remove('hidden');
@@ -226,41 +226,35 @@
         window.renderEditColors = () => {
             const container = document.getElementById('edit-colors-list');
             if(window.currentEditColors.length === 0) {
-                container.innerHTML = '<p class="text-xs text-red-500">لا توجد ألوان. المنتج غير متاح.</p>';
+                container.innerHTML = '<p class="text-xs text-red-500">لا توجد ألوان.</p>';
                 return;
             }
-
-            container.innerHTML = window.currentEditColors.map((color, colorIdx) => `
-                <div class="border rounded-lg p-3 bg-white">
+            container.innerHTML = window.currentEditColors.map((color, cIdx) => `
+                <div class="border rounded-lg p-3 bg-white mb-2">
                     <div class="flex justify-between mb-2">
                         <span class="font-bold text-sm text-gray-700">${color.name}</span>
-                        <button onclick="window.removeColorFromEdit(${colorIdx})" class="text-red-500 text-xs hover:underline">حذف اللون بالكامل</button>
+                        <button onclick="window.removeColorFromEdit(${cIdx})" class="text-red-500 text-xs hover:underline">حذف اللون</button>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        ${color.sizes.map((size, sizeIdx) => `
-                            <button onclick="window.removeSizeFromEdit(${colorIdx}, ${sizeIdx})" class="px-2 py-1 bg-green-50 border border-green-200 text-green-700 text-xs rounded hover:bg-red-100 hover:text-red-600 hover:border-red-200 transition" title="اضغط للحذف">
-                                ${size} ✕
-                            </button>
+                        ${color.sizes.map((size, sIdx) => `
+                            <button onclick="window.removeSizeFromEdit(${cIdx}, ${sIdx})" class="px-2 py-1 bg-green-50 border border-green-200 text-green-700 text-xs rounded hover:bg-red-100 hover:text-red-600 hover:border-red-200 transition" title="حذف المقاس">${size} ✕</button>
                         `).join('')}
                     </div>
                 </div>
             `).join('');
         };
 
-        window.removeSizeFromEdit = (colorIdx, sizeIdx) => {
+        window.removeSizeFromEdit = (cIdx, sIdx) => {
             if(confirm('حذف هذا المقاس؟')) {
-                window.currentEditColors[colorIdx].sizes.splice(sizeIdx, 1);
-                // If no sizes left, remove color
-                if(window.currentEditColors[colorIdx].sizes.length === 0) {
-                    window.currentEditColors.splice(colorIdx, 1);
-                }
+                window.currentEditColors[cIdx].sizes.splice(sIdx, 1);
+                if(window.currentEditColors[cIdx].sizes.length === 0) window.currentEditColors.splice(cIdx, 1);
                 renderEditColors();
             }
         };
 
-        window.removeColorFromEdit = (colorIdx) => {
-            if(confirm('حذف اللون بكل مقاساته؟')) {
-                window.currentEditColors.splice(colorIdx, 1);
+        window.removeColorFromEdit = (cIdx) => {
+            if(confirm('حذف اللون بالكامل؟')) {
+                window.currentEditColors.splice(cIdx, 1);
                 renderEditColors();
             }
         };
@@ -268,39 +262,29 @@
         window.saveProductEdits = async () => {
             const btn = document.getElementById('save-edit-btn');
             btn.disabled = true; btn.innerText = "جاري الحفظ...";
-            
             try {
-                const name = document.getElementById('edit-prod-name').value;
-                const price = document.getElementById('edit-prod-price').value;
-                
                 await updateDoc(doc(db, "products", window.currentEditId), {
-                    name: name,
-                    price: Number(price),
+                    name: document.getElementById('edit-prod-name').value,
+                    price: Number(document.getElementById('edit-prod-price').value),
                     colors: window.currentEditColors
                 });
-                
-                alert('تم التعديل بنجاح ✅');
+                alert('تم التعديل ✅');
                 window.closeEditModal();
-            } catch(e) {
-                alert('خطأ: ' + e.message);
-            }
+            } catch(e) { alert('خطأ: ' + e.message); }
             btn.disabled = false; btn.innerText = "حفظ التعديلات";
         };
 
         window.closeEditModal = () => document.getElementById('edit-modal').classList.add('hidden');
 
-        // --- Standard Functions ---
+        // --- باقي الوظائف (إضافة، حذف، طلبات) ---
         function renderOrders(orders, containerId, isArchive) {
             const list = document.getElementById(containerId);
             if(!orders.length) { list.innerHTML = '<p class="text-center text-gray-400 py-10">فارغ</p>'; return; }
             const statusText = { 'new': '⏳ مراجعة', 'processing': '⚙️ تجهيز', 'shipped': '🚚 توصيل', 'completed': '✅ استلام', 'cancelled': '❌ ملغي' };
-            
             list.innerHTML = orders.map(o => {
                 const st = o.status || 'new';
                 const itemsHtml = (o.items && o.items.length) ? o.items.map(i => `<div>- ${i.productName} (${i.color}/${i.size}) x${i.qty}</div>`).join('') : `<div>- ${o.productName}</div>`;
-                const controls = isArchive ? 
-                    `<button onclick="window.delDoc('orders','${o.id}')" class="w-full py-2 bg-red-100 text-red-600 font-bold rounded text-sm hover:bg-red-200">حذف نهائي 🗑️</button>` :
-                    `<div class="flex gap-2 items-center bg-gray-50 p-2 rounded"><select onchange="window.updateStatus('${o.id}', this.value)" class="p-1 rounded text-sm flex-1 border outline-none font-bold"><option value="new" ${st=='new'?'selected':''}>⏳ مراجعة</option><option value="processing" ${st=='processing'?'selected':''}>⚙️ تجهيز</option><option value="shipped" ${st=='shipped'?'selected':''}>🚚 توصيل</option><option value="completed" ${st=='completed'?'selected':''}>✅ تسليم (أرشفة)</option><option value="cancelled" ${st=='cancelled'?'selected':''}>❌ إلغاء (أرشفة)</option></select><a href="https://wa.me/20${o.customerPhone}?text=مرحباً ${o.customerName}.." target="_blank" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold">واتساب</a></div>`;
+                const controls = isArchive ? `<button onclick="window.delDoc('orders','${o.id}')" class="w-full py-2 bg-red-100 text-red-600 font-bold rounded text-sm hover:bg-red-200">حذف نهائي 🗑️</button>` : `<div class="flex gap-2 items-center bg-gray-50 p-2 rounded"><select onchange="window.updateStatus('${o.id}', this.value)" class="p-1 rounded text-sm flex-1 border outline-none font-bold"><option value="new" ${st=='new'?'selected':''}>⏳ مراجعة</option><option value="processing" ${st=='processing'?'selected':''}>⚙️ تجهيز</option><option value="shipped" ${st=='shipped'?'selected':''}>🚚 توصيل</option><option value="completed" ${st=='completed'?'selected':''}>✅ تسليم (أرشفة)</option><option value="cancelled" ${st=='cancelled'?'selected':''}>❌ إلغاء (أرشفة)</option></select><a href="https://wa.me/20${o.customerPhone}?text=مرحباً ${o.customerName}.." target="_blank" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold">واتساب</a></div>`;
                 return `<div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-right"><div class="flex justify-between border-b pb-2 mb-2"><span class="font-bold">#${o.id.slice(0,5)}</span><span class="text-xs font-bold text-gray-500">${statusText[st]}</span></div><div class="text-sm space-y-1 mb-3"><p class="font-bold">${o.customerName}</p><p class="text-blue-600 font-bold">${o.customerPhone}</p><p>${o.customerAddress}</p><div class="bg-gray-50 p-2 border rounded mt-2">${itemsHtml}</div><p class="font-black text-[#4b5f28] pt-1">${o.total} ج.م</p></div>${controls}</div>`;
             }).join('');
         }
